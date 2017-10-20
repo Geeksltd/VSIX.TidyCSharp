@@ -1,0 +1,40 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Geeks.GeeksProductivityTools.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ExcludeResources" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="TrackItemInSolutionExplorer" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ResourceFileTypes" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.gif;.jpg;.png;.bmp;.resx;.ico;.bat;.tif;.psd;.sln;.suo;.csproj;.user;.cd;.lic;_reset.css;.html;.jsm;.map;.cache;vsdoc;.dat;.force;.map;.md;.rtf;.tmp</Value>
+    </Setting>
+    <Setting Name="ExcludedDirectories" Type="System.String" Scope="User">
+      <Value Profile="(Default)">@Temp\Validation;@CuteSoft;@Coder.Meta;.svn;node_modules;bower_components;public;obj
+</Value>
+    </Setting>
+    <Setting Name="ShowMethodParameters" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ShowMethods" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ShowMethodReturnTypes" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ShowClassNames" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ShowProperties" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="RemoteMachines" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="CleanupChoices" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+  </Settings>
+</SettingsFile>
