@@ -1,6 +1,6 @@
 using EnvDTE;
 using Geeks.GeeksProductivityTools.Definition;
-using Geeks.GeeksTidyCSharp;
+using Geeks.VSIX.TidyCSharp;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {

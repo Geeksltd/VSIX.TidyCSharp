@@ -4,7 +4,6 @@ namespace Geeks.GeeksProductivityTools.Utils
     {
         public static void GeeksProductivityToolsProcess()
         {
-            return;
             var visualStudioProcesses = System.Diagnostics.Process.GetProcessesByName("devenv");
             foreach (var process in visualStudioProcesses)
             {

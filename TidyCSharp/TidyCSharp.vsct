@@ -8,7 +8,6 @@
   <Commands package="guidGeeksProductivityToolsPkg">
 
     <Groups>
-      <!--Clean-up-->
       <Group guid="GuidCleanupCmdSet" id="CleanupContextMenuGroup" priority="0x0000">
         <Parent guid="guidSolutionExplorerMenu" id="menuidSolutionExplorerItemMenu" />
       </Group>
@@ -16,8 +15,6 @@
         <Parent guid="GuidCleanupCmdSet" id="CustomCleanUpCommand" />
       </Group>
     </Groups>
-    <!--/Clean-up-->
-
     <Buttons>
       <Button guid="GuidCleanupCmdSet" id="CustomCleanUpCommand" priority="0x0100" type="Button">
         <Parent guid="GuidCleanupCmdSet" id="CleanupContextMenuGroup" />
@@ -26,7 +23,6 @@
           <ButtonText>Clean up C#...</ButtonText>
         </Strings>
       </Button>
-      
     </Buttons>
   </Commands>
   <CommandPlacements>
@@ -55,7 +51,6 @@
       <Parent guid="guidSolutionExplorerMenu" id="menuidSolutionExplorerAppDesignerFolderMenu" />
     </CommandPlacement>
     
-    
     <CommandPlacement guid="GuidCleanupCmdSet" id="CleanupContextMenuGroup" priority="0x0000">
       <Parent guid="guidSolutionExplorerMenu" id="menuidCodeWindowContextMenu" />
     </CommandPlacement>
@@ -66,14 +61,12 @@
 
   <Symbols>
     <GuidSymbol name="guidGeeksProductivityToolsPkg" value="{c6176957-c61c-4beb-8dd8-e7c0170b0bf3}" />
-    <!--Clean-up-->
     
     <GuidSymbol name="GuidCleanupCmdSet" value="{53366ba1-1788-42c8-922a-034d6dc89b12}">
       <IDSymbol name="CleanupContextMenuGroup" value="0x1020" />
       <IDSymbol name="MySubMenuGroup" value="0x0137" />
       <IDSymbol name="CustomCleanUpCommand" value="0x0138" />
     </GuidSymbol>
-
     <GuidSymbol name="guidVSPackage1CmdSet" value="{cf31800b-e941-4f53-891d-65b895fa033a}">
       <IDSymbol name="CleanupContextMenuGroup" value="0x1020" />
     </GuidSymbol>
@@ -90,8 +83,5 @@
       <IDSymbol name="menuidCodeWindowContextMenu" value="1037" />
       <IDSymbol name="menuidEasyMdiContextMenu" value="1067" />
     </GuidSymbol>
-
-    <!--/Clean-up-->
-
   </Symbols>
 </CommandTable>

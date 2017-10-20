@@ -4,7 +4,7 @@ using Geeks.GeeksProductivityTools.Definition;
 using Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp;
 using Geeks.GeeksProductivityTools.Utility;
 using Microsoft.VisualStudio.Shell;
-using Geeks.GeeksTidyCSharp;
+using Geeks.VSIX.TidyCSharp;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {

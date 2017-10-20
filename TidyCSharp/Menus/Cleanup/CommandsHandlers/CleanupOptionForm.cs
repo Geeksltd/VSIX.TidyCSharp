@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Geeks.GeeksProductivityTools.Definition;
-using Geeks.GeeksTidyCSharp.Properties;
+using Geeks.VSIX.TidyCSharp.Properties;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
 {

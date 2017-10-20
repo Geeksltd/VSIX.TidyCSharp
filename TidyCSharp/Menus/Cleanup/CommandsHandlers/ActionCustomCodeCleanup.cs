@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.Shell;
 using Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra;
 using System.Windows.Forms;
 using Geeks.GeeksProductivityTools.Utility;
-using Geeks.GeeksTidyCSharp;
+using Geeks.VSIX.TidyCSharp;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
