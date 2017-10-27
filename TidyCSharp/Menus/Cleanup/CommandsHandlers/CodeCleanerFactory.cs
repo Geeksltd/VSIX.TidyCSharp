@@ -1,4 +1,5 @@
 using Geeks.GeeksProductivityTools.Definition;
+using Geeks.VSIX.TidyCSharp.Cleanup;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {

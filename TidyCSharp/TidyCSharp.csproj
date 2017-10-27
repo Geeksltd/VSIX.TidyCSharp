@@ -340,6 +340,10 @@
     <Compile Include="Menus\Cleanup\CommandRunners\ConvertMembersToExpressionBodied.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\SimplifyClassFieldDeclarations.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\CompactSmallIfElseStatements.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\BlockRewriter.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\CSharpSyntaxRewriterBase.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\WhiteSpaceNormalizerOptions.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\WhitespaceRewriter.cs" />
     <Compile Include="Menus\Cleanup\CommandsHandlers\ActionCustomCodeCleanup.cs" />
     <Compile Include="Menus\Cleanup\CommandsHandlers\CleanupOptionForm.cs">
       <SubType>Form</SubType>
@@ -352,7 +356,7 @@
     <Compile Include="Menus\Cleanup\Utils\ActiveDocument.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Infra\CodeCleaner.cs" />
     <Compile Include="Definition\CodeCleanerType.cs" />
-    <Compile Include="Menus\Cleanup\Utils\CodeCleanerFactory.cs" />
+    <Compile Include="Menus\Cleanup\CommandsHandlers\CodeCleanerFactory.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Infra\CodeCleanerHost.cs" />
     <Compile Include="Menus\Cleanup\TokenRemovers\FieldTokenRemover.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Infra\ICodeCleaner.cs" />
@@ -383,7 +387,7 @@
     <Compile Include="Menus\Cleanup\SyntaxNodeExtractors\NestedClassExtractor.cs" />
     <Compile Include="Menus\Cleanup\SyntaxNodeExtractors\MethodExtractor.cs" />
     <Compile Include="Menus\Cleanup\SyntaxNodeExtractors\PropertyExtractor.cs" />
-    <Compile Include="Menus\Cleanup\CommandRunners\WhiteSpaceNormalizer.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\WhiteSpaceNormalizer.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\PrivateModifierRemover.cs" />
     <Compile Include="Extensions\DteExtensions.cs" />
     <Compile Include="Environment\ErrorList.cs" />

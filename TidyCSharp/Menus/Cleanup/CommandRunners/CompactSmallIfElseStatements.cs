@@ -1,12 +1,14 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
+using Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace;
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using Geeks.GeeksProductivityTools;
 
-namespace Geeks.GeeksProductivityTools.Menus.Cleanup
+namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class CompactSmallIfElseStatements : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
@@ -22,7 +24,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             if (newRoot != initialSourceNode && GeeksProductivityToolsPackage.Instance != null)
             {
                 initialSourceNode = Formatter.Format(initialSourceNode, GeeksProductivityToolsPackage.Instance.CleanupWorkingSolution.Workspace);
-            }                           
+            }
             return initialSourceNode;
         }
 
@@ -172,7 +174,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 if (block.HasNoneWhitespaceTrivia()) return null;
                 var firstStatement = block.Statements.First();
                 if (firstStatement is IfStatementSyntax) return firstStatement;
-                if (firstStatement.Span.Length <= WhiteSpaceNormalizer.BLOCK_SINGLE_STATEMENT_MAX_LENGTH) return firstStatement;
+                if (firstStatement.Span.Length <= WhiteSpaceNormalizerOptions.BLOCK_SINGLE_STATEMENT_MAX_LENGTH) return firstStatement;
                 return null;
             }
 
