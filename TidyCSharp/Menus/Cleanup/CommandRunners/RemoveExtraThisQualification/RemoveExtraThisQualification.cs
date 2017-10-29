@@ -3,10 +3,9 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.CSharp;
-using System;
-using Microsoft.CodeAnalysis.Rename;
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
 
-namespace Geeks.GeeksProductivityTools.Menus.Cleanup
+namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class RemoveExtraThisQualification : CodeCleanerCommandRunnerBase, ICodeCleaner
     {

@@ -4,7 +4,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
-using Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.GeeksProductivityTools;
 
@@ -174,7 +173,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 if (block.HasNoneWhitespaceTrivia()) return null;
                 var firstStatement = block.Statements.First();
                 if (firstStatement is IfStatementSyntax) return firstStatement;
-                if (firstStatement.Span.Length <= Options.BLOCK_SINGLE_STATEMENT_MAX_LENGTH) return firstStatement;
+                if (firstStatement.Span.Length <= NormalizeWhitespace.Options.BLOCK_SINGLE_STATEMENT_MAX_LENGTH) return firstStatement;
                 return null;
             }
 

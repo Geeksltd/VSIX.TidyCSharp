@@ -15,28 +15,28 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         [CleanupItem(Title = "Remove and Sort Using Directives")]
         OrganizeUsingDirectives = 0x04,
 
-        [CleanupItem(Title = "Small methods properties -> Expression bodied")]
+        [CleanupItem(Title = "Small methods properties -> Expression bodied", SubItemType = typeof(SimplifyClassFieldDeclaration.CleanupTypes))]
         ConvertMembersToExpressionBodied = 0x08,
 
         [CleanupItem(Title = "Use C# alias type names (e.g. \"System.Int32\" -> \"int\")")]
         ConvertFullNameTypesToBuiltInTypes = 0x10,
 
         [CleanupItem(Title = "Simply async calls")]
-        SimplyAsyncCallsCommand = 0x20,
+        SimplyAsyncCalls = 0x20,
 
         [CleanupItem(Title = "Move constructors before methods")]
-        SortClassMembersCommand = 0x40,
+        SortClassMembers = 0x40,
 
-        [CleanupItem(Title = "Compact class field declarations")]
-        SimplifyClassFieldDeclarationsCommand = 0x80,
+        [CleanupItem(Title = "Compact class field declarations", SubItemType = typeof(SimplifyClassFieldDeclaration.CleanupTypes))]
+        SimplifyClassFieldDeclarations = 0x80,
 
         [CleanupItem(Title = "Remove unnecessary \"Attribute\" (e.g. [SomethingAttribute] -> [Something]")]
-        RemoveAttributeKeyworkCommand = 0x100,
+        RemoveAttributeKeywork = 0x100,
 
         [CleanupItem(Title = "Compact small if/else blocks")]
-        CompactSmallIfElseStatementsCommand = 0x200,
+        CompactSmallIfElseStatements = 0x200,
 
-        [CleanupItem(Title = "Remove unnecessary 'this.'")]
+        [CleanupItem(Title = "Remove unnecessary 'this.'", SubItemType = typeof(RemoveExtraThisKeyword.CleanupTypes))]
         RemoveExtraThisQualification = 0x400,
 
         [CleanupItem(Title = "Local variables -> camelCased")]

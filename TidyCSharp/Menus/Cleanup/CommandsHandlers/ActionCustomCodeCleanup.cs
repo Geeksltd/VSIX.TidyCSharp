@@ -25,7 +25,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             if (messageBoxResult != DialogResult.OK) return;
 
-            var dialogResult = CleanupOptionForm.Instance2.ShowDialog();
+            var dialogResult = CleanupOptionForm.Instance.ShowDialog();
 
             if (dialogResult == DialogResult.Cancel) return;
 

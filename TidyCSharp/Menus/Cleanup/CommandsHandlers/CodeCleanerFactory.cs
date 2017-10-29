@@ -16,15 +16,15 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                     return new ConvertMembersToExpressionBodied();
                 case CodeCleanerType.ConvertFullNameTypesToBuiltInTypes:
                     return new ConvertFullNameTypesToBuiltInTypes();
-                case CodeCleanerType.SortClassMembersCommand:
+                case CodeCleanerType.SortClassMembers:
                     return new SortClassMembers();
-                case CodeCleanerType.SimplyAsyncCallsCommand:
+                case CodeCleanerType.SimplyAsyncCalls:
                     return new SimplyAsyncCalls();
-                case CodeCleanerType.SimplifyClassFieldDeclarationsCommand:
+                case CodeCleanerType.SimplifyClassFieldDeclarations:
                     return new SimplifyClassFieldDeclarations();
-                case CodeCleanerType.RemoveAttributeKeyworkCommand:
+                case CodeCleanerType.RemoveAttributeKeywork:
                     return new RemoveAttributeKeywork();
-                case CodeCleanerType.CompactSmallIfElseStatementsCommand:
+                case CodeCleanerType.CompactSmallIfElseStatements:
                     return new CompactSmallIfElseStatements();
                 case CodeCleanerType.RemoveExtraThisQualification:
                     return new RemoveExtraThisQualification();

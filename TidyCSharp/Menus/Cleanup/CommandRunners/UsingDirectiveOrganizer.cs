@@ -3,8 +3,10 @@ using EnvDTE;
 using Geeks.GeeksProductivityTools.Definition;
 using Geeks.GeeksProductivityTools.Utils;
 using Microsoft.CodeAnalysis;
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using Geeks.GeeksProductivityTools;
 
-namespace Geeks.GeeksProductivityTools.Menus.Cleanup
+namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class UsingDirectiveOrganizer : CodeCleanerCommandRunnerBase, ICodeCleaner
     {

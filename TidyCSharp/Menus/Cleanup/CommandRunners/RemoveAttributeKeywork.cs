@@ -1,9 +1,10 @@
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 
-namespace Geeks.GeeksProductivityTools.Menus.Cleanup
+namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class RemoveAttributeKeywork : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
@@ -23,9 +24,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
         {
             public override SyntaxNode VisitAttribute(AttributeSyntax node)
             {
-                if(node.Name is IdentifierNameSyntax newNameNode)
+                if (node.Name is IdentifierNameSyntax newNameNode)
                 {
-                    if(newNameNode.Identifier.ValueText.EndsWith(Attribute_Keywork))
+                    if (newNameNode.Identifier.ValueText.EndsWith(Attribute_Keywork))
                     {
                         var newName = newNameNode.Identifier.ValueText.TrimEnd(Attribute_Keywork);
 

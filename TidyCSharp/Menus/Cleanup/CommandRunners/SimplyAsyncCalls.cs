@@ -1,14 +1,11 @@
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using EnvDTE;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Formatting;
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
 
-namespace Geeks.GeeksProductivityTools.Menus.Cleanup
+namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class SimplyAsyncCalls : CodeCleanerCommandRunnerBase, ICodeCleaner
     {

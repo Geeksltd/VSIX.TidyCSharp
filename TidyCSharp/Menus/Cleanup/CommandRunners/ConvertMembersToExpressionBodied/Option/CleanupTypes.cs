@@ -1,7 +1,7 @@
 ﻿using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using System;
 
-namespace Geeks.VSIX.TidyCSharp.Cleanup.RemovePrivateModifier
+namespace Geeks.VSIX.TidyCSharp.Cleanup.ConvertMembersToExpressionBodied2
 {
     [Flags]
     public enum CleanupTypes

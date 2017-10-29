@@ -1,14 +1,11 @@
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using EnvDTE;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
 
-namespace Geeks.GeeksProductivityTools.Menus.Cleanup
+namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class ConvertMembersToExpressionBodied : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
@@ -131,7 +128,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             if (setNode != null || getNode.Body == null) return propertyDeclaration;
             if (getNode.Body == null) return propertyDeclaration;
             if (getNode.Body.Statements.Count > 1) return propertyDeclaration;
-            if(getNode.Body.ContainsDirectives) return propertyDeclaration;
+            if (getNode.Body.ContainsDirectives) return propertyDeclaration;
 
             var returnStatements = getNode.Body.Statements.OfType<ReturnStatementSyntax>().ToList();
             if (returnStatements.Count() != 1) return propertyDeclaration;

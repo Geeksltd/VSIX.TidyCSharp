@@ -15,13 +15,13 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
         {
             Instance = new CleanupOptionForm();
         }
-        public static CleanupOptionForm Instance2
-        {
-            get
-            {
-                return new CleanupOptionForm();
-            }
-        }
+        //public static CleanupOptionForm Instance2
+        //{
+        //    get
+        //    {
+        //        return new CleanupOptionForm();
+        //    }
+        //}
         public static CleanupOptionForm Instance { get; set; }
         public CleanupOptions CleanupOptions { get; private set; }
 
@@ -61,6 +61,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             newSubControl.Init((CodeCleanerType)checkBoxItem.CleanerType);
 
             mainPanel.Controls.Add(newSubControl);
+            this.Height += newSubControl.Height;
         }
 
 

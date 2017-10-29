@@ -6,12 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Geeks.GeeksProductivityTools.Menus.Cleanup
+namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class SimplifyClassFieldDeclarations : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        const int MAX_FIELD_DECLARATION_LENGTH = 80;
-
         public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
         {
             return SimplifyClassFieldDeclarationsHelper(initialSourceNode);
@@ -89,7 +87,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                         .OfType<FieldDeclarationSyntax>()
                         .Where(fd => fd.AttributeLists.Any() == false)
                         .Where(fd => fd.HasStructuredTrivia == false)
-                        .Where(fd => fd.DescendantTrivia().Any(t=> t.IsKind(SyntaxKind.SingleLineCommentTrivia) || t.IsKind(SyntaxKind.MultiLineCommentTrivia))== false)
+                        .Where(fd => fd.DescendantTrivia().Any(t => t.IsKind(SyntaxKind.SingleLineCommentTrivia) || t.IsKind(SyntaxKind.MultiLineCommentTrivia)) == false)
                         .Where(fd => fd.Declaration.Variables.All(x => x.Initializer == null || x.Initializer.Value is LiteralExpressionSyntax))
                         .ToList();
 
@@ -143,7 +141,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                                 .WithVariables(SyntaxFactory.SeparatedList(finalList))
                         );
 
-                    if (newDelarationItem.Value.NewFieldDeclaration.Span.Length <= MAX_FIELD_DECLARATION_LENGTH)
+                    if (newDelarationItem.Value.NewFieldDeclaration.Span.Length <= SimplifyClassFieldDeclaration.Options.MAX_FIELD_DECLARATION_LENGTH)
                     {
                         newDeclarationDic.Add(newDelarationItem.Key, newDelarationItem.Value);
                     }

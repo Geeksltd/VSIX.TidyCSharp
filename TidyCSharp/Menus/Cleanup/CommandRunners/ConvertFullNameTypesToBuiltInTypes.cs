@@ -1,10 +1,9 @@
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using EnvDTE;
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
 
-namespace Geeks.GeeksProductivityTools.Menus.Cleanup
+namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class ConvertFullNameTypesToBuiltInTypes : CodeCleanerCommandRunnerBase, ICodeCleaner
     {

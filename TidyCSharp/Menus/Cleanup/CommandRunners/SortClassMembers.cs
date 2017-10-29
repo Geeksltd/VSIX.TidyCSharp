@@ -1,15 +1,10 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using EnvDTE;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Formatting;
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
 
-namespace Geeks.GeeksProductivityTools.Menus.Cleanup
+namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class SortClassMembers : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
@@ -39,7 +34,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                     .ReplaceNodes
                     (
                         classes,
-                        (oldNode1, oldNode2) => 
+                        (oldNode1, oldNode2) =>
                         {
                             var newClass = newClassesDic[oldNode1];
                             if (oldNode1 != newClass) return newClass;
@@ -72,7 +67,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 }
             }
 
-            if(constructorsToMoveList.Any())
+            if (constructorsToMoveList.Any())
             {
                 annotatedClassNode = annotatedClassNode.RemoveNodes(constructorsToMoveList, SyntaxRemoveOptions.KeepNoTrivia);
                 var annotatedMethod = annotatedClassNode.GetAnnotatedNodes(methodAnnotation).First();

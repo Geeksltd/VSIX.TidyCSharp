@@ -20,11 +20,11 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             var privateModifiersRemoverTask = Task.Run(() => Invoke(CodeCleanerType.PrivateAccessModifier));
             var membersToExpressionBodyTask = privateModifiersRemoverTask.ContinueWith(antecedentTask => Invoke(CodeCleanerType.ConvertMembersToExpressionBodied));
             var fullNameTypesToBuiltInTypesTask = membersToExpressionBodyTask.ContinueWith(antecedentTask => Invoke(CodeCleanerType.ConvertFullNameTypesToBuiltInTypes));
-            var simplyAsyncCallsCommandTask = fullNameTypesToBuiltInTypesTask.ContinueWith(antecedentTask => Invoke(CodeCleanerType.SimplyAsyncCallsCommand));
-            var sortClassMembersCommandTask = simplyAsyncCallsCommandTask.ContinueWith(antecedentTask => Invoke(CodeCleanerType.SortClassMembersCommand));
-            var simplifyClassFieldDeclarationsCommandTask = sortClassMembersCommandTask.ContinueWith(antecedentTask => Invoke(CodeCleanerType.SimplifyClassFieldDeclarationsCommand));
-            var RemoveAttributeKeyworkCommandTask = simplifyClassFieldDeclarationsCommandTask.ContinueWith(antecedentTask => Invoke(CodeCleanerType.RemoveAttributeKeyworkCommand));
-            var CompactSmallIfElseStatementsCommandTask = RemoveAttributeKeyworkCommandTask.ContinueWith(antecedentTask => Invoke(CodeCleanerType.CompactSmallIfElseStatementsCommand));
+            var simplyAsyncCallsCommandTask = fullNameTypesToBuiltInTypesTask.ContinueWith(antecedentTask => Invoke(CodeCleanerType.SimplyAsyncCalls));
+            var sortClassMembersCommandTask = simplyAsyncCallsCommandTask.ContinueWith(antecedentTask => Invoke(CodeCleanerType.SortClassMembers));
+            var simplifyClassFieldDeclarationsCommandTask = sortClassMembersCommandTask.ContinueWith(antecedentTask => Invoke(CodeCleanerType.SimplifyClassFieldDeclarations));
+            var RemoveAttributeKeyworkCommandTask = simplifyClassFieldDeclarationsCommandTask.ContinueWith(antecedentTask => Invoke(CodeCleanerType.RemoveAttributeKeywork));
+            var CompactSmallIfElseStatementsCommandTask = RemoveAttributeKeyworkCommandTask.ContinueWith(antecedentTask => Invoke(CodeCleanerType.CompactSmallIfElseStatements));
             var RemoveExtraThisQualificationCommandTask = CompactSmallIfElseStatementsCommandTask.ContinueWith(antecedentTask => Invoke(CodeCleanerType.RemoveExtraThisQualification));
             var CamelCasedLocalVariableTask = RemoveExtraThisQualificationCommandTask.ContinueWith(antecedentTask => Invoke(CodeCleanerType.CamelCasedLocalVariable));
             var CamelCasedFieldsTask = CamelCasedLocalVariableTask.ContinueWith(antecedentTask => Invoke(CodeCleanerType.CamelCasedFields));
