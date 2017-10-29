@@ -1,12 +1,13 @@
 using System;
 using Geeks.GeeksProductivityTools.Utils;
 using static Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp.CSharpActionDelegate;
+using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
 
 namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 {
     public class ActionCSharpOnSolution
     {
-        public static void Invoke(TargetAction action, Definition.CodeCleanerType[] type)
+        public static void Invoke(TargetAction action, CleanupOptions cleanupOptions)
         {
             try
             {
@@ -19,7 +20,7 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
                     if (currentProject.FullName.ToLower().EndsWith(".shproj")) continue;
 
                     for (var j = 1; j < currentProject.ProjectItems.Count; j++)
-                        ActionCSharpOnProjectItem.Action(currentProject.ProjectItems.Item(j), action, type);
+                        ActionCSharpOnProjectItem.Action(currentProject.ProjectItems.Item(j), action, cleanupOptions);
                 }
             }
             catch (Exception e)

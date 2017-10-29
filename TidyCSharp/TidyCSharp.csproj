@@ -332,6 +332,8 @@
     <Compile Include="Menus\Cleanup\CommandRunners\Infra\CleanerActionInvoker.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\ConvertFullNameTypesToBuiltInTypes.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Infra\CodeCleanerCommandRunnerBase.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\PrivateModifierRemover\Option\CleanupTypes.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\PrivateModifierRemover\Option\Options.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\RemoveAttributeKeywork.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\RemoveExtraThisQualification.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\SortClassMembers.cs" />
@@ -341,26 +343,37 @@
     <Compile Include="Menus\Cleanup\CommandRunners\SimplifyClassFieldDeclarations.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\CompactSmallIfElseStatements.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\BlockRewriter.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\Option\CleanupTypes.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\Infra\ICleanupOption.cs" />
+    <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\IMainCleanup.cs" />
+    <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\CleanupItemAttribute.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\CSharpSyntaxRewriterBase.cs" />
-    <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\WhiteSpaceNormalizerOptions.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\Option\Options.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\WhitespaceRewriter.cs" />
     <Compile Include="Menus\Cleanup\CommandsHandlers\ActionCustomCodeCleanup.cs" />
+    <Compile Include="Menus\Cleanup\CommandsHandlers\CleanupItemUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Menus\Cleanup\CommandsHandlers\CleanupItemUserControl.Designer.cs">
+      <DependentUpon>CleanupItemUserControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Menus\Cleanup\CommandsHandlers\CleanupOptionForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Menus\Cleanup\CommandsHandlers\CleanupOptionForm.Designer.cs">
       <DependentUpon>CleanupOptionForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Menus\Cleanup\CommandsHandlers\CleanupOptions.cs" />
     <Compile Include="Menus\Cleanup\Utils\RenameHelper\VariableRenamingBase.cs" />
-    <Compile Include="Menus\Cleanup\CommandsHandlers\ExtendedBaseCodeCleanupCommand.cs" />
+    <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\ExtendedBaseCodeCleanupCommand.cs" />
     <Compile Include="Menus\Cleanup\Utils\ActiveDocument.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Infra\CodeCleaner.cs" />
-    <Compile Include="Definition\CodeCleanerType.cs" />
+    <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\CodeCleanerType.cs" />
     <Compile Include="Menus\Cleanup\CommandsHandlers\CodeCleanerFactory.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Infra\CodeCleanerHost.cs" />
     <Compile Include="Menus\Cleanup\TokenRemovers\FieldTokenRemover.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Infra\ICodeCleaner.cs" />
-    <Compile Include="Menus\Cleanup\CommandsHandlers\BaseCodeCleanupCommand.cs" />
+    <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\BaseCodeCleanupCommand.cs" />
     <Compile Include="Menus\Cleanup\TokenRemovers\IPrivateModiferTokenRemover.cs" />
     <Compile Include="Menus\Cleanup\SyntaxNodeExtractors\ISyntaxTreeMemberExtractor.cs" />
     <Compile Include="Menus\Cleanup\TokenRemovers\MethodTokenRemover.cs" />
@@ -388,7 +401,7 @@
     <Compile Include="Menus\Cleanup\SyntaxNodeExtractors\MethodExtractor.cs" />
     <Compile Include="Menus\Cleanup\SyntaxNodeExtractors\PropertyExtractor.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\WhiteSpaceNormalizer.cs" />
-    <Compile Include="Menus\Cleanup\CommandRunners\PrivateModifierRemover.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\PrivateModifierRemover\PrivateModifierRemover.cs" />
     <Compile Include="Extensions\DteExtensions.cs" />
     <Compile Include="Environment\ErrorList.cs" />
     <Compile Include="ErrorNotification\ErrorNotification.cs" />
@@ -422,6 +435,9 @@
     <Compile Include="Utility\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Menus\Cleanup\CommandsHandlers\CleanupItemUserControl.resx">
+      <DependentUpon>CleanupItemUserControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Menus\Cleanup\CommandsHandlers\CleanupOptionForm.resx">
       <DependentUpon>CleanupOptionForm.cs</DependentUpon>
     </EmbeddedResource>

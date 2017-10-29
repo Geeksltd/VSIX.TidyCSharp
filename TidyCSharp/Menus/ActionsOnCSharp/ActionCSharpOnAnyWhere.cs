@@ -3,12 +3,13 @@ using EnvDTE;
 using Geeks.GeeksProductivityTools.Definition;
 using Geeks.GeeksProductivityTools.Utils;
 using static Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp.CSharpActionDelegate;
+using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
 
 namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 {
     public class ActionCSharpOnAnyWhere
     {
-        public static void Invoke(TargetAction action, Definition.CodeCleanerType[] type)
+        public static void Invoke(TargetAction action, CleanupOptions cleanupOptions)
         {
             try
             {
@@ -24,20 +25,20 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
                     {
                         if (selectedProjectItem.ProjectItems == null || selectedProjectItem.ProjectItems.Count == 0)
                         {
-                            action(selectedProjectItem, type, true);
+                            action(selectedProjectItem, cleanupOptions, true);
                         }
                         else
                         {
-                            ActionCSharpOnProjectItem.Action(selectedProjectItem, action, type);
+                            ActionCSharpOnProjectItem.Action(selectedProjectItem, action, cleanupOptions);
                         }
                     }
                     else if (selectItem.Project != null)
                     {
-                        ActionCSharpOnProject.Invoke(action, type);
+                        ActionCSharpOnProject.Invoke(action, cleanupOptions);
                     }
                     else
                     {
-                        ActionCSharpOnSolution.Invoke(action, type);
+                        ActionCSharpOnSolution.Invoke(action, cleanupOptions);
                     }
                 }
             }
@@ -48,12 +49,12 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
             }
         }
 
-        private static void DoActionForItems(ProjectItems projectItems, TargetAction action, CodeCleanerType[] type)
+        private static void DoActionForItems(ProjectItems projectItems, TargetAction action, CleanupOptions cleanupOptions)
         {
             for (int subItemIndex = 1; subItemIndex <= projectItems.Count; subItemIndex++)
             {
                 var subItem = projectItems.Item(subItemIndex);
-                ActionCSharpOnProjectItem.Action(subItem, action, type);
+                ActionCSharpOnProjectItem.Action(subItem, action, cleanupOptions);
             }
         }
     }

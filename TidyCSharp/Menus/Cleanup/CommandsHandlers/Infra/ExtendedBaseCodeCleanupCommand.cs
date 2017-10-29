@@ -1,10 +1,10 @@
 using System;
 using System.Windows.Forms;
-using Geeks.GeeksProductivityTools.Definition;
 using Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp;
 using Geeks.GeeksProductivityTools.Utility;
 using Microsoft.VisualStudio.Shell;
 using Geeks.VSIX.TidyCSharp;
+using Geeks.VSIX.TidyCSharp.Cleanup;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -12,7 +12,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
     {
         protected CodeCleanerType CleanerType { get; private set; }
 
-        protected ExtendedBaseCodeCleanupCommand(OleMenuCommandService menu, uint commandID, CodeCleanerType cleanerType) 
+        protected ExtendedBaseCodeCleanupCommand(OleMenuCommandService menu, uint commandID, CodeCleanerType cleanerType)
             : base(menu, commandID)
         {
             CleanerType = cleanerType;
@@ -35,7 +35,12 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             if (commandGuid == GuidList.GuidCleanupCmdSet)
             {
-                ActionCSharpOnAnyWhere.Invoke(desiredAction, new[] { CleanerType });
+                ActionCSharpOnAnyWhere.Invoke(desiredAction,
+                    new VSIX.TidyCSharp.Cleanup.CommandsHandlers.CleanupOptions
+                    {
+                        //ActionTypes = new[] { CleanerType }
+                    }
+                );
                 GeeksProductivityToolsPackage.Instance.SaveSolutionChanges();
             }
             else return;

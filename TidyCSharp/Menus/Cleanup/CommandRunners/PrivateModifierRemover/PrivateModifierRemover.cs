@@ -1,6 +1,7 @@
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Microsoft.CodeAnalysis;
 
-namespace Geeks.GeeksProductivityTools.Menus.Cleanup
+namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class PrivateModifierRemover : CodeCleanerCommandRunnerBase, ICodeCleaner
     {

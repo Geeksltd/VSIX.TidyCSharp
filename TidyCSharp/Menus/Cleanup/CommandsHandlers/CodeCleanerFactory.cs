@@ -1,16 +1,17 @@
-using Geeks.GeeksProductivityTools.Definition;
+using System;
 using Geeks.VSIX.TidyCSharp.Cleanup;
+using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
     public class CodeCleanerFactory
     {
-        public static ICodeCleaner Create(CodeCleanerType type)
+        public static ICodeCleaner Create(CodeCleanerType type, CleanupOptions cleanupOptions)
         {
             switch (type)
             {
                 case CodeCleanerType.NormalizeWhiteSpaces:
-                    return new WhiteSpaceNormalizer();
+                    return new WhiteSpaceNormalizer() { Options = cleanupOptions.WhiteSpaceNormalizer };
                 case CodeCleanerType.ConvertMembersToExpressionBodied:
                     return new ConvertMembersToExpressionBodied();
                 case CodeCleanerType.ConvertFullNameTypesToBuiltInTypes:

@@ -174,7 +174,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 if (block.HasNoneWhitespaceTrivia()) return null;
                 var firstStatement = block.Statements.First();
                 if (firstStatement is IfStatementSyntax) return firstStatement;
-                if (firstStatement.Span.Length <= WhiteSpaceNormalizerOptions.BLOCK_SINGLE_STATEMENT_MAX_LENGTH) return firstStatement;
+                if (firstStatement.Span.Length <= Options.BLOCK_SINGLE_STATEMENT_MAX_LENGTH) return firstStatement;
                 return null;
             }
 

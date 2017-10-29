@@ -2,8 +2,10 @@
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using Geeks.GeeksProductivityTools.Definition;
-using Geeks.VSIX.TidyCSharp.Properties;
+using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
+using static Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers.CleanupItemUserControl;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers;
+using Geeks.VSIX.TidyCSharp.Cleanup;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
 {
@@ -13,8 +15,15 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
         {
             Instance = new CleanupOptionForm();
         }
+        public static CleanupOptionForm Instance2
+        {
+            get
+            {
+                return new CleanupOptionForm();
+            }
+        }
         public static CleanupOptionForm Instance { get; set; }
-        public CodeCleanerType[] SelectedTypes { get; private set; }
+        public CleanupOptions CleanupOptions { get; private set; }
 
         CleanupOptionForm()
         {
@@ -28,74 +37,79 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             LoadFromSetting();
         }
 
+
         private void CleanupOptionForm_Load(object sender, EventArgs e)
         {
         }
 
         private void CreateControls()
         {
-            NewCheckbox(CodeCleanerType.NormalizeWhiteSpaces, "Normalize white spaces");
-            NewCheckbox(CodeCleanerType.PrivateAccessModifier, "Remove unnecessary \"private\";");
-            NewCheckbox(CodeCleanerType.ConvertMembersToExpressionBodied, "Small methods properties -> Expression bodied");
-            NewCheckbox(CodeCleanerType.ConvertFullNameTypesToBuiltInTypes, "Use C# alias type names (e.g. \"System.Int32\" -> \"int\")");
-            NewCheckbox(CodeCleanerType.SimplyAsyncCallsCommand, "Simply async calls");
-            NewCheckbox(CodeCleanerType.SortClassMembersCommand, "Move constructors before methods");
-            NewCheckbox(CodeCleanerType.SimplifyClassFieldDeclarationsCommand, "Compact class field declarations");
-            NewCheckbox(CodeCleanerType.RemoveAttributeKeyworkCommand, "Remove unnecessary \"Attribute\" (e.g. [SomethingAttribute] -> [Something]");
-            NewCheckbox(CodeCleanerType.CompactSmallIfElseStatementsCommand, "Compact small if/else blocks");
-            NewCheckbox(CodeCleanerType.RemoveExtraThisQualification, "Remove unnecessary 'this.'");
-            NewCheckbox(CodeCleanerType.CamelCasedLocalVariable, "Local variables -> camelCased");
-            NewCheckbox(CodeCleanerType.CamelCasedFields, "\"_something\" -> \"Something\" or \"something\"");
-            NewCheckbox(CodeCleanerType.CamelCasedConstFields, "Const names \"Something\" -> \"SOME_THING\"");
+            CleanupItemUserControl.CreateControls(typeof(CodeCleanerType), checkBoxItem => NewCheckboxItem(checkBoxItem), true);
         }
 
-        private void NewCheckbox(CodeCleanerType cleanerType, string title)
+        int TAB_INDEX_START = 3;
+
+        private void NewCheckboxItem(CheckBoxItem checkBoxItem)
         {
-            checkedListBox1.Items.Add(new CheckBoxItem { Name = title, CleanerType = cleanerType });
+            var newSubControl = new CleanupItemUserControl()
+            {
+                Dock = DockStyle.Top,
+                AutoSize = false,
+                TabIndex = TAB_INDEX_START++,
+            };
+
+            newSubControl.Init((CodeCleanerType)checkBoxItem.CleanerType);
+
+            mainPanel.Controls.Add(newSubControl);
         }
+
 
         private void LoadFromSetting()
         {
-            if (string.IsNullOrEmpty(Settings.Default.CleanupChoices))
-            {
-                for (int i = 0; i < checkedListBox1.Items.Count; i++)
-                {
-                    checkedListBox1.SetItemChecked(i, true);
-                }
-                return;
-            }
+            ////if (string.IsNullOrEmpty(Settings.Default.CleanupChoices))
+            ////{
+            ////    for (int i = 0; i < checkedListBoxWhitespaceNormalizer.Items.Count; i++)
+            ////    {
+            ////        checkedListBoxWhitespaceNormalizer.SetItemChecked(i, true);
+            ////    }
+            ////    return;
+            ////}
 
-            var choices = Settings.Default.CleanupChoices.Split(',');
-            int value = 0;
-            foreach (var item in choices)
-            {
-                if (int.TryParse(item, out value))
-                {
-                    if (Enum.IsDefined(typeof(CodeCleanerType), value))
-                    {
-                        CodeCleanerType enumValue = (CodeCleanerType)Enum.ToObject(typeof(CodeCleanerType), value);
+            ////var choices = Settings.Default.CleanupChoices.Split(',');
+            ////int value = 0;
+            ////foreach (var item in choices)
+            ////{
+            ////    if (int.TryParse(item, out value))
+            ////    {
+            ////        if (Enum.IsDefined(typeof(CodeCleanerType), value))
+            ////        {
+            ////            CodeCleanerType enumValue = (CodeCleanerType)Enum.ToObject(typeof(CodeCleanerType), value);
 
-                        var foundItem = checkedListBox1.Items.OfType<CheckBoxItem>().FirstOrDefault(x => x.CleanerType == enumValue);
+            ////            var foundItem = checkedListBoxWhitespaceNormalizer.Items.OfType<CheckBoxItem>().FirstOrDefault(x => x.CleanerType == enumValue);
 
-                        if (foundItem == null) continue;
+            ////            if (foundItem == null) continue;
 
-                        checkedListBox1.SetItemChecked(checkedListBox1.Items.IndexOf(foundItem), true);
-                    }
-                }
-            }
+            ////            checkedListBoxWhitespaceNormalizer.SetItemChecked(checkedListBoxWhitespaceNormalizer.Items.IndexOf(foundItem), true);
+            ////        }
+            ////    }
+            ////}
         }
 
         private void ApplyCleanup()
         {
-            SelectedTypes = checkedListBox1.CheckedItems?.Cast<CheckBoxItem>().Select(x => x.CleanerType).ToArray();
-            SelectedTypes = SortSelectedTypes(SelectedTypes);
+            CleanupOptions = new CleanupOptions();
 
-            Settings.Default.CleanupChoices = string.Join(",", SelectedTypes.Select(x => (int)x));
-            Settings.Default.Save();
-        }
-        private CodeCleanerType[] SortSelectedTypes(CodeCleanerType[] selectedTypes)
-        {
-            return selectedTypes.OrderByDescending(x => (int)x).ToArray();
+            foreach (CleanupItemUserControl item in mainPanel.Controls)
+            {
+                CleanupOptions.Accept(item);
+            }
+            ////var SelectedTypes = checkedListBoxWhitespaceNormalizer.CheckedItems?.Cast<CheckBoxItem>().Select(x => x.CleanerType).ToArray();
+            ////SelectedTypes = SortSelectedTypes(SelectedTypes);
+
+            ////CleanupOptions = new CleanupOptions() { ActionTypes = SelectedTypes };
+
+            ////Settings.Default.CleanupChoices = string.Join(",", SelectedTypes.Select(x => (int)x));
+            ////Settings.Default.Save();
         }
 
         private void btnApply_Click(object sender, EventArgs e)
@@ -105,16 +119,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             this.Close();
         }
 
-        public class CheckBoxItem
+        private void checkboxWhitespaceNormalizer_CheckedChanged(object sender, EventArgs e)
         {
-            public string Name { get; set; }
-            public CodeCleanerType CleanerType { get; set; }
 
-            public override string ToString()
-            {
-                return Name;
-            }
         }
-
     }
 }

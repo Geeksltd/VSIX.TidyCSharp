@@ -10,10 +10,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
     public class CSharpSyntaxRewriterBase : CSharpSyntaxRewriter
     {
         protected SyntaxNode InitialSource;
-        readonly WhiteSpaceNormalizerOptions Options;
+        readonly Options Options;
         static SyntaxTrivia _endOfLineTrivia = default(SyntaxTrivia);
 
-        public CSharpSyntaxRewriterBase(SyntaxNode initialSource, WhiteSpaceNormalizerOptions options) : base()
+        public CSharpSyntaxRewriterBase(SyntaxNode initialSource, Options options) : base()
         {
             InitialSource = initialSource;
             Options = options;
@@ -26,17 +26,18 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                     .FirstOrDefault(x => x.IsKind(SyntaxKind.EndOfLineTrivia));
         }
 
-        protected bool CheckOption(WSN_CleanupTypes optionItem)
+        protected bool CheckOption(CleanupTypes? optionItem)
         {
             if (Options == null) return true;
             if (Options.CleanupItems == null) return true;
+            if (optionItem == null) return true;
 
             return (Options.CleanupItems & optionItem) == optionItem;
         }
 
         #region
 
-        SyntaxTriviaList CleanUpList(SyntaxTriviaList newList, WSN_CleanupTypes? option = null)
+        SyntaxTriviaList CleanUpList(SyntaxTriviaList newList, CleanupTypes? option = null)
         {
             if (option.HasValue && CheckOption(option.Value) == false) return newList;
 
@@ -72,32 +73,41 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             return syntaxTrivias;
         }
 
-        protected SyntaxTriviaList CleanUpListWithNoWhitespaces(SyntaxTriviaList syntaxTrivias, bool itsForCloseBrace = false)
+        protected SyntaxTriviaList CleanUpListWithNoWhitespaces(SyntaxTriviaList syntaxTrivias, CleanupTypes? options, bool itsForCloseBrace = false)
         {
             syntaxTrivias = ProcessSpecialTrivias(syntaxTrivias, itsForCloseBrace);
 
-            var specialTriviasCount =
+            if (CheckOption(options))
+            {
+                var specialTriviasCount =
                 syntaxTrivias
                     .Count(t =>
                         !t.IsKind(SyntaxKind.EndOfLineTrivia) && !t.IsKind(SyntaxKind.WhitespaceTrivia)
                     );
 
-            if (specialTriviasCount > 0) return CleanUpList(syntaxTrivias);
+                if (specialTriviasCount > 0) return CleanUpList(syntaxTrivias);
 
-            return CleanUpList(syntaxTrivias, 0);
+                return CleanUpList(syntaxTrivias, 0);
+            }
+
+            return syntaxTrivias;
         }
 
-        protected SyntaxTriviaList CleanUpListWithDefaultWhitespaces(SyntaxTriviaList syntaxTrivias, bool itsForCloseBrace = false)
+        protected SyntaxTriviaList CleanUpListWithDefaultWhitespaces(SyntaxTriviaList syntaxTrivias, CleanupTypes? options, bool itsForCloseBrace = false)
         {
-            syntaxTrivias = CleanUpList(syntaxTrivias);
+            if (CheckOption(options))
+                syntaxTrivias = CleanUpList(syntaxTrivias);
+
             syntaxTrivias = ProcessSpecialTrivias(syntaxTrivias, itsForCloseBrace);
 
             return syntaxTrivias;
         }
 
-        protected SyntaxTriviaList CleanUpListWithExactNumberOfWhitespaces(SyntaxTriviaList syntaxTrivias, int exactNumberOfBlanks, bool itsForCloseBrace = false)
+        protected SyntaxTriviaList CleanUpListWithExactNumberOfWhitespaces(SyntaxTriviaList syntaxTrivias, int exactNumberOfBlanks, CleanupTypes? options, bool itsForCloseBrace = false)
         {
-            syntaxTrivias = CleanUpList(syntaxTrivias, exactNumberOfBlanks);
+            if (CheckOption(options))
+                syntaxTrivias = CleanUpList(syntaxTrivias, exactNumberOfBlanks);
+
             syntaxTrivias = ProcessSpecialTrivias(syntaxTrivias, itsForCloseBrace);
 
             return syntaxTrivias;
@@ -120,7 +130,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                 {
                     if (itsForCloseBrace)
                     {
-                        if (CheckOption(WSN_CleanupTypes.Remove_BLs_after_Open_Bracket_and_Before_Close_Brackets))
+                        if (CheckOption(CleanupTypes.Remove_BLs_after_Open_Bracket_and_Before_Close_Brackets))
                         {
                             i += RemoveBlankDuplication(syntaxTrivias, SyntaxKind.EndOfLineTrivia, i) + 1;
 
@@ -166,7 +176,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                     continue;
                 }
 
-                if (CheckOption(WSN_CleanupTypes.Remove_DBL_Inside_Comments) == false)
+                if (CheckOption(CleanupTypes.Remove_DBL_Inside_Comments) == false)
                 {
                     outputTriviasList.Add(syntaxTrivias[i]);
 
@@ -195,7 +205,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
         SyntaxTriviaList Insert_Space_Before_Comment_Text(SyntaxTriviaList syntaxTrivias, SyntaxTrivia currentTrivia)
         {
-            if (CheckOption(WSN_CleanupTypes.Insert_Space_Before_Comment_Text))
+            if (CheckOption(CleanupTypes.Insert_Space_Before_Comment_Text))
             {
                 if (currentTrivia.IsKind(SyntaxKind.SingleLineCommentTrivia))
                 {

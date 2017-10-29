@@ -1,6 +1,8 @@
+using System;
 using System.Threading.Tasks;
 using EnvDTE;
-using Geeks.GeeksProductivityTools.Definition;
+using Geeks.VSIX.TidyCSharp.Cleanup;
+using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -48,9 +50,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             });
         }
 
-        public void Invoke(CodeCleanerType cleanerType)
+        internal void Invoke(CodeCleanerType cleanerType, CleanupOptions cleanupOptions = null)
         {
-            var instance = CodeCleanerFactory.Create(cleanerType);
+            var instance = CodeCleanerFactory.Create(cleanerType, cleanupOptions);
             new CodeCleaner(instance, Item).Run();
         }
         //TODO: By Alireza =>  To return Syntax node and pass syntaxNode no next clean up function and dont close windows for each cleanup , just for something like organize usings

@@ -25,15 +25,15 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             if (messageBoxResult != DialogResult.OK) return;
 
-            var dialogResult = CleanupOptionForm.Instance.ShowDialog();
+            var dialogResult = CleanupOptionForm.Instance2.ShowDialog();
 
             if (dialogResult == DialogResult.Cancel) return;
 
             ActionsOnCSharp.CSharpActionDelegate.TargetAction desiredAction = ActionsOnCSharp.ActionsCSharpOnFile.DoCleanup;
 
-            if (CleanupOptionForm.Instance.SelectedTypes != null)
+            if (CleanupOptionForm.Instance.CleanupOptions != null)
             {
-                ActionsOnCSharp.ActionCSharpOnAnyWhere.Invoke(desiredAction, CleanupOptionForm.Instance.SelectedTypes);
+                ActionsOnCSharp.ActionCSharpOnAnyWhere.Invoke(desiredAction, CleanupOptionForm.Instance.CleanupOptions);
                 GeeksProductivityToolsPackage.Instance.SaveSolutionChanges();
             }
         }

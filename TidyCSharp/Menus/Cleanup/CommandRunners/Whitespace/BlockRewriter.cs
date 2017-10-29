@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -9,11 +8,11 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 {
     class BlockRewriter : CSharpSyntaxRewriterBase
     {
-        public BlockRewriter(SyntaxNode initialSource, WhiteSpaceNormalizerOptions options) : base(initialSource, options) { }
+        public BlockRewriter(SyntaxNode initialSource, Options options) : base(initialSource, options) { }
 
         public override SyntaxNode Visit(SyntaxNode node)
         {
-            if (CheckOption(WSN_CleanupTypes.Remove_Brackets_of_block_that_has_only_one_statement_with_length_shorter_than_70_chars) == false)
+            if (CheckOption(CleanupTypes.Remove_Brackets_of_block_that_has_only_one_statement_with_length_shorter_than_70_chars) == false)
             {
                 if (node is BlockSyntax)
                 {
@@ -44,7 +43,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             {
                 var singleStatement = blockNode.Statements.First();
 
-                if (singleStatement.Span.Length <= WhiteSpaceNormalizerOptions.BLOCK_SINGLE_STATEMENT_MAX_LENGTH)
+                if (singleStatement.Span.Length <= Options.BLOCK_SINGLE_STATEMENT_MAX_LENGTH)
                 {
                     singleStatement =
                       singleStatement
@@ -54,7 +53,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                                       singleStatement
                                           .GetTrailingTrivia()
                                           .AddRange(blockNode.GetTrailingTrivia())
-                                  ), 1)
+                                  ), 1, null)
                           );
                     lastBlockToken = singleStatement.GetLastToken();
 
@@ -70,7 +69,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
         {
             if (lastBlockToken != default(SyntaxToken) && lastBlockToken == lastToken)
             {
-                token = token.WithLeadingTrivia(CleanUpListWithExactNumberOfWhitespaces(token.LeadingTrivia, 1));
+                token = token.WithLeadingTrivia(CleanUpListWithExactNumberOfWhitespaces(token.LeadingTrivia, 1, null));
                 lastBlockToken = default(SyntaxToken);
             }
 

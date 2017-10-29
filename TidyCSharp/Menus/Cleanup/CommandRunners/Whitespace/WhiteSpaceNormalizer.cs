@@ -16,9 +16,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             return NormalizeWhiteSpaceHelper(initialSourceNode, Options);
         }
 
-        WhiteSpaceNormalizerOptions Options { get; set; }
+        public Options Options { get; set; }
 
-        public static SyntaxNode NormalizeWhiteSpaceHelper(SyntaxNode initialSourceNode, WhiteSpaceNormalizerOptions options)
+        public static SyntaxNode NormalizeWhiteSpaceHelper(SyntaxNode initialSourceNode, Options options)
         {
             if (GeeksProductivityToolsPackage.Instance != null)
             {

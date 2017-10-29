@@ -3,12 +3,13 @@ using EnvDTE;
 using Geeks.GeeksProductivityTools.Utils;
 using static Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp.CSharpActionDelegate;
 using System.Windows;
+using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
 
 namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 {
     public class ActionCSharpOnProject
     {
-        public static void Invoke(TargetAction action, Definition.CodeCleanerType[] type)
+        public static void Invoke(TargetAction action, CleanupOptions cleanupOptions)
         {
             try
             {
@@ -23,7 +24,7 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
                 }
 
                 for (var i = 1; i <= currentProject.ProjectItems.Count; i++)
-                    ActionCSharpOnProjectItem.Action(currentProject.ProjectItems.Item(i), action, type);
+                    ActionCSharpOnProjectItem.Action(currentProject.ProjectItems.Item(i), action, cleanupOptions);
             }
             catch (Exception e)
             {
