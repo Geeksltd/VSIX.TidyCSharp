@@ -3,10 +3,12 @@ using Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers;
 using System;
 using System.Linq;
 
-namespace Geeks.VSIX.TidyCSharp.Cleanup.ConvertMembersToExpressionBodied2
+namespace Geeks.VSIX.TidyCSharp.Cleanup.MembersToExpressionBodied
 {
     public class Options : ICleanupOption
     {
+        public const int MAX_EXPRESSION_BODIED_MEMBER_LENGTH = 90;
+
         public CleanupTypes? CleanupItems { get; private set; }
 
         public int? CleanupItemsInteger => (int?)CleanupItems;

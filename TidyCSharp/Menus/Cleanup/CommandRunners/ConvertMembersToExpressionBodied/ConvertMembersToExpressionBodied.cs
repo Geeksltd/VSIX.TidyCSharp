@@ -4,6 +4,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using Geeks.VSIX.TidyCSharp.Cleanup.MembersToExpressionBodied;
+using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -11,33 +14,39 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
     {
         public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
         {
-            return ConvertMembersToExpressionBodiedHelper(initialSourceNode);
+            return ConvertMembersToExpressionBodiedHelper(initialSourceNode, Options);
         }
 
-        class Rewriter : CSharpSyntaxRewriter
+        class Rewriter : CleanupCSharpSyntaxRewriter
         {
+            public Rewriter(ICleanupOption Options) : base(Options) { }
             public override SyntaxNode Visit(SyntaxNode node)
             {
                 if (node == null) return base.Visit(node);
 
                 if (node is MethodDeclarationSyntax && node.Parent is ClassDeclarationSyntax)
                 {
-                    node = ConvertToExpressionBodiedHelper(node as MethodDeclarationSyntax);
+                    if (CheckOption((int)CleanupTypes.Convert_Methods))
+                    {
+                        node = ConvertToExpressionBodiedHelper(node as MethodDeclarationSyntax);
+                    }
                 }
                 else if (node is PropertyDeclarationSyntax)
                 {
-                    node = ConvertToExpressionBodiedHelper(node as PropertyDeclarationSyntax);
+                    if (CheckOption((int)CleanupTypes.Convert_ReadOnly_Property))
+                    {
+                        node = ConvertToExpressionBodiedHelper(node as PropertyDeclarationSyntax);
+                    }
                 }
 
                 return base.Visit(node);
             }
         }
 
-        const int MAX_EXPRESSION_BODIED_MEMBER_LENGTH = 90;
         static SyntaxTrivia[] _spaceTrivia = { SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, " ") };
-        public static SyntaxNode ConvertMembersToExpressionBodiedHelper(SyntaxNode initialSourceNode)
+        public static SyntaxNode ConvertMembersToExpressionBodiedHelper(SyntaxNode initialSourceNode, ICleanupOption Options)
         {
-            return new Rewriter().Visit(initialSourceNode);
+            return new Rewriter(Options).Visit(initialSourceNode);
         }
 
         public static MethodDeclarationSyntax ConvertToExpressionBodiedHelper(MethodDeclarationSyntax methodDeclaration)
@@ -105,7 +114,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 .WithoutLeadingTrivia();
 
             var length = expression.WithoutTrivia().Span.Length + method.Span.Length - method.Body.FullSpan.Length;
-            if (length > MAX_EXPRESSION_BODIED_MEMBER_LENGTH) return null;
+            if (length > MembersToExpressionBodied.Options.MAX_EXPRESSION_BODIED_MEMBER_LENGTH) return null;
             if (method.Body.ChildNodes().OfType<UsingStatementSyntax>().Any()) return null;
 
             return expression;

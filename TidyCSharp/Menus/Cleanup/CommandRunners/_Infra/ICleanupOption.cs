@@ -9,5 +9,16 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.Infra
 
         void Accept(IMainCleanup mainCleanup);
     }
+    public static class ICleanupOptionHelper
+    {
+        public static bool CheckOption(this ICleanupOption options, int? optionItem)
+        {
+            if (options == null) return true;
+            if (options.CleanupItemsInteger == null) return true;
+            if (optionItem == null) return true;
 
+            return (options.CleanupItemsInteger & optionItem) == optionItem;
+        }
+
+    }
 }

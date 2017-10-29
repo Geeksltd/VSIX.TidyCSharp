@@ -371,6 +371,7 @@
       <DependentUpon>CleanupOptionForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Menus\Cleanup\CommandsHandlers\CleanupOptions.cs" />
+    <Compile Include="Menus\Cleanup\Utils\CleanupCSharpSyntaxRewriter.cs" />
     <Compile Include="Menus\Cleanup\Utils\RenameHelper\VariableRenamingBase.cs" />
     <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\ExtendedBaseCodeCleanupCommand.cs" />
     <Compile Include="Menus\Cleanup\Utils\ActiveDocument.cs" />

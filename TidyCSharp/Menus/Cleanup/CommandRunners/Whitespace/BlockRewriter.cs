@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 {
@@ -12,7 +13,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
         public override SyntaxNode Visit(SyntaxNode node)
         {
-            if (CheckOption(CleanupTypes.Remove_Brackets_of_block_that_has_only_one_statement_with_length_shorter_than_70_chars) == false)
+            if (CheckOption((int)CleanupTypes.Remove_Brackets_of_block_that_has_only_one_statement_with_length_shorter_than_70_chars) == false)
             {
                 if (node is BlockSyntax)
                 {

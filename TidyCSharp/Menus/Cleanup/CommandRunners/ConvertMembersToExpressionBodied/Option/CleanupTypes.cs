@@ -1,25 +1,15 @@
 ﻿using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using System;
 
-namespace Geeks.VSIX.TidyCSharp.Cleanup.ConvertMembersToExpressionBodied2
+namespace Geeks.VSIX.TidyCSharp.Cleanup.MembersToExpressionBodied
 {
     [Flags]
     public enum CleanupTypes
     {
-        [CleanupItem(Title = "Remove Class Private Modifier")]
-        Remove_Class_Private_Modifier = 0x01,
+        [CleanupItem(Title = "Convert Methods => Method with only a single return statement and lenth less than 100 chars(length of its signature and its single statement)")]
+        Convert_Methods = 0x01,
 
-        [CleanupItem(Title = "Remove Nested Class Private Modifier")]
-        Remove_Nested_Class_Private_Modifier = 0x02,
-
-        [CleanupItem(Title = "Remove Class Fields Private Modifier")]
-        Remove_Class_Fields_Private_Modifier = 0x04,
-
-        [CleanupItem(Title = "Remove Class Methods Private Modifier")]
-        Remove_Class_Methods_Private_Modifier = 0x08,
-
-        [CleanupItem(Title = "Remove Class Properties Private Modifier")]
-        Remove_Class_Properties_Private_Modifier = 0x10,
+        [CleanupItem(Title = "Convert ReadOnly Property =>  ReadOnly Property with only a single return statement and lenth less than 100 chars(length of its Defenition and its single statement)")]
+        Convert_ReadOnly_Property = 0x02,
     }
-
 }

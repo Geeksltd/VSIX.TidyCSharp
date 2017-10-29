@@ -2,7 +2,6 @@ using System.Linq;
 using EnvDTE;
 using Microsoft.CodeAnalysis;
 using RoslynDocument = Microsoft.CodeAnalysis.Document;
-using System;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
@@ -39,13 +38,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         public ICleanupOption Options { get; set; }
 
-        protected bool CheckOption(int? optionItem)
+        public bool CheckOption(int? optionItem)
         {
-            if (Options == null) return true;
-            if (Options.CleanupItemsInteger == null) return true;
-            if (optionItem == null) return true;
-
-            return (Options.CleanupItemsInteger & optionItem) == optionItem;
+            return Options.CheckOption(optionItem);
         }
 
         public class ProjectItemDetailsType

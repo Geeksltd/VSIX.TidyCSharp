@@ -34,7 +34,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             var leadingTriviList = endOfFileToken.LeadingTrivia;
             leadingTriviList = CleanUpListWithNoWhitespaces(leadingTriviList, CleanupTypes.Trim_The_File, itsForCloseBrace: true);
 
-            if (CheckOption(CleanupTypes.Trim_The_File))
+            if (CheckOption((int)CleanupTypes.Trim_The_File))
             {
                 if (leadingTriviList.Any() && leadingTriviList.Last().IsKind(SyntaxKind.EndOfLineTrivia))
                 {
@@ -131,7 +131,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             bool isCleanupDone = false;
             if (_LastMember is MethodDeclarationSyntax && IsStartWithSpecialDirective(leadingTriviaList) == false)
             {
-                if (CheckOption(CleanupTypes.Adding_Blank_after_Method_Close_Bracket))
+                if (CheckOption((int)CleanupTypes.Adding_Blank_after_Method_Close_Bracket))
                 {
                     if (leadingTriviaList.Count(x => x.IsKind(SyntaxKind.EndOfLineTrivia)) < 2)
                     {
@@ -139,13 +139,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                         isCleanupDone = true;
                     }
                 }
-                else if (CheckOption(CleanupTypes.Remove_DBL_Between_Class_Members))
+                else if (CheckOption((int)CleanupTypes.Remove_DBL_Between_Class_Members))
                 {
                     leadingTriviaList = CleanUpListWithDefaultWhitespaces(leadingTriviaList, null);
                     isCleanupDone = true;
                 }
             }
-            else if (CheckOption(CleanupTypes.Remove_DBL_Between_Class_Members))
+            else if (CheckOption((int)CleanupTypes.Remove_DBL_Between_Class_Members))
             {
                 leadingTriviaList = CleanUpListWithDefaultWhitespaces(leadingTriviaList, null);
                 isCleanupDone = true;
@@ -185,7 +185,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
             if (_lastTokenIsACloseBrace)
             {
-                if (CheckOption(CleanupTypes.Adding_Blank_after_Block_Close_Bracket))
+                if (CheckOption((int)CleanupTypes.Adding_Blank_after_Block_Close_Bracket))
                 {
                     if (leadingTriviaList.Count(x => x.IsKind(SyntaxKind.EndOfLineTrivia)) < 2)
                     {
@@ -193,13 +193,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                         isCleanupDone = true;
                     }
                 }
-                else if (CheckOption(CleanupTypes.Remove_DBL_Between_Methods_Statements))
+                else if (CheckOption((int)CleanupTypes.Remove_DBL_Between_Methods_Statements))
                 {
                     leadingTriviaList = CleanUpListWithDefaultWhitespaces(leadingTriviaList, null);
                     isCleanupDone = true;
                 }
             }
-            else if (CheckOption(CleanupTypes.Remove_DBL_Between_Methods_Statements))
+            else if (CheckOption((int)CleanupTypes.Remove_DBL_Between_Methods_Statements))
             {
                 leadingTriviaList = CleanUpListWithDefaultWhitespaces(leadingTriviaList, null);
                 isCleanupDone = true;

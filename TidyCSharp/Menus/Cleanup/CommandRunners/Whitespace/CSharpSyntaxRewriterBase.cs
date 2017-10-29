@@ -4,19 +4,18 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 {
-    public class CSharpSyntaxRewriterBase : CSharpSyntaxRewriter
+    public class CSharpSyntaxRewriterBase : CleanupCSharpSyntaxRewriter
     {
         protected SyntaxNode InitialSource;
-        readonly Options Options;
         static SyntaxTrivia _endOfLineTrivia = default(SyntaxTrivia);
 
-        public CSharpSyntaxRewriterBase(SyntaxNode initialSource, Options options) : base()
+        public CSharpSyntaxRewriterBase(SyntaxNode initialSource, Options options) : base(options)
         {
             InitialSource = initialSource;
-            Options = options;
 
             _endOfLineTrivia =
                 initialSource
@@ -26,20 +25,11 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                     .FirstOrDefault(x => x.IsKind(SyntaxKind.EndOfLineTrivia));
         }
 
-        protected bool CheckOption(CleanupTypes? optionItem)
-        {
-            if (Options == null) return true;
-            if (Options.CleanupItems == null) return true;
-            if (optionItem == null) return true;
-
-            return (Options.CleanupItems & optionItem) == optionItem;
-        }
-
         #region
 
         SyntaxTriviaList CleanUpList(SyntaxTriviaList newList, CleanupTypes? option = null)
         {
-            if (option.HasValue && CheckOption(option.Value) == false) return newList;
+            if (option.HasValue && CheckOption((int)option.Value) == false) return newList;
 
             var lineBreaksAtBeginning = newList.TakeWhile(t => t.IsKind(SyntaxKind.EndOfLineTrivia)).Count();
 
@@ -77,7 +67,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
         {
             syntaxTrivias = ProcessSpecialTrivias(syntaxTrivias, itsForCloseBrace);
 
-            if (CheckOption(options))
+            if (CheckOption((int?)options))
             {
                 var specialTriviasCount =
                 syntaxTrivias
@@ -95,7 +85,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
         protected SyntaxTriviaList CleanUpListWithDefaultWhitespaces(SyntaxTriviaList syntaxTrivias, CleanupTypes? options, bool itsForCloseBrace = false)
         {
-            if (CheckOption(options))
+            if (CheckOption((int?)options))
                 syntaxTrivias = CleanUpList(syntaxTrivias);
 
             syntaxTrivias = ProcessSpecialTrivias(syntaxTrivias, itsForCloseBrace);
@@ -105,7 +95,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
         protected SyntaxTriviaList CleanUpListWithExactNumberOfWhitespaces(SyntaxTriviaList syntaxTrivias, int exactNumberOfBlanks, CleanupTypes? options, bool itsForCloseBrace = false)
         {
-            if (CheckOption(options))
+            if (CheckOption((int?)options))
                 syntaxTrivias = CleanUpList(syntaxTrivias, exactNumberOfBlanks);
 
             syntaxTrivias = ProcessSpecialTrivias(syntaxTrivias, itsForCloseBrace);
@@ -130,7 +120,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                 {
                     if (itsForCloseBrace)
                     {
-                        if (CheckOption(CleanupTypes.Remove_BLs_after_Open_Bracket_and_Before_Close_Brackets))
+                        if (CheckOption((int)CleanupTypes.Remove_BLs_after_Open_Bracket_and_Before_Close_Brackets))
                         {
                             i += RemoveBlankDuplication(syntaxTrivias, SyntaxKind.EndOfLineTrivia, i) + 1;
 
@@ -176,7 +166,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                     continue;
                 }
 
-                if (CheckOption(CleanupTypes.Remove_DBL_Inside_Comments) == false)
+                if (CheckOption((int)CleanupTypes.Remove_DBL_Inside_Comments) == false)
                 {
                     outputTriviasList.Add(syntaxTrivias[i]);
 
@@ -205,7 +195,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
         SyntaxTriviaList Insert_Space_Before_Comment_Text(SyntaxTriviaList syntaxTrivias, SyntaxTrivia currentTrivia)
         {
-            if (CheckOption(CleanupTypes.Insert_Space_Before_Comment_Text))
+            if (CheckOption((int)CleanupTypes.Insert_Space_Before_Comment_Text))
             {
                 if (currentTrivia.IsKind(SyntaxKind.SingleLineCommentTrivia))
                 {
