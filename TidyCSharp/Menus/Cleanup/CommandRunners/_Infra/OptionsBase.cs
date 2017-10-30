@@ -6,7 +6,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.Infra
 {
     public abstract class OptionsBase : ICleanupOption
     {
-        public virtual int? CleanupItemsInteger { get; set; }
+        public virtual int? CleanupItemsInteger { get; private set; }
 
         protected abstract CodeCleanerType GetCodeCleanerType();
 
