@@ -2,6 +2,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -18,12 +19,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
         protected override VariableRenamingBaseRewriter GetRewriter(Document workingDocument)
         {
-            return new Rewriter(workingDocument);
+            return new Rewriter(workingDocument, Options);
         }
 
         class Rewriter : VariableRenamingBaseRewriter
         {
-            public Rewriter(Document workingDocument) : base(workingDocument) { }
+            public Rewriter(Document workingDocument, ICleanupOption options) : base(workingDocument, options) { }
 
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
@@ -32,13 +33,24 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             ClassDeclarationSyntax RenameDeclarations(ClassDeclarationSyntax classNode)
             {
-                var renamingResult = new FieldRenamer(WorkingDocument).RenameDeclarations(classNode);
-                if (renamingResult != null)
+                if (CheckOption((int)CamelCasedClassFields.CleanupTypes.Normal_Fields))
                 {
-                    classNode = renamingResult.Node as ClassDeclarationSyntax;
-                    WorkingDocument = renamingResult.Document;
+                    var renamingResult = new FieldRenamer(WorkingDocument).RenameDeclarations(classNode);
+                    if (renamingResult != null)
+                    {
+                        classNode = renamingResult.Node as ClassDeclarationSyntax;
+                        WorkingDocument = renamingResult.Document;
+                    }
                 }
-
+                if (CheckOption((int)CamelCasedClassFields.CleanupTypes.Const_Fields))
+                {
+                    var renamingResult = new CONSTRenamer(WorkingDocument).RenameDeclarations(classNode);
+                    if (renamingResult != null)
+                    {
+                        classNode = renamingResult.Node as ClassDeclarationSyntax;
+                        WorkingDocument = renamingResult.Document;
+                    }
+                }
                 return classNode;
             }
         }

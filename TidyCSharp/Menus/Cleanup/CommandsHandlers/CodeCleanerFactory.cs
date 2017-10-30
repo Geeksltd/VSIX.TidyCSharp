@@ -28,12 +28,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                     return new CompactSmallIfElseStatements();
                 case CodeCleanerType.RemoveExtraThisQualification:
                     return new RemoveExtraThisQualification() { Options = cleanupOptions.RemoveExtraThisQualification };
-                case CodeCleanerType.CamelCasedLocalVariable:
+                case CodeCleanerType.CamelCasedMethodVariable:
                     return new CamelCasedLocalVariable();
                 case CodeCleanerType.CamelCasedFields:
                     return new CamelCasedFields();
-                case CodeCleanerType.CamelCasedConstFields:
-                    return new CamelCasedConstFields();
                 case CodeCleanerType.PrivateAccessModifier:
                     return new PrivateModifierRemover();
                 case CodeCleanerType.OrganizeUsingDirectives:

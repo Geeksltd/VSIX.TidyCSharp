@@ -44,7 +44,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             {
                 var singleStatement = blockNode.Statements.First();
 
-                if (singleStatement.Span.Length <= Options.BLOCK_SINGLE_STATEMENT_MAX_LENGTH)
+                if (singleStatement.Span.Length <= NormalizeWhitespace.Options.BLOCK_SINGLE_STATEMENT_MAX_LENGTH)
                 {
                     singleStatement =
                       singleStatement

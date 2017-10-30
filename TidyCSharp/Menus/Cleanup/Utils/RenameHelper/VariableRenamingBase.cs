@@ -1,6 +1,8 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
+using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -53,11 +55,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         protected abstract VariableRenamingBaseRewriter GetRewriter(Document workingDocument);
 
-        protected abstract class VariableRenamingBaseRewriter : CSharpSyntaxRewriter
+        protected abstract class VariableRenamingBaseRewriter : CleanupCSharpSyntaxRewriter
         {
             public Document WorkingDocument { get; protected set; }
-
-            public VariableRenamingBaseRewriter(Document workingDocument)
+            public VariableRenamingBaseRewriter(Document workingDocument, ICleanupOption options) : base(options)
             {
                 WorkingDocument = workingDocument;
             }

@@ -15,17 +15,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             else
             {
-                var invoker = new CleanerActionInvoker(item);
-                invoker.Invoke(command, cleanupOptions);
-                //switch (command)
-                //{
-                //    case CodeCleanerType.All:
-                //        invoker.InvokeAll();
-                //        break;
-                //    default:
-                //        invoker.Invoke(command);
-                //        break;
-                //}
+                var instance = CodeCleanerFactory.Create(command, cleanupOptions);
+                new CodeCleaner(instance, item).Run();
             }
         }
     }

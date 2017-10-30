@@ -2,6 +2,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -17,11 +18,11 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         }
         protected override VariableRenamingBaseRewriter GetRewriter(Document workingDocument)
         {
-            return new Rewriter(workingDocument);
+            return new Rewriter(workingDocument, Options);
         }
         class Rewriter : VariableRenamingBaseRewriter
         {
-            public Rewriter(Document workingDocument) : base(workingDocument) { }
+            public Rewriter(Document workingDocument, ICleanupOption options) : base(workingDocument, options) { }
 
             public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
             {
@@ -30,20 +31,25 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             MethodDeclarationSyntax RenameDeclarations(MethodDeclarationSyntax methodNode)
             {
-                var renamingResult = new VariableRenamer(WorkingDocument).RenameDeclarations(methodNode);
-                if (renamingResult != null)
+                if (CheckOption((int)CamelCasedMethodVariable.CleanupTypes.Local_variable))
                 {
-                    methodNode = renamingResult.Node as MethodDeclarationSyntax;
-                    WorkingDocument = renamingResult.Document;
+                    var renamingResult = new VariableRenamer(WorkingDocument).RenameDeclarations(methodNode);
+                    if (renamingResult != null)
+                    {
+                        methodNode = renamingResult.Node as MethodDeclarationSyntax;
+                        WorkingDocument = renamingResult.Document;
+                    }
                 }
 
-                renamingResult = new ParameterRenamer(WorkingDocument).RenameDeclarations(methodNode);
-                if (renamingResult != null)
+                if (CheckOption((int)CamelCasedMethodVariable.CleanupTypes.Method_Parameter))
                 {
-                    methodNode = renamingResult.Node as MethodDeclarationSyntax;
-                    WorkingDocument = renamingResult.Document;
+                    var renamingResult = new ParameterRenamer(WorkingDocument).RenameDeclarations(methodNode);
+                    if (renamingResult != null)
+                    {
+                        methodNode = renamingResult.Node as MethodDeclarationSyntax;
+                        WorkingDocument = renamingResult.Document;
+                    }
                 }
-
                 return methodNode;
             }
         }

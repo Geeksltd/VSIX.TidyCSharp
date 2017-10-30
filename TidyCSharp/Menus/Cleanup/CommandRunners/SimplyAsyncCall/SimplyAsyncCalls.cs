@@ -4,6 +4,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
+using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -11,24 +13,28 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
     {
         public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
         {
-            return SimplyAsyncCallsHelper(initialSourceNode);
+            return SimplyAsyncCallsHelper(initialSourceNode, Options);
             //return SimplyAsyncCallsHelper2(initialSourceNode);
         }
 
 
-        public static SyntaxNode SimplyAsyncCallsHelper2(SyntaxNode initialSourceNode)
+        public static SyntaxNode SimplyAsyncCallsHelper2(SyntaxNode initialSourceNode, ICleanupOption options)
         {
-            return new Rewriter().Visit(initialSourceNode);
+            return new Rewriter(options).Visit(initialSourceNode);
         }
-        class Rewriter : CSharpSyntaxRewriter
+        class Rewriter : CleanupCSharpSyntaxRewriter
         {
+            public Rewriter(ICleanupOption options) : base(options)
+            {
+            }
+
             public override SyntaxNode Visit(SyntaxNode node)
             {
                 if (node == null) return base.Visit(node);
                 if (node is MethodDeclarationSyntax == false) return base.Visit(node);
                 if (node.Parent is ClassDeclarationSyntax == false) return base.Visit(node);
 
-                node = SimplyAsyncCallsHelper((MethodDeclarationSyntax)node);
+                node = SimplyAsyncCallsHelper((MethodDeclarationSyntax)node, Options);
 
                 return base.Visit(node);
             }
@@ -36,7 +42,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
         static SyntaxTrivia[] _spaceTrivia = { SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, " ") };
 
-        public static SyntaxNode SimplyAsyncCallsHelper(SyntaxNode initialSource)
+        public static SyntaxNode SimplyAsyncCallsHelper(SyntaxNode initialSource, ICleanupOption options)
         {
             return
                 initialSource
@@ -45,11 +51,11 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         initialSource
                             .DescendantNodes()
                             .Where(node => node is MethodDeclarationSyntax && node.Parent is ClassDeclarationSyntax)
-                        , (node1, node2) => SimplyAsyncCallsHelper((MethodDeclarationSyntax)node1)
+                        , (node1, node2) => SimplyAsyncCallsHelper((MethodDeclarationSyntax)node1, options)
                     );
         }
 
-        public static MethodDeclarationSyntax SimplyAsyncCallsHelper(MethodDeclarationSyntax method)
+        public static MethodDeclarationSyntax SimplyAsyncCallsHelper(MethodDeclarationSyntax method, ICleanupOption options)
         {
             if ((method.Parent is ClassDeclarationSyntax) == false) return method;
             if (method.Modifiers.Any(x => x.IsKind(SyntaxKind.AsyncKeyword)) == false) return method;
@@ -79,20 +85,26 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             if (singleStatement is ReturnStatementSyntax)
             {
-                newStatement =
-                    (singleStatement as ReturnStatementSyntax).WithExpression(awaitStatementExpression.Expression);
+                if (options.CheckOption((int)SimplyAsyncCall.CleanupTypes.Single_Return_Statement))
+                {
+                    newStatement =
+                        (singleStatement as ReturnStatementSyntax).WithExpression(awaitStatementExpression.Expression);
+                }
             }
             else if (singleStatement is ExpressionStatementSyntax)
             {
-                var newReturnStatement =
+                if (options.CheckOption((int)SimplyAsyncCall.CleanupTypes.Single_Expression))
+                {
+                    var newReturnStatement =
                     SyntaxFactory
                         .ReturnStatement(awaitStatementExpression.Expression)
                         .WithLeadingTrivia(singleStatement.GetLeadingTrivia())
                         .WithTrailingTrivia(singleStatement.GetTrailingTrivia());
 
-                newStatement =
-                    newReturnStatement.WithReturnKeyword(
-                        newReturnStatement.ReturnKeyword.WithTrailingTrivia(_spaceTrivia));
+                    newStatement =
+                        newReturnStatement.WithReturnKeyword(
+                            newReturnStatement.ReturnKeyword.WithTrailingTrivia(_spaceTrivia));
+                }
             }
 
             return
