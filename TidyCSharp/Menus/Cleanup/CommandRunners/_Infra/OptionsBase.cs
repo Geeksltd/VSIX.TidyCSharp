@@ -8,14 +8,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.Infra
     {
         public virtual int? CleanupItemsInteger { get; private set; }
 
-        protected abstract CodeCleanerType GetCodeCleanerType();
-
+        public abstract CodeCleanerType GetCodeCleanerType();
 
         public void Accept(IMainCleanup mainCleanup)
         {
             if (mainCleanup.MainCleanupItemType == GetCodeCleanerType())
             {
-                var selectedItems = mainCleanup.GetSubItems().Select(x => x.CleanerType).ToArray();
+                var selectedItems = mainCleanup.GetSelectedSubItems().Select(x => x.CleanerType).ToArray();
 
                 CleanupItemsInteger = selectedItems.FirstOrDefault();
 
@@ -24,6 +23,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.Infra
                     CleanupItemsInteger |= item;
                 }
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{(CleanupItemsInteger ?? 0).ToString()}";
+            //return $"{(int)GetCodeCleanerType()}:{(CleanupItemsInteger ?? 0).ToString()}";
         }
     }
 

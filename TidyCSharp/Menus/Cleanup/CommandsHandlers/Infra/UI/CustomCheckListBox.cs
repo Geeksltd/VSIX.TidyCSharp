@@ -17,20 +17,35 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers.Infra
         public CustomCheckListBox()
         {
             InitializeComponent();
-            //this.Height = 0;
-            //this.AutoSize = false;
         }
 
-        public void AddItem(CheckBoxItem item)
+        public void AddItem(CheckBoxItemInfo item)
         {
-            var newControl = new CustomCheckBox() { Text = item.Name, Tag = item, Dock = DockStyle.Top, Height = HEIGHT_OF_CHECKBOX };
+            var newControl = new CustomCheckBox() { Text = item.Name, Info = item, Dock = DockStyle.Top, Height = HEIGHT_OF_CHECKBOX };
             this.Controls.Add(newControl);
         }
 
-        public CheckBoxItem[] GetCheckedItems()
+        public CheckBoxItemInfo[] GetCheckedItems()
         {
-            var selectedTypes = this.Controls.OfType<CustomCheckBox>().Where(x=>x.Checked).Select(x => x.Tag as CheckBoxItem);
+            var selectedTypes = this.Controls.OfType<CustomCheckBox>().Where(x=>x.Checked).Select(x => x.Info);
             return selectedTypes.OrderBy(x => x.Order).ToArray();
+        }
+        public CheckBoxItemInfo[] GetItems()
+        {
+            return this.Controls.OfType<CustomCheckBox>().Select(x => x.Info).ToArray();
+        }
+
+
+        public void SetCheckedItems(int value)
+        {
+            foreach (var item in this.Controls.OfType<CustomCheckBox>())
+            {
+
+                if (item.Info != null && ((item.Info.CleanerType & value) == item.Info.CleanerType))
+                {
+                    item.Checked = true;
+                }
+            }
         }
     }
 }

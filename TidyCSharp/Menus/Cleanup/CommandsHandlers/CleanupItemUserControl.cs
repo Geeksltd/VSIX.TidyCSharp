@@ -50,15 +50,36 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
 
         }
 
-        public CheckBoxItem[] GetSubItems()
+        public void SetSubItems(int value)
         {
-            if (checkboxCleanupItem.Checked == false) return new CheckBoxItem[0];
+            if (value == -1)
+            {
+                checkboxCleanupItem.Checked = true;
+                return;
+            }
+            customCheckListBox1.SetCheckedItems(value);
+            checkboxCleanupItem.Checked = customCheckListBox1.GetCheckedItems().Any();
+        }
+
+        public bool IsMainObjectSelected()
+        {
+            if (checkboxCleanupItem.Checked == false) return false;
+            if (customCheckListBox1.GetItems().Any() && GetSelectedSubItems().Any() == false) return false;
+            return true;
+        }
+        public CheckBoxItemInfo[] GetSelectedSubItems()
+        {
+            if (checkboxCleanupItem.Checked == false) return new CheckBoxItemInfo[0];
 
             var selectedTypes = customCheckListBox1.GetCheckedItems();
             return selectedTypes.OrderBy(x => x.Order).ToArray();
         }
+        public CheckBoxItemInfo[] GetSubItems()
+        {
+            return customCheckListBox1.GetItems();
+        }
 
-        public static void CreateControls(Type subItemType, Action<CheckBoxItem> action, bool sortDESC = false)
+        public static void CreateControls(Type subItemType, Action<CheckBoxItemInfo> action, bool sortDESC = false)
         {
             try
             {
@@ -69,7 +90,7 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
 
                 foreach (var item in items)
                 {
-                    var tempCheckBoxItem = new CheckBoxItem() { CleanerType = item.Key };
+                    var tempCheckBoxItem = new CheckBoxItemInfo() { CleanerType = item.Key };
 
                     tempCheckBoxItem.Order = item.Value.Order.GetValueOrDefault(item.Key);
 
@@ -109,12 +130,12 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
                 );
         }
 
-        private void NewCheckboxItem(CheckBoxItem checkBoxItem)
+        private void NewCheckboxItem(CheckBoxItemInfo checkBoxItem)
         {
             customCheckListBox1.AddItem(checkBoxItem);
         }
 
-        public class CheckBoxItem
+        public class CheckBoxItemInfo
         {
             public string Name { get; set; }
             public int CleanerType { get; set; }

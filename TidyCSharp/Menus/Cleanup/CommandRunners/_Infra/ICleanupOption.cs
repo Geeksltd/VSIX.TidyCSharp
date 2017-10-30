@@ -8,6 +8,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.Infra
         int? CleanupItemsInteger { get; }
 
         void Accept(IMainCleanup mainCleanup);
+
+        CodeCleanerType GetCodeCleanerType();
     }
     public static class ICleanupOptionHelper
     {

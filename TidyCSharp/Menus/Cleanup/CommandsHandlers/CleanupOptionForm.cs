@@ -6,6 +6,7 @@ using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
 using static Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers.CleanupItemUserControl;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers;
 using Geeks.VSIX.TidyCSharp.Cleanup;
+using Geeks.VSIX.TidyCSharp.Properties;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
 {
@@ -15,7 +16,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
         {
             Instance = new CleanupOptionForm();
         }
-        //public static CleanupOptionForm Instance2
+        //public static CleanupOptionForm Instance
         //{
         //    get
         //    {
@@ -49,7 +50,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
 
         int TAB_INDEX_START = 3;
 
-        private void NewCheckboxItem(CheckBoxItem checkBoxItem)
+        private void NewCheckboxItem(CheckBoxItemInfo checkBoxItem)
         {
             var newSubControl = new CleanupItemUserControl()
             {
@@ -67,33 +68,33 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
 
         private void LoadFromSetting()
         {
-            ////if (string.IsNullOrEmpty(Settings.Default.CleanupChoices))
-            ////{
-            ////    for (int i = 0; i < checkedListBoxWhitespaceNormalizer.Items.Count; i++)
-            ////    {
-            ////        checkedListBoxWhitespaceNormalizer.SetItemChecked(i, true);
-            ////    }
-            ////    return;
-            ////}
+            if (string.IsNullOrEmpty(Settings.Default.CleanupChoices))
+            {
+                return;
+            }
+            try
+            {
 
-            ////var choices = Settings.Default.CleanupChoices.Split(',');
-            ////int value = 0;
-            ////foreach (var item in choices)
-            ////{
-            ////    if (int.TryParse(item, out value))
-            ////    {
-            ////        if (Enum.IsDefined(typeof(CodeCleanerType), value))
-            ////        {
-            ////            CodeCleanerType enumValue = (CodeCleanerType)Enum.ToObject(typeof(CodeCleanerType), value);
+                var choices = Settings.Default.CleanupChoices.Split(new string[] { CleanupOptions.TO_STRING_SEPRATOR }, StringSplitOptions.RemoveEmptyEntries);
+                int value = 0;
+                foreach (var item in choices)
+                {
+                    var choiceItem = item.Split(new string[] { CleanupOptions.TO_STRING_SEPRATOR2 }, StringSplitOptions.RemoveEmptyEntries);
 
-            ////            var foundItem = checkedListBoxWhitespaceNormalizer.Items.OfType<CheckBoxItem>().FirstOrDefault(x => x.CleanerType == enumValue);
+                    var cleanUpType = (CodeCleanerType)int.Parse(choiceItem[0]);
 
-            ////            if (foundItem == null) continue;
+                    foreach (CleanupItemUserControl control in mainPanel.Controls.OfType<CleanupItemUserControl>())
+                    {
+                        if (control.MainCleanupItemType != cleanUpType) continue;
 
-            ////            checkedListBoxWhitespaceNormalizer.SetItemChecked(checkedListBoxWhitespaceNormalizer.Items.IndexOf(foundItem), true);
-            ////        }
-            ////    }
-            ////}
+                        control.SetSubItems(int.Parse(choiceItem[1]));
+                    }
+                }
+            }
+            catch
+            {
+
+            }
         }
 
         private void ApplyCleanup()
@@ -104,13 +105,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             {
                 CleanupOptions.Accept(item);
             }
-            ////var SelectedTypes = checkedListBoxWhitespaceNormalizer.CheckedItems?.Cast<CheckBoxItem>().Select(x => x.CleanerType).ToArray();
-            ////SelectedTypes = SortSelectedTypes(SelectedTypes);
 
-            ////CleanupOptions = new CleanupOptions() { ActionTypes = SelectedTypes };
 
-            ////Settings.Default.CleanupChoices = string.Join(",", SelectedTypes.Select(x => (int)x));
-            ////Settings.Default.Save();
+            Settings.Default.CleanupChoices = CleanupOptions.ToString();
+            Settings.Default.Save();
         }
 
         private void btnApply_Click(object sender, EventArgs e)

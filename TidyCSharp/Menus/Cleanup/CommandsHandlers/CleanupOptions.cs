@@ -10,13 +10,20 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers
     {
         List<ICleanupOption> optionItems = new List<ICleanupOption>();
 
+        public const string TO_STRING_SEPRATOR2 = ":";
+        public const string TO_STRING_SEPRATOR = ";";
+        public List<CodeCleanerType> ActionTypes { get; private set; } = new List<CodeCleanerType>();
+
         public CleanupOptions()
         {
-            optionItems.Add(PrivateModifierRemover = new RemovePrivateModifier.Options());
-            optionItems.Add(WhiteSpaceNormalizer = new NormalizeWhitespace.Options());
+            optionItems.Add(CamelCasedFields = new CamelCasedClassFields.Options());
+            optionItems.Add(CamelCasedLocalVariable = new CamelCasedMethodVariable.Options());
             optionItems.Add(ConvertMembersToExpressionBodied = new MembersToExpressionBodied.Options());
+            optionItems.Add(PrivateModifierRemover = new RemovePrivateModifier.Options());
             optionItems.Add(RemoveExtraThisQualification = new RemoveExtraThisKeyword.Options());
             optionItems.Add(SimplifyClassFieldDeclarations = new SimplifyClassFieldDeclaration.Options());
+            optionItems.Add(SimplyAsyncCall = new SimplyAsyncCall.Options());
+            optionItems.Add(WhiteSpaceNormalizer = new NormalizeWhitespace.Options());
         }
 
         public void Accept(IMainCleanup mainCleanup)
@@ -25,17 +32,33 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers
             {
                 item.Accept(mainCleanup);
             }
-            if (mainCleanup.GetSubItems().Any())
+            if (mainCleanup.IsMainObjectSelected() && (mainCleanup.GetSubItems().Any() == false || mainCleanup.GetSelectedSubItems().Any()))
             {
                 ActionTypes.Add(mainCleanup.MainCleanupItemType);
             }
         }
 
-        public RemovePrivateModifier.Options PrivateModifierRemover { get; private set; }
-        public NormalizeWhitespace.Options WhiteSpaceNormalizer { get; private set; }
+        public CamelCasedClassFields.Options CamelCasedFields { get; private set; }
+        public CamelCasedMethodVariable.Options CamelCasedLocalVariable { get; private set; }
         public MembersToExpressionBodied.Options ConvertMembersToExpressionBodied { get; private set; }
+        public RemovePrivateModifier.Options PrivateModifierRemover { get; private set; }
         public RemoveExtraThisKeyword.Options RemoveExtraThisQualification { get; private set; }
         public SimplifyClassFieldDeclaration.Options SimplifyClassFieldDeclarations { get; private set; }
-        public List<CodeCleanerType> ActionTypes { get; private set; } = new List<CodeCleanerType>();
+        public SimplyAsyncCall.Options SimplyAsyncCall { get; private set; }
+        public NormalizeWhitespace.Options WhiteSpaceNormalizer { get; private set; }
+
+        public override string ToString()
+        {
+            return string.Join(TO_STRING_SEPRATOR, ActionTypes
+                .Select(x =>
+                {
+                    var optionItem = optionItems.FirstOrDefault(o => o.GetCodeCleanerType() == x);
+                    if (optionItem == null) return $"{(int)x}{TO_STRING_SEPRATOR2}{-1}";
+                    if (optionItem.CleanupItemsInteger.HasValue == false) return $"{(int)x}{TO_STRING_SEPRATOR2}{0}";
+                    return $"{(int)x}{TO_STRING_SEPRATOR2}{optionItem.CleanupItemsInteger.Value}";
+
+                })
+            );
+        }
     }
 }
