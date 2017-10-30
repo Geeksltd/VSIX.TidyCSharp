@@ -14,25 +14,28 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers
         {
             optionItems.Add(PrivateModifierRemover = new RemovePrivateModifier.Options());
             optionItems.Add(WhiteSpaceNormalizer = new NormalizeWhitespace.Options());
+            optionItems.Add(ConvertMembersToExpressionBodied = new MembersToExpressionBodied.Options());
+            optionItems.Add(RemoveExtraThisQualification = new RemoveExtraThisKeyword.Options());
+            optionItems.Add(SimplifyClassFieldDeclarations = new SimplifyClassFieldDeclaration.Options());
         }
 
         public void Accept(IMainCleanup mainCleanup)
         {
-            var temp = new List<CodeCleanerType>();
-
             foreach (var item in optionItems)
             {
                 item.Accept(mainCleanup);
             }
             if (mainCleanup.GetSubItems().Any())
             {
-                temp.Add(mainCleanup.MainCleanupItemType);
+                ActionTypes.Add(mainCleanup.MainCleanupItemType);
             }
-            ActionTypes = temp.ToArray();
         }
 
         public RemovePrivateModifier.Options PrivateModifierRemover { get; private set; }
         public NormalizeWhitespace.Options WhiteSpaceNormalizer { get; private set; }
-        public CodeCleanerType[] ActionTypes { get; private set; }
+        public MembersToExpressionBodied.Options ConvertMembersToExpressionBodied { get; private set; }
+        public RemoveExtraThisKeyword.Options RemoveExtraThisQualification { get; private set; }
+        public SimplifyClassFieldDeclaration.Options SimplifyClassFieldDeclarations { get; private set; }
+        public List<CodeCleanerType> ActionTypes { get; private set; } = new List<CodeCleanerType>();
     }
 }

@@ -1,4 +1,6 @@
+using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -12,26 +14,30 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
     {
         public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
         {
-            return SimplifyClassFieldDeclarationsHelper(initialSourceNode);
+            return SimplifyClassFieldDeclarationsHelper(initialSourceNode, Options);
         }
 
-        public static SyntaxNode SimplifyClassFieldDeclarationsHelper(SyntaxNode initialSourceNode)
+        public static SyntaxNode SimplifyClassFieldDeclarationsHelper(SyntaxNode initialSourceNode, ICleanupOption options)
         {
-            initialSourceNode = new Rewriter().Visit(initialSourceNode);
+            initialSourceNode = new Rewriter(options).Visit(initialSourceNode);
             return initialSourceNode;
         }
 
-        class Rewriter : CSharpSyntaxRewriter
+        class Rewriter : CleanupCSharpSyntaxRewriter
         {
-            public Rewriter() : base()
+            public Rewriter(ICleanupOption options) : base(options)
             {
             }
 
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                node = Apply(node) as ClassDeclarationSyntax;
+                if(CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Group_And_Merge_class_fields))
+                {
+                    node = Apply(node) as ClassDeclarationSyntax;
+                    return node;
+                }
 
-                return node;
+                return base.VisitClassDeclaration(node);
             }
 
             public override SyntaxNode VisitVariableDeclarator(VariableDeclaratorSyntax node)
@@ -43,34 +49,35 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 var value = node.Initializer.Value;
 
-                if (value is LiteralExpressionSyntax)
+                if
+                (
+                    !CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Null) && 
+                    !CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Literal)
+                )
+                    return base.VisitVariableDeclarator(node);
+
+                if (value is LiteralExpressionSyntax)             
                 {
                     var variableTypeNode = GetSystemTypeOfTypeNode((node.Parent as VariableDeclarationSyntax));
                     var valueObj = (value as LiteralExpressionSyntax).Token.Value;
 
                     if (TypesMapItem.GetAllPredefinedTypesDic().ContainsKey(variableTypeNode))
                     {
+                        if (CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Literal) == false) return base.VisitVariableDeclarator(node);
+
                         var typeItem = TypesMapItem.GetAllPredefinedTypesDic()[variableTypeNode];
-                        if ((typeItem.DefaultValue == null && valueObj != null) || (typeItem.DefaultValue != null && !typeItem.DefaultValue.Equals(valueObj))) return base.VisitVariableDeclarator(node);
+
+                        if ((typeItem.DefaultValue == null && valueObj != null) || (typeItem.DefaultValue != null && !typeItem.DefaultValue.Equals(valueObj)))
+                            return base.VisitVariableDeclarator(node);
                     }
                     else
                     {
+                        if (CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Null) == false) return base.VisitVariableDeclarator(node);
                         if (valueObj != null) return base.VisitVariableDeclarator(node);
                     }
 
                     node = node.WithInitializer(null).WithoutTrailingTrivia();
                 }
-                //else if (value is DefaultExpressionSyntax)
-                //{
-                //    node = node.WithInitializer(null).WithoutTrailingTrivia();
-                //}
-                //else if (value is ObjectCreationExpressionSyntax)
-                //{
-                //    if (variableTypeNode.IsKind(SyntaxKind.PredefinedType))
-                //    {
-                //        node = node.WithInitializer(null).WithoutTrailingTrivia();
-                //    }
-                //}
 
                 return base.VisitVariableDeclarator(node);
             }

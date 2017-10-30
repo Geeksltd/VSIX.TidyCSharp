@@ -13,7 +13,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 case CodeCleanerType.NormalizeWhiteSpaces:
                     return new WhiteSpaceNormalizer() { Options = cleanupOptions.WhiteSpaceNormalizer };
                 case CodeCleanerType.ConvertMembersToExpressionBodied:
-                    return new ConvertMembersToExpressionBodied();
+                    return new ConvertMembersToExpressionBodied() { Options = cleanupOptions.ConvertMembersToExpressionBodied };
                 case CodeCleanerType.ConvertFullNameTypesToBuiltInTypes:
                     return new ConvertFullNameTypesToBuiltInTypes();
                 case CodeCleanerType.SortClassMembers:
@@ -21,13 +21,13 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 case CodeCleanerType.SimplyAsyncCalls:
                     return new SimplyAsyncCalls();
                 case CodeCleanerType.SimplifyClassFieldDeclarations:
-                    return new SimplifyClassFieldDeclarations();
+                    return new SimplifyClassFieldDeclarations() { Options = cleanupOptions.SimplifyClassFieldDeclarations };
                 case CodeCleanerType.RemoveAttributeKeywork:
                     return new RemoveAttributeKeywork();
                 case CodeCleanerType.CompactSmallIfElseStatements:
                     return new CompactSmallIfElseStatements();
                 case CodeCleanerType.RemoveExtraThisQualification:
-                    return new RemoveExtraThisQualification();
+                    return new RemoveExtraThisQualification() { Options = cleanupOptions.RemoveExtraThisQualification };
                 case CodeCleanerType.CamelCasedLocalVariable:
                     return new CamelCasedLocalVariable();
                 case CodeCleanerType.CamelCasedFields:
@@ -37,7 +37,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 case CodeCleanerType.PrivateAccessModifier:
                     return new PrivateModifierRemover();
                 case CodeCleanerType.OrganizeUsingDirectives:
-                    return new UsingDirectiveOrganizer();
+                    return new UsingDirectiveOrganizer() { Options = cleanupOptions.PrivateModifierRemover };
                 default: return null; // TODO
             }
         }

@@ -4,6 +4,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.CSharp;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
+using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -11,15 +13,15 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
     {
         public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
         {
-            return new Rewriter(ProjectItemDetails).Visit(initialSourceNode);
+            return new Rewriter(ProjectItemDetails, Options).Visit(initialSourceNode);
         }
 
 
-        class Rewriter : CSharpSyntaxRewriter
+        class Rewriter : CleanupCSharpSyntaxRewriter
         {
             private readonly SemanticModel semanticModel;
 
-            public Rewriter(ProjectItemDetailsType projectItemDetails)
+            public Rewriter(ProjectItemDetailsType projectItemDetails, ICleanupOption options) : base(options)
             {
                 semanticModel = projectItemDetails.SemanticModel;
             }
@@ -44,6 +46,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     if (thisItem.Parent is MemberAccessExpressionSyntax thisItemAsMemberAccessException)
                     {
                         var newAccess = GetMemberAccessWithoutThis(thisItemAsMemberAccessException);
+
                         if (newAccess != null)
                         {
                             newItems.Add(thisItemAsMemberAccessException, newAccess);
@@ -61,9 +64,14 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             private SyntaxNode GetMemberAccessWithoutThis(MemberAccessExpressionSyntax thisItemAsMemberAccessException)
             {
+                var thisItemAsMemberAccessExceptionSymbol = semanticModel.GetSymbolInfo(thisItemAsMemberAccessException).Symbol;
+
+                if (thisItemAsMemberAccessExceptionSymbol is IFieldSymbol && !CheckOption((int)RemoveExtraThisKeyword.CleanupTypes.Remove_From_Fields_Call)) return null;
+                if (thisItemAsMemberAccessExceptionSymbol is IPropertySymbol && !CheckOption((int)RemoveExtraThisKeyword.CleanupTypes.Remove_From_Properties_Call)) return null;
+                if (thisItemAsMemberAccessExceptionSymbol is IMethodSymbol && !CheckOption((int)RemoveExtraThisKeyword.CleanupTypes.Remove_From_Method_Call)) return null;
+
                 var right = thisItemAsMemberAccessException.Name;
                 var symbols = semanticModel.LookupSymbols(thisItemAsMemberAccessException.SpanStart, name: right.Identifier.ValueText);
-                var thisItemAsMemberAccessExceptionSymbol = semanticModel.GetSymbolInfo(thisItemAsMemberAccessException).Symbol;
                 if (symbols.Any(x => x == thisItemAsMemberAccessExceptionSymbol))
                 {
                     return right.WithLeadingTrivia(thisItemAsMemberAccessException.GetLeadingTrivia());

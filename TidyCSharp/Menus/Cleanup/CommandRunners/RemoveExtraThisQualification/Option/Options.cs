@@ -14,7 +14,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.RemoveExtraThisKeyword
 
         public void Accept(IMainCleanup mainCleanup)
         {
-            if (mainCleanup.MainCleanupItemType == CodeCleanerType.SimplifyClassFieldDeclarations)
+            if (mainCleanup.MainCleanupItemType == CodeCleanerType.RemoveExtraThisQualification)
             {
                 var selectedItems = mainCleanup.GetSubItems().Select(x => (CleanupTypes)x.CleanerType).ToArray();
 
