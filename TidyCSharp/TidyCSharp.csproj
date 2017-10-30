@@ -356,6 +356,15 @@
     <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\BlockRewriter.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\Option\CleanupTypes.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\_Infra\ICleanupOption.cs" />
+    <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\UI\CustomCheckBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\UI\CustomCheckListBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\UI\CustomCheckListBox.Designer.cs">
+      <DependentUpon>CustomCheckListBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\IMainCleanup.cs" />
     <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\CleanupItemAttribute.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\CSharpSyntaxRewriterBase.cs" />
@@ -452,6 +461,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Menus\Cleanup\CommandsHandlers\CleanupOptionForm.resx">
       <DependentUpon>CleanupOptionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Menus\Cleanup\CommandsHandlers\Infra\UI\CustomCheckListBox.resx">
+      <DependentUpon>CustomCheckListBox.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

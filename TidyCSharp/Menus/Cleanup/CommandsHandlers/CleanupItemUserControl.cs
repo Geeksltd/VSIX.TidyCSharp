@@ -5,25 +5,23 @@ using System.Text;
 using System.Windows.Forms;
 using Geeks.VSIX.TidyCSharp.Cleanup;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers.Infra;
 
 namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
 {
-
     public partial class CleanupItemUserControl : UserControl, IMainCleanup
     {
-        private const int HEIGHT_OF_CHECKBOX = 15;
-
         public CleanupItemUserControl()
         {
             InitializeComponent();
-            checkedListBoxcheckboxCleanupSubItems.BorderStyle = BorderStyle.None;
+            customCheckListBox1.BorderStyle = BorderStyle.None;
             checkboxCleanupItem.CheckedChanged += CheckboxCleanupItem_CheckedChanged;
-            checkedListBoxcheckboxCleanupSubItems.Enabled = checkboxCleanupItem.Checked;
+            customCheckListBox1.Enabled = checkboxCleanupItem.Checked;
         }
 
         private void CheckboxCleanupItem_CheckedChanged(object sender, EventArgs e)
         {
-            checkedListBoxcheckboxCleanupSubItems.Enabled = checkboxCleanupItem.Checked;
+            customCheckListBox1.Enabled = checkboxCleanupItem.Checked;
         }
 
         public CodeCleanerType MainCleanupItemType { get; set; }
@@ -44,21 +42,19 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
                 CreateControls(values.Value.SubItemType, checkBoxItem => NewCheckboxItem(checkBoxItem));
                 this.BorderStyle = BorderStyle.FixedSingle;
 
-                var h = (checkedListBoxcheckboxCleanupSubItems.Items.Count * (HEIGHT_OF_CHECKBOX + 4.5));
-                this.Height += (int)h;
+                this.Height += customCheckListBox1.Controls.Count * customCheckListBox1.Controls[0].Height;
                 return;
             }
 
-            this.Height = HEIGHT_OF_CHECKBOX + 10;// checkboxCleanupItem.Height;
+            this.Height = CustomCheckListBox.HEIGHT_OF_CHECKBOX + 5;// checkboxCleanupItem.Height;
 
-            //CreateControls<TSubItemType>(checkBoxItem => NewCheckboxItem(checkBoxItem));
         }
 
         public CheckBoxItem[] GetSubItems()
         {
             if (checkboxCleanupItem.Checked == false) return new CheckBoxItem[0];
 
-            var selectedTypes = checkedListBoxcheckboxCleanupSubItems.CheckedItems?.Cast<CheckBoxItem>();
+            var selectedTypes = customCheckListBox1.GetCheckedItems();
             return selectedTypes.OrderBy(x => x.Order).ToArray();
         }
 
@@ -99,10 +95,6 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
             foreach (var item in Enum.GetValues(subItemType))
             {
                 yield return Get(subItemType, item);
-                //var memInfo = type.GetMember(item.ToString());
-                //var attributes = memInfo[0].GetCustomAttributes(typeof(CleanupItemAttribute), false);
-                ////var description = ((CleanupItemAttribute)attributes[0]).Title;
-                //yield return new KeyValuePair<int, CleanupItemAttribute>((int)item, (CleanupItemAttribute)attributes.FirstOrDefault());
             }
         }
 
@@ -110,7 +102,6 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
         {
             var memInfo = subItemType.GetMember(item.ToString());
             var attributes = memInfo[0].GetCustomAttributes(typeof(CleanupItemAttribute), false);
-            //var description = ((CleanupItemAttribute)attributes[0]).Title;
             return new KeyValuePair<int, CleanupItemAttribute>((int)item,
                 (CleanupItemAttribute)attributes.FirstOrDefault()
                 ??
@@ -118,60 +109,9 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
                 );
         }
 
-        //public static void CreateControls<T>(Action<CheckBoxItem> action)
-        //    where T : struct
-        //{
-        //    foreach (var item in Get<T>().OrderBy(x => x.Value.Order))
-        //    {
-        //        var tempCheckBoxItem = new CheckBoxItem() { CleanerType = item.Key };
-
-        //        if (item.Value != null)
-        //        {
-        //            tempCheckBoxItem.Order = item.Value.Order;
-
-        //            if (item.Value.Title != null)
-        //            {
-        //                tempCheckBoxItem.Name = item.Value.Title;
-        //            }
-        //            else
-        //            {
-        //                tempCheckBoxItem.Name = Enum.GetName(typeof(T), item.Key).ToString();
-        //            }
-        //        }
-        //        else
-        //        {
-        //            tempCheckBoxItem.Name = null;
-        //            tempCheckBoxItem.Order = int.MaxValue;
-        //        }
-        //    }
-        //}
-
-        //public static IEnumerable<KeyValuePair<int, CleanupItemAttribute>> Get<T>()
-        //    where T : struct
-        //{
-        //    foreach (var item in Enum.GetValues(typeof(T)))
-        //    {
-        //        yield return Get<T>(item);
-        //        //var memInfo = type.GetMember(item.ToString());
-        //        //var attributes = memInfo[0].GetCustomAttributes(typeof(CleanupItemAttribute), false);
-        //        ////var description = ((CleanupItemAttribute)attributes[0]).Title;
-        //        //yield return new KeyValuePair<int, CleanupItemAttribute>((int)item, (CleanupItemAttribute)attributes.FirstOrDefault());
-        //    }
-        //}
-
-        //public static KeyValuePair<int, CleanupItemAttribute> Get<T>(object item)
-        //    where T : struct
-        //{
-        //    var memInfo = typeof(T).GetMember(item.ToString());
-        //    var attributes = memInfo[0].GetCustomAttributes(typeof(CleanupItemAttribute), false);
-        //    //var description = ((CleanupItemAttribute)attributes[0]).Title;
-        //    return new KeyValuePair<int, CleanupItemAttribute>((int)item, (CleanupItemAttribute)attributes.FirstOrDefault());
-        //}
-
         private void NewCheckboxItem(CheckBoxItem checkBoxItem)
         {
-            checkedListBoxcheckboxCleanupSubItems.Items.Add(checkBoxItem);
-            ////this.Height += HEIGHT_OF_CHECKBOX + 25;
+            customCheckListBox1.AddItem(checkBoxItem);
         }
 
         public class CheckBoxItem
