@@ -24,6 +24,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         [CleanupItem(Title = "Compact class field declarations", FirstOrder = 5, SubItemType = typeof(SimplifyClassFieldDeclaration.CleanupTypes))]
         SimplifyClassFieldDeclarations = 0x80,
 
+        [CleanupItem(Title = "Compact variables declarations", FirstOrder = 5)]
+        SimplifyVariableDeclarations = 0x8000,
+
         [CleanupItem(Title = "Remove unnecessary 'this.'", FirstOrder = 6, SubItemType = typeof(RemoveExtraThisKeyword.CleanupTypes))]
         RemoveExtraThisQualification = 0x400,
 

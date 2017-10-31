@@ -36,6 +36,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                     return new PrivateModifierRemover();
                 case CodeCleanerType.OrganizeUsingDirectives:
                     return new UsingDirectiveOrganizer() { Options = cleanupOptions.PrivateModifierRemover };
+                case CodeCleanerType.SimplifyVariableDeclarations:
+                    return new SimplifyVariableDeclarations();
                 default: return null; // TODO
             }
         }
