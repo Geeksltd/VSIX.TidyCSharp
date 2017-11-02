@@ -1,4 +1,3 @@
-using System;
 using EnvDTE;
 using Geeks.VSIX.TidyCSharp;
 using Geeks.VSIX.TidyCSharp.Cleanup;

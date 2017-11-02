@@ -1,5 +1,4 @@
 using EnvDTE;
-using Microsoft.CodeAnalysis;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {

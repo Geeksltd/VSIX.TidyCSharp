@@ -1,6 +1,5 @@
-﻿using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
+﻿using System.Linq;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers;
-using System.Linq;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup.Infra
 {

@@ -1,8 +1,8 @@
 using System.Linq;
 using EnvDTE;
+using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Microsoft.CodeAnalysis;
 using RoslynDocument = Microsoft.CodeAnalysis.Document;
-using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {

@@ -56,7 +56,7 @@ namespace Geeks.GeeksProductivityTools
             }
 
             // Check if this error is already in the error list, don't report more than once  
-            bool alreadyReported = false;
+            var alreadyReported = false;
             foreach (ErrorTask task in _errorListProvider.Tasks)
             {
                 if (task.ErrorCategory == errorTask.ErrorCategory &&

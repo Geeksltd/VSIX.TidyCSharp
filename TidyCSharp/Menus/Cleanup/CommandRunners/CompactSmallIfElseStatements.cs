@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
+using Geeks.GeeksProductivityTools;
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
-using Geeks.GeeksProductivityTools.Menus.Cleanup;
-using Geeks.GeeksProductivityTools;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {

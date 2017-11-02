@@ -1,7 +1,7 @@
 using System.Linq;
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Geeks.GeeksProductivityTools.Menus.Cleanup;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {

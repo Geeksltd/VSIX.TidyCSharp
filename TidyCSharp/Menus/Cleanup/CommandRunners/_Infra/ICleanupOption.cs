@@ -1,5 +1,4 @@
 ﻿using Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers;
-using System;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup.Infra
 {

@@ -1,8 +1,8 @@
 using System.Linq;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
