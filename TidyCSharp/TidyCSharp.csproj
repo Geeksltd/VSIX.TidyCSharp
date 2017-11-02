@@ -329,6 +329,7 @@
     <Compile Include="Menus\Cleanup\CommandRunners\CamelCasedClassFields\CamelCasedFields.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\CamelCasedClassFields\Option\CleanupTypes.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\CamelCasedClassFields\Option\Options.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\ConvertPropertiesToAutoProperties.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\SimplifyVariableDeclarations.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\SimplyAsyncCall\Option\CleanupTypes.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\SimplyAsyncCall\Option\Options.cs" />
@@ -474,6 +475,7 @@
     <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

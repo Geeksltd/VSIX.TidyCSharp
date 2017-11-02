@@ -27,6 +27,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         [CleanupItem(Title = "Compact variables declarations", FirstOrder = 5)]
         SimplifyVariableDeclarations = 0x8000,
 
+        [CleanupItem(Title = "Convert properties to Auto Properties", FirstOrder = 5)]
+        ConvertPropertiesToAutoProperties = 0x10000,
+
         [CleanupItem(Title = "Remove unnecessary 'this.'", FirstOrder = 6, SubItemType = typeof(RemoveExtraThisKeyword.CleanupTypes))]
         RemoveExtraThisQualification = 0x400,
 

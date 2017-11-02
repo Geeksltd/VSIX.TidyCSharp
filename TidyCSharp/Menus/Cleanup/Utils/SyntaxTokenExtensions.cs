@@ -6,6 +6,7 @@ using System.Text;
 using EnvDTE;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -114,27 +115,82 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                     .WithLeadingTrivia(token.GetLeadingTrivia().Where(t => !t.IsWhitespaceTrivia()))
                     .WithTrailingTrivia(token.GetTrailingTrivia().Where(t => !t.IsWhitespaceTrivia()));
         }
-        public static bool HasNoneWhitespaceTrivia(this IEnumerable<SyntaxTrivia> triviaList)
+        public static bool HasNoneWhitespaceTrivia(this IEnumerable<SyntaxTrivia> triviaList, SyntaxKind[] exceptionList = null)
         {
-            return triviaList.Any(t => !t.IsWhitespaceTrivia());
+            if (exceptionList == null)
+                return triviaList.Any(t => !t.IsWhitespaceTrivia());
+
+            return triviaList.Any(t => !t.IsWhitespaceTrivia() && exceptionList.Any(e => t.IsKind(e)) == false);
         }
         public static bool IsWhitespaceTrivia(this SyntaxTrivia trivia)
         {
             return trivia.IsKind(SyntaxKind.EndOfLineTrivia) || trivia.IsKind(SyntaxKind.WhitespaceTrivia);
         }
-        public static bool HasNoneWhitespaceTrivia(this SyntaxNode node)
+        public static bool HasNoneWhitespaceTrivia(this SyntaxNode node,SyntaxKind[] exceptionList = null)
         {
             if (node.ContainsDirectives) return true;
             if (node.HasStructuredTrivia) return true;
-            if (node.DescendantTrivia(descendIntoTrivia: true).HasNoneWhitespaceTrivia()) return true;
+            if (node.DescendantTrivia(descendIntoTrivia: true).HasNoneWhitespaceTrivia(exceptionList)) return true;
             return false;
         }
-        public static bool HasNoneWhitespaceTrivia(this SyntaxToken token)
+        public static bool HasNoneWhitespaceTrivia(this SyntaxToken token, SyntaxKind[] exceptionList = null)
         {
             if (token.ContainsDirectives) return true;
             if (token.HasStructuredTrivia) return true;
             if (token.GetAllTrivia().HasNoneWhitespaceTrivia()) return true;
             return false;
+        }
+
+        public static bool IsPrivate(this FieldDeclarationSyntax field)
+        {
+            return IsPrivate(field.Modifiers);
+        }
+        public static bool IsPrivate(this PropertyDeclarationSyntax field)
+        {
+            return IsPrivate(field.Modifiers);
+        }
+
+        public static bool IsPublic(this FieldDeclarationSyntax field)
+        {
+            return field.Modifiers.Any(m => m.IsKind(SyntaxKind.PublicKeyword));
+        }
+        public static bool IsPublic(this PropertyDeclarationSyntax field)
+        {
+            return field.Modifiers.Any(m => m.IsKind(SyntaxKind.PublicKeyword));
+        }
+        public static bool IsProtected(this FieldDeclarationSyntax field)
+        {
+            return field.Modifiers.Any(m => m.IsKind(SyntaxKind.ProtectedKeyword));
+        }
+        public static bool IsProtected(this PropertyDeclarationSyntax field)
+        {
+            return field.Modifiers.Any(m => m.IsKind(SyntaxKind.ProtectedKeyword));
+        }
+        public static bool IsInternal(this FieldDeclarationSyntax field)
+        {
+            return field.Modifiers.Any(m => m.IsKind(SyntaxKind.InternalKeyword));
+        }
+        public static bool IsInternal(this PropertyDeclarationSyntax field)
+        {
+            return field.Modifiers.Any(m => m.IsKind(SyntaxKind.InternalKeyword));
+        }
+
+        public static bool IsPrivate(this LocalDeclarationStatementSyntax local)
+        {
+            return IsPrivate(local.Modifiers);
+        }
+
+        private static bool IsPrivate(SyntaxTokenList modifiers)
+        {
+            return
+                modifiers.Any(m => m.IsKind(SyntaxKind.PrivateKeyword)) ||
+                modifiers
+                    .Any(
+                        m =>
+                            m.IsKind(SyntaxKind.PublicKeyword) ||
+                            m.IsKind(SyntaxKind.ProtectedKeyword) ||
+                            m.IsKind(SyntaxKind.InternalKeyword)
+                    ) == false;
         }
     }
 }

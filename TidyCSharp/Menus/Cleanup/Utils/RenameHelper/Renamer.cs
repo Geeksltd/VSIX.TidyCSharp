@@ -273,7 +273,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             var methodAnnotation = new SyntaxAnnotation(SELECTED_METHOD_ANNOTATION);
             var changeDic = new Dictionary<SyntaxNode, SyntaxNode>();
-            changeDic.Add(startNode, startNode.WithAdditionalAnnotations(methodAnnotation));
+            if (startNode != null)
+            {
+                changeDic.Add(startNode, startNode.WithAdditionalAnnotations(methodAnnotation));
+            }
             changeDic.Add(declarationNode, declarationNode.WithIdentifier(identifierToken.WithAdditionalAnnotations(RenameAnnotation.Create())));
 
             var annotatedRoot = root.ReplaceNodes(changeDic.Keys, (x, y) => changeDic[x]);
@@ -288,7 +291,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             var methodAnnotation = new SyntaxAnnotation(SELECTED_METHOD_ANNOTATION);
             var changeDic = new Dictionary<SyntaxNode, SyntaxNode>();
-            changeDic.Add(startNode, startNode.WithAdditionalAnnotations(methodAnnotation));
+            if (startNode != null)
+            {
+                changeDic.Add(startNode, startNode.WithAdditionalAnnotations(methodAnnotation));
+            }
             changeDic.Add(declarationNode, declarationNode.WithIdentifier(identifierToken.WithAdditionalAnnotations(RenameAnnotation.Create())));
 
             var annotatedRoot = root.ReplaceNodes(changeDic.Keys, (x, y) => changeDic[x]);
