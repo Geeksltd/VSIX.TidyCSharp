@@ -35,16 +35,24 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             public override SyntaxNode VisitVariableDeclaration(VariableDeclarationSyntax node)
             {
-                if (node.Parent is LocalDeclarationStatementSyntax == false) return base.VisitVariableDeclaration(node);
+                return ConvertToVar(node) ?? node;
+            }
+
+            private SyntaxNode ConvertToVar(VariableDeclarationSyntax node)
+            {
+                if (node.Parent is LocalDeclarationStatementSyntax == false) return null;
                 if (node.Type is IdentifierNameSyntax varIdentifierNameSyntax)
                 {
-                    if (varIdentifierNameSyntax.Identifier.ValueText == VarKeyword) return base.VisitVariableDeclaration(node);
+                    if (varIdentifierNameSyntax.Identifier.ValueText == VarKeyword) return null;
                 }
-                if (node.Variables.Count > 1) return base.VisitVariableDeclaration(node);
+                if (node.Variables.Count > 1) return null;
 
                 var variable = node.Variables.First();
 
+                if (variable.Initializer == null) return null;
+
                 var typeOfInitializer = projectItemDetails.SemanticModel.GetTypeInfo(variable.Initializer.Value);
+
                 var typeOfTypeDef = projectItemDetails.SemanticModel.GetTypeInfo(node.Type);
 
                 if (typeOfInitializer.Type == typeOfTypeDef.Type)
