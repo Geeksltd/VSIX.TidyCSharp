@@ -34,6 +34,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         if (oldNode1.Parent is MemberAccessExpressionSyntax)
                         {
                             if ((oldNode1.Parent as MemberAccessExpressionSyntax).Expression != oldNode1) return oldNode1;
+                            var symbol = ProjectItemDetails.SemanticModel.GetSymbolInfo(oldNode1).Symbol;
+                            if (symbol != null && symbol.Kind != SymbolKind.NamedType) return oldNode1;
                         }
                         else if (oldNode1 is IdentifierNameSyntax == false && oldNode1 is QualifiedNameSyntax == false) return oldNode1;
                         else
