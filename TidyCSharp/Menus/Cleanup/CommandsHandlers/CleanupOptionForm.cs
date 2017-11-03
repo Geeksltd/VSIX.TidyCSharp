@@ -3,7 +3,6 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
-using static Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers.CleanupItemUserControl;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers;
 using Geeks.VSIX.TidyCSharp.Cleanup;
 using Geeks.VSIX.TidyCSharp.Properties;
@@ -12,18 +11,18 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
 {
     public partial class CleanupOptionForm : Form
     {
-        static CleanupOptionForm()
+        static CleanupOptionForm _Instance = new CleanupOptionForm();
+        public static CleanupOptionForm Instance
         {
-            Instance = new CleanupOptionForm();
+            get
+            {
+                return _Instance;
+            }
+            set
+            {
+                _Instance = value;
+            }
         }
-        //public static CleanupOptionForm Instance
-        //{
-        //    get
-        //    {
-        //        return new CleanupOptionForm();
-        //    }
-        //}
-        public static CleanupOptionForm Instance { get; set; }
         public CleanupOptions CleanupOptions { get; private set; }
 
         CleanupOptionForm()
@@ -66,6 +65,32 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
         }
 
 
+        public void DeserializeValues(string strValue)
+        {
+            try
+            {
+                var choices = strValue.Split(new string[] { CleanupOptions.TO_STRING_SEPRATOR }, System.StringSplitOptions.RemoveEmptyEntries);
+
+                var controls = mainPanel.Controls.OfType<CleanupItemUserControl>();
+
+                foreach (var item in choices)
+                {
+                    var choiceItem = item.Split(new string[] { CleanupOptions.TO_STRING_SEPRATOR2 }, System.StringSplitOptions.RemoveEmptyEntries);
+
+                    var cleanUpType = (CodeCleanerType)int.Parse(choiceItem[0]);
+                    var isSelected = bool.Parse(choiceItem[1]);
+
+                    var selectedControls = controls.FirstOrDefault(c => c.MainCleanupItemType == cleanUpType);
+
+                    selectedControls.SetMainItemSelection(isSelected);
+                    selectedControls.SetSubItems(int.Parse(choiceItem[2]));
+                }
+            }
+            catch
+            {
+
+            }
+        }
         private void LoadFromSetting()
         {
             if (string.IsNullOrEmpty(Settings.Default.CleanupChoices))
@@ -77,6 +102,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
 
                 return;
             }
+            DeserializeValues(Settings.Default.CleanupChoices);
+            return;
             try
             {
 
@@ -92,6 +119,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
                     {
                         if (control.MainCleanupItemType != cleanUpType) continue;
 
+                        var t = int.Parse(choiceItem[1]);
+                        control.SetMainItemSelection(t == -1 || t != 0);
                         control.SetSubItems(int.Parse(choiceItem[1]));
                     }
                 }
@@ -112,7 +141,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             }
 
 
-            Settings.Default.CleanupChoices = CleanupOptions.ToString();
+            //Settings.Default.CleanupChoices = CleanupOptions.ToString();
+            Settings.Default.CleanupChoices = CleanupOptions.SerializeValues();
             if (string.IsNullOrEmpty(Settings.Default.CleanupChoices))
             {
                 Settings.Default.CleanupChoices = "null";

@@ -47,6 +47,28 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers
         public SimplyAsyncCall.Options SimplyAsyncCall { get; private set; }
         public NormalizeWhitespace.Options WhiteSpaceNormalizer { get; private set; }
 
+        public string SerializeValues()
+        {
+            var values = System.Enum.GetValues(typeof(CodeCleanerType)).Cast<int>();
+
+            return string.Join(TO_STRING_SEPRATOR, values
+                .Select(enumValueAsObject =>
+                {
+                    var optionItem = optionItems.FirstOrDefault(o => (int)o.GetCodeCleanerType() == enumValueAsObject);
+
+                    var IsParentSelected = ActionTypes.Contains((CodeCleanerType)enumValueAsObject);
+
+                    if (optionItem == null) return $"{enumValueAsObject}{TO_STRING_SEPRATOR2}{IsParentSelected}{TO_STRING_SEPRATOR2}{-1}";
+
+                    if (optionItem.CleanupItemsInteger.HasValue == false)
+                        return $"{enumValueAsObject}{TO_STRING_SEPRATOR2}{IsParentSelected}{TO_STRING_SEPRATOR2}{0}";
+
+                    return $"{enumValueAsObject}{TO_STRING_SEPRATOR2}{IsParentSelected}{TO_STRING_SEPRATOR2}{optionItem.CleanupItemsInteger.Value}";
+
+                })
+            );
+        }
+
         public override string ToString()
         {
             return string.Join(TO_STRING_SEPRATOR, ActionTypes

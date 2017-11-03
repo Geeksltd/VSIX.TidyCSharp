@@ -10,6 +10,7 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
         bool HasSubItems { get; }
         CheckBoxItemInfo[] GetSelectedSubItems();
         void SetSubItems(int value);
+        void SetMainItemSelection(bool isSelected);
         void ReSetSubItems(bool selectAll = false);
     }
 }

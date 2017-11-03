@@ -50,15 +50,13 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
         public CodeCleanerType MainCleanupItemType { get; private set; }
         public bool HasSubItems { get; private set; } = false;
 
+        public void SetMainItemSelection(bool isSelected)
+        {
+            checkboxCleanupItem.Checked = isSelected;
+        }
         public void SetSubItems(int value)
         {
-            if (value == -1)
-            {
-                checkboxCleanupItem.Checked = true;
-                return;
-            }
             customCheckListBox1.SetCheckedItems(value);
-            checkboxCleanupItem.Checked = customCheckListBox1.GetCheckedItems().Any();
         }
 
         public void ReSetSubItems(bool selectAll = false)
@@ -77,19 +75,11 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
                 return true;
             }
         }
-
         public CheckBoxItemInfo[] GetSelectedSubItems()
         {
-            if (checkboxCleanupItem.Checked == false) return new CheckBoxItemInfo[0];
-
             var selectedTypes = customCheckListBox1.GetCheckedItems();
             return selectedTypes.OrderBy(x => x.Order).ToArray();
         }
-
-        //public CheckBoxItemInfo[] GetSubItems()
-        //{
-        //    return customCheckListBox1.GetItems();
-        //}
 
         #endregion
 
