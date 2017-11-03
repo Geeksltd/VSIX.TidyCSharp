@@ -26,10 +26,21 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
                 var window = item.Open(Constants.vsViewKindCode);
 
                 window.Activate();
+
+                var hasWhitespace = cleanupOptions.ActionTypes.Contains(VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces);
+
                 foreach (var actionTypeItem in cleanupOptions.ActionTypes)
                 {
-                    CodeCleanerHost.Run(item, actionTypeItem, cleanupOptions);
+                    if (actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces)
+                    {
+                        CodeCleanerHost.Run(item, actionTypeItem, cleanupOptions);
+                    }
                 }
+                if (hasWhitespace)
+                {
+                    CodeCleanerHost.Run(item, VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces, cleanupOptions);
+                }
+
                 if (fileWindowMustBeOpend == false)
                 {
                     window.Close(vsSaveChanges.vsSaveChangesYes);
