@@ -70,7 +70,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         {
             if (string.Compare(WorkingDocument.GetTextAsync().Result.ToString(), ProjectItemDetails.InitialSourceNode.GetText().ToString(), false) != 0)
             {
-                GeeksProductivityToolsPackage.Instance.RefreshSolution(WorkingDocument.Project.Solution);
+                TidyCSharpPackage.Instance.RefreshSolution(WorkingDocument.Project.Solution);
             }
         }
 
@@ -126,7 +126,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 if (CheckVisibility(baseFieldFieldDeclaration, getNode, setNode, propertyDeclaration) == false) return null;
 
-                var refrences = Microsoft.CodeAnalysis.FindSymbols.SymbolFinder.FindReferencesAsync(baseFieldSymbol, GeeksProductivityToolsPackage.Instance.CleanupWorkingSolution);
+                var refrences = Microsoft.CodeAnalysis.FindSymbols.SymbolFinder.FindReferencesAsync(baseFieldSymbol, TidyCSharpPackage.Instance.CleanupWorkingSolution);
                 var references = refrences.Result.FirstOrDefault();
 
                 if (references == null) return null;

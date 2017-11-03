@@ -16,16 +16,16 @@ namespace Geeks.GeeksProductivityTools
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideOptionPage(typeof(OptionsPage), "Geeks productivity tools", "General", 0, 0, true)]
     [Guid(GuidList.GuidGeeksProductivityToolsPkgString)]
-    public sealed class GeeksProductivityToolsPackage : Package
+    public sealed class TidyCSharpPackage : Package
     {
-        public GeeksProductivityToolsPackage() { }
+        public TidyCSharpPackage() { }
 
         // Strongly reference events so that it's not GC'd
         EnvDTE.DocumentEvents docEvents;
         EnvDTE.SolutionEvents solEvents;
         EnvDTE.Events events;
 
-        public static GeeksProductivityToolsPackage Instance { get; private set; }
+        public static TidyCSharpPackage Instance { get; private set; }
         public Workspace VsWorkspace { get; set; }
 
         bool bResetWorkingSolution = false;

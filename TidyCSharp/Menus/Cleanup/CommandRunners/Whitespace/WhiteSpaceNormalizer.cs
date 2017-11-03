@@ -20,9 +20,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
         public static SyntaxNode NormalizeWhiteSpaceHelper(SyntaxNode initialSourceNode, Options options)
         {
-            if (GeeksProductivityToolsPackage.Instance != null)
+            if (TidyCSharpPackage.Instance != null)
             {
-                initialSourceNode = Formatter.Format(initialSourceNode, GeeksProductivityToolsPackage.Instance.CleanupWorkingSolution.Workspace);
+                initialSourceNode = Formatter.Format(initialSourceNode, TidyCSharpPackage.Instance.CleanupWorkingSolution.Workspace);
             }
 
             initialSourceNode = new BlockRewriter(initialSourceNode, options).Visit(initialSourceNode);

@@ -47,7 +47,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
         {
             if (string.Compare(WorkingDocument.GetTextAsync().Result.ToString(), ProjectItemDetails.InitialSourceNode.GetText().ToString(), false) != 0)
             {
-                GeeksProductivityToolsPackage.Instance.RefreshSolution(WorkingDocument.Project.Solution);
+                TidyCSharpPackage.Instance.RefreshSolution(WorkingDocument.Project.Solution);
             }
         }
 

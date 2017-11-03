@@ -34,7 +34,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             if (CleanupOptionForm.Instance.CleanupOptions != null)
             {
                 ActionsOnCSharp.ActionCSharpOnAnyWhere.Invoke(desiredAction, CleanupOptionForm.Instance.CleanupOptions);
-                GeeksProductivityToolsPackage.Instance.SaveSolutionChanges();
+                TidyCSharpPackage.Instance.SaveSolutionChanges();
             }
         }
     }

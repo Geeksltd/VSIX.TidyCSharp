@@ -20,9 +20,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         {
             var newRoot = new Rewriter(initialSourceNode).Visit(initialSourceNode);
 
-            if (newRoot != initialSourceNode && GeeksProductivityToolsPackage.Instance != null)
+            if (newRoot != initialSourceNode && TidyCSharpPackage.Instance != null)
             {
-                initialSourceNode = Formatter.Format(initialSourceNode, GeeksProductivityToolsPackage.Instance.CleanupWorkingSolution.Workspace);
+                initialSourceNode = Formatter.Format(initialSourceNode, TidyCSharpPackage.Instance.CleanupWorkingSolution.Workspace);
             }
             return initialSourceNode;
         }

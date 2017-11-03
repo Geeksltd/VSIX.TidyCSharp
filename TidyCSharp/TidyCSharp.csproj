@@ -358,6 +358,13 @@
     <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\BlockRewriter.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\Option\CleanupTypes.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\_Infra\ICleanupOption.cs" />
+    <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\CheckBoxItemInfo.cs" />
+    <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\UI\CleanupItemUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\UI\CleanupItemUserControl.Designer.cs">
+      <DependentUpon>CleanupItemUserControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\UI\CustomCheckBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -373,12 +380,6 @@
     <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\Option\Options.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\WhitespaceRewriter.cs" />
     <Compile Include="Menus\Cleanup\CommandsHandlers\ActionCustomCodeCleanup.cs" />
-    <Compile Include="Menus\Cleanup\CommandsHandlers\CleanupItemUserControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Menus\Cleanup\CommandsHandlers\CleanupItemUserControl.Designer.cs">
-      <DependentUpon>CleanupItemUserControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="Menus\Cleanup\CommandsHandlers\CleanupOptionForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -458,11 +459,11 @@
     <Compile Include="Utility\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Menus\Cleanup\CommandsHandlers\CleanupItemUserControl.resx">
-      <DependentUpon>CleanupItemUserControl.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Menus\Cleanup\CommandsHandlers\CleanupOptionForm.resx">
       <DependentUpon>CleanupOptionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Menus\Cleanup\CommandsHandlers\Infra\UI\CleanupItemUserControl.resx">
+      <DependentUpon>CleanupItemUserControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Menus\Cleanup\CommandsHandlers\Infra\UI\CustomCheckListBox.resx">
       <DependentUpon>CustomCheckListBox.cs</DependentUpon>

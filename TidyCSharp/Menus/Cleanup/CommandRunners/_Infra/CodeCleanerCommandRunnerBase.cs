@@ -32,7 +32,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             }
             var newDocument = ProjectItemDetails.ProjectItemDocument.WithText(initialSourceNode.GetText());
 
-            GeeksProductivityToolsPackage.Instance.RefreshSolution(newDocument.Project.Solution);
+            TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
         }
         public abstract SyntaxNode CleanUp(SyntaxNode initialSourceNode);
 
@@ -85,7 +85,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             static RoslynDocument GetRoslynDomuentByProjectItem(ProjectItem projectItem)
             {
                 return
-                    GeeksProductivityToolsPackage.Instance
+                    TidyCSharpPackage.Instance
                         .CleanupWorkingSolution
                         .Projects.FirstOrDefault(p => p.Name == projectItem.ContainingProject.Name)
                         ?.Documents.FirstOrDefault(d => d.FilePath == projectItem.ToFullPathPropertyValue());

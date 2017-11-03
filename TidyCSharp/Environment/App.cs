@@ -14,7 +14,7 @@ namespace Geeks.GeeksProductivityTools
         {
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(GlobalExceptionHandlerEvent);
 
-            DTE = (DTE2)GeeksProductivityToolsPackage.GetGlobalService(typeof(SDTE));
+            DTE = (DTE2)TidyCSharpPackage.GetGlobalService(typeof(SDTE));
 
             Settings = new GlobalSettings();
             Settings.Load();

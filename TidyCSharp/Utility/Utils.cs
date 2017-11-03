@@ -39,7 +39,7 @@ namespace GeeksAddin
             app.StatusBar.Text = "No solution or project is identified. app.Solution is " +
                 (app.Solution?.GetType().Name).Or("NULL");
 
-            App.DTE = (DTE2)GeeksProductivityToolsPackage.GetGlobalService(typeof(SDTE));
+            App.DTE = (DTE2)TidyCSharpPackage.GetGlobalService(typeof(SDTE));
 
             return null;
         }

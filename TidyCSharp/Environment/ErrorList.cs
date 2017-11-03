@@ -52,7 +52,7 @@ namespace Geeks.GeeksProductivityTools
         {
             if (_errorListProvider == null)
             {
-                _errorListProvider = new ErrorListProvider(GeeksProductivityToolsPackage.Instance);
+                _errorListProvider = new ErrorListProvider(TidyCSharpPackage.Instance);
             }
 
             // Check if this error is already in the error list, don't report more than once  
