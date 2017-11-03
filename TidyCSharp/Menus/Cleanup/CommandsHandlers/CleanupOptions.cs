@@ -32,7 +32,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers
             {
                 item.Accept(mainCleanup);
             }
-            if (mainCleanup.IsMainObjectSelected() && (mainCleanup.GetSubItems().Any() == false || mainCleanup.GetSelectedSubItems().Any()))
+            if (mainCleanup.IsMainObjectSelected)
             {
                 ActionTypes.Add(mainCleanup.MainCleanupItemType);
             }
