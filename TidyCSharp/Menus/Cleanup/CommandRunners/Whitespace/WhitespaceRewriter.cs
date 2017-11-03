@@ -212,6 +212,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
             statementNode = statementNode.WithLeadingTrivia(leadingTriviaList);
 
+            _LastMember = null;
+
             return statementNode;
         }
 
@@ -250,6 +252,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
             mainNode = mainNode.ReplaceToken(firstToken, ApplyOpenBracket(firstToken));
 
+            _LastMember = null;
+
             return mainNode;
         }
 
@@ -277,7 +281,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             var x =
                 openBraceToken
                     .WithLeadingTrivia(
-                        CleanUpListWithExactNumberOfWhitespaces(openBraceToken.LeadingTrivia, 0, CleanupTypes.Remove_BLs_after_Open_Bracket_and_Before_Close_Brackets, itsForCloseBrace: true));
+                        CleanUpListWithExactNumberOfWhitespaces(openBraceToken.LeadingTrivia, 0, CleanupTypes.Remove_BLs_after_Open_Bracket_and_Before_Close_Brackets, itsForCloseBrace: false));
 
             return x;
         }
