@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
-  <Import Project="..\packages\Microsoft.Net.Compilers.2.4.0\build\Microsoft.Net.Compilers.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.2.4.0\build\Microsoft.Net.Compilers.props')" />
+  <Import Project="..\packages\Microsoft.Net.Compilers.2.3.2\build\Microsoft.Net.Compilers.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.2.3.2\build\Microsoft.Net.Compilers.props')" />
   <Import Project="..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props" Condition="'$(VisualStudioVersion)' == '14.0' And Exists('..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props')" />
   <Import Project="..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props" Condition="'$(VisualStudioVersion)' != '14.0' And Exists('..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.props')" />
   <PropertyGroup>
@@ -163,9 +163,7 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="System">
-      <HintPath>..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1\System.dll</HintPath>
-    </Reference>
+    <Reference Include="System" />
     <Reference Include="System.AppContext, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.AppContext.4.3.0\lib\net46\System.AppContext.dll</HintPath>
     </Reference>
@@ -359,12 +357,6 @@
     <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\Option\CleanupTypes.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\_Infra\ICleanupOption.cs" />
     <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\CheckBoxItemInfo.cs" />
-    <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\UI\CleanupItemUserControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\UI\CleanupItemUserControl.Designer.cs">
-      <DependentUpon>CleanupItemUserControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\UI\CustomCheckBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -380,6 +372,12 @@
     <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\Option\Options.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\WhitespaceRewriter.cs" />
     <Compile Include="Menus\Cleanup\CommandsHandlers\ActionCustomCodeCleanup.cs" />
+    <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\UI\CleanupItemUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\UI\CleanupItemUserControl.Designer.cs">
+      <DependentUpon>CleanupItemUserControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Menus\Cleanup\CommandsHandlers\CleanupOptionForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -459,11 +457,11 @@
     <Compile Include="Utility\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Menus\Cleanup\CommandsHandlers\CleanupOptionForm.resx">
-      <DependentUpon>CleanupOptionForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Menus\Cleanup\CommandsHandlers\Infra\UI\CleanupItemUserControl.resx">
       <DependentUpon>CleanupItemUserControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Menus\Cleanup\CommandsHandlers\CleanupOptionForm.resx">
+      <DependentUpon>CleanupOptionForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Menus\Cleanup\CommandsHandlers\Infra\UI\CustomCheckListBox.resx">
       <DependentUpon>CustomCheckListBox.cs</DependentUpon>
@@ -555,7 +553,7 @@
     <Error Condition="'$(VisualStudioVersion)' != '14.0' And !Exists('..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.targets'))" />
     <Error Condition="'$(VisualStudioVersion)' == '14.0' And !Exists('..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.props'))" />
     <Error Condition="'$(VisualStudioVersion)' == '14.0' And !Exists('..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.2.4.0\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.2.4.0\build\Microsoft.Net.Compilers.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.2.3.2\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.2.3.2\build\Microsoft.Net.Compilers.props'))" />
   </Target>
   <Import Project="..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.targets" Condition="'$(VisualStudioVersion)' != '14.0' And Exists('..\packages\Microsoft.VSSDK.BuildTools.15.0.26201\build\Microsoft.VSSDK.BuildTools.targets')" />
   <Import Project="..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.targets" Condition="'$(VisualStudioVersion)' == '14.0' And Exists('..\packages\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.14.0.23-pre\build\Microsoft.VisualStudio.Sdk.BuildTasks.14.0.targets')" />
