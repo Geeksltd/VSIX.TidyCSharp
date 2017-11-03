@@ -28,6 +28,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
         CleanupOptionForm()
         {
             InitializeComponent();
+            mainPanel.Padding = new Padding(5, 5, 5, 0);
             base.ShowInTaskbar = false;
             base.WindowState = FormWindowState.Normal;
             this.StartPosition = FormStartPosition.CenterScreen;
@@ -141,7 +142,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             }
 
 
-            //Settings.Default.CleanupChoices = CleanupOptions.ToString();
             Settings.Default.CleanupChoices = CleanupOptions.SerializeValues();
             if (string.IsNullOrEmpty(Settings.Default.CleanupChoices))
             {

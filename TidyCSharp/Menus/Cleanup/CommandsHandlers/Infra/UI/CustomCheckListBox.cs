@@ -5,7 +5,7 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers.Infra
 {
     public partial class CustomCheckListBox : UserControl
     {
-        public const int HEIGHT_OF_CHECKBOX = 15;
+        public const int HEIGHT_OF_CHECKBOX = 22;
         public CustomCheckListBox()
         {
             InitializeComponent();
@@ -13,7 +13,15 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers.Infra
 
         public void AddItem(CheckBoxItemInfo item)
         {
-            var newControl = new CustomCheckBox() { Text = item.Name, Info = item, Dock = DockStyle.Top, Height = HEIGHT_OF_CHECKBOX };
+            var newControl =
+                new CustomCheckBox()
+                {
+                    Text = item.Name,
+                    Info = item,
+                    Dock = DockStyle.Top,
+                    Margin = new Padding(0),
+                    Height = HEIGHT_OF_CHECKBOX
+                };
             this.Controls.Add(newControl);
         }
 
