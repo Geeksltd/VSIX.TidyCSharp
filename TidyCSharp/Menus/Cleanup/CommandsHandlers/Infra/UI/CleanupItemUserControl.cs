@@ -19,13 +19,6 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
             customCheckListBox1.Enabled = checkboxCleanupItem.Checked;
         }
 
-        private void CheckboxCleanupItem_CheckedChanged(object sender, EventArgs e)
-        {
-            customCheckListBox1.Enabled = checkboxCleanupItem.Checked;
-        }
-
-        public CodeCleanerType MainCleanupItemType { get; set; }
-
         public void Init(CodeCleanerType mainCleanupItemType)
         {
             MainCleanupItemType = mainCleanupItemType;
@@ -39,6 +32,8 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
 
             if (values.Value.SubItemType != null)
             {
+                HasSubItems = true;
+
                 CreateControls(values.Value.SubItemType, checkBoxItem => NewCheckboxItem(checkBoxItem));
                 this.BorderStyle = BorderStyle.FixedSingle;
 
@@ -46,9 +41,14 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
                 return;
             }
 
-            this.Height = CustomCheckListBox.HEIGHT_OF_CHECKBOX + 5;// checkboxCleanupItem.Height;
+            this.Height = CustomCheckListBox.HEIGHT_OF_CHECKBOX + 5;
 
         }
+
+        #region IMainCleanup
+
+        public CodeCleanerType MainCleanupItemType { get; private set; }
+        public bool HasSubItems { get; private set; } = false;
 
         public void SetSubItems(int value)
         {
@@ -61,12 +61,23 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
             checkboxCleanupItem.Checked = customCheckListBox1.GetCheckedItems().Any();
         }
 
-        public bool IsMainObjectSelected()
+        public void ReSetSubItems(bool selectAll = false)
         {
-            if (checkboxCleanupItem.Checked == false) return false;
-            if (customCheckListBox1.GetItems().Any() && GetSelectedSubItems().Any() == false) return false;
-            return true;
+            checkboxCleanupItem.Checked = selectAll;
+
+            customCheckListBox1.ReSetSubItems(selectAll);
         }
+
+        public bool IsMainObjectSelected
+        {
+            get
+            {
+                if (checkboxCleanupItem.Checked == false) return false;
+                if (HasSubItems && GetSelectedSubItems().Any() == false) return false;
+                return true;
+            }
+        }
+
         public CheckBoxItemInfo[] GetSelectedSubItems()
         {
             if (checkboxCleanupItem.Checked == false) return new CheckBoxItemInfo[0];
@@ -74,10 +85,13 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
             var selectedTypes = customCheckListBox1.GetCheckedItems();
             return selectedTypes.OrderBy(x => x.Order).ToArray();
         }
-        public CheckBoxItemInfo[] GetSubItems()
-        {
-            return customCheckListBox1.GetItems();
-        }
+
+        //public CheckBoxItemInfo[] GetSubItems()
+        //{
+        //    return customCheckListBox1.GetItems();
+        //}
+
+        #endregion
 
         public static void CreateControls(Type subItemType, Action<CheckBoxItemInfo> action, bool sortDESC = false)
         {
@@ -111,7 +125,7 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
             }
         }
 
-        public static IEnumerable<KeyValuePair<int, CleanupItemAttribute>> Get(Type subItemType)
+        static IEnumerable<KeyValuePair<int, CleanupItemAttribute>> Get(Type subItemType)
         {
             foreach (var item in Enum.GetValues(subItemType))
             {
@@ -119,7 +133,7 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
             }
         }
 
-        public static KeyValuePair<int, CleanupItemAttribute> Get(Type subItemType, object item)
+        static KeyValuePair<int, CleanupItemAttribute> Get(Type subItemType, object item)
         {
             var memInfo = subItemType.GetMember(item.ToString());
             var attributes = memInfo[0].GetCustomAttributes(typeof(CleanupItemAttribute), false);
@@ -130,21 +144,14 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
                 );
         }
 
-        private void NewCheckboxItem(CheckBoxItemInfo checkBoxItem)
+        void NewCheckboxItem(CheckBoxItemInfo checkBoxItem)
         {
             customCheckListBox1.AddItem(checkBoxItem);
         }
-
-        public class CheckBoxItemInfo
+        void CheckboxCleanupItem_CheckedChanged(object sender, EventArgs e)
         {
-            public string Name { get; set; }
-            public int CleanerType { get; set; }
-            public int Order { get; set; }
-
-            public override string ToString()
-            {
-                return Name;
-            }
+            customCheckListBox1.Enabled = checkboxCleanupItem.Checked;
         }
+
     }
 }

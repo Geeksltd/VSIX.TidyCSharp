@@ -5,9 +5,11 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
 {
     public interface IMainCleanup
     {
-        bool IsMainObjectSelected();
-        CodeCleanerType MainCleanupItemType { get; set; }
+        bool IsMainObjectSelected { get; }
+        CodeCleanerType MainCleanupItemType { get; }
+        bool HasSubItems { get; }
         CheckBoxItemInfo[] GetSelectedSubItems();
-        CheckBoxItemInfo[] GetSubItems();
+        void SetSubItems(int value);
+        void ReSetSubItems(bool selectAll = false);
     }
 }

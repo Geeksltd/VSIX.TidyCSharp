@@ -70,6 +70,11 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
         {
             if (string.IsNullOrEmpty(Settings.Default.CleanupChoices))
             {
+                foreach (IMainCleanup control in mainPanel.Controls.OfType<IMainCleanup>())
+                {
+                    control.ReSetSubItems(true);
+                }
+
                 return;
             }
             try
@@ -108,6 +113,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
 
 
             Settings.Default.CleanupChoices = CleanupOptions.ToString();
+            if (string.IsNullOrEmpty(Settings.Default.CleanupChoices))
+            {
+                Settings.Default.CleanupChoices = "null";
+            }
             Settings.Default.Save();
         }
 
