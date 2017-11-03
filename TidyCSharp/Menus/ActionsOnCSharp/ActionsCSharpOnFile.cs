@@ -27,18 +27,35 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 
                 window.Activate();
 
-                var hasWhitespace = cleanupOptions.ActionTypes.Contains(VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces);
-
                 foreach (var actionTypeItem in cleanupOptions.ActionTypes)
                 {
-                    if (actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces)
-                    {
-                        CodeCleanerHost.Run(item, actionTypeItem, cleanupOptions);
-                    }
+                    if (actionTypeItem == VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces) continue;
+                    if (actionTypeItem == VSIX.TidyCSharp.Cleanup.CodeCleanerType.OrganizeUsingDirectives) continue;
+
+                    CodeCleanerHost.Run(item, actionTypeItem, cleanupOptions);
                 }
-                if (hasWhitespace)
+
+                if (cleanupOptions.ActionTypes.Contains(VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces))
                 {
                     CodeCleanerHost.Run(item, VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces, cleanupOptions);
+                }
+
+                if (cleanupOptions.ActionTypes.Contains(VSIX.TidyCSharp.Cleanup.CodeCleanerType.OrganizeUsingDirectives))
+                {
+                    window.Document.Close(vsSaveChanges.vsSaveChangesYes);
+
+                    CodeCleanerHost.Run(item, VSIX.TidyCSharp.Cleanup.CodeCleanerType.OrganizeUsingDirectives, cleanupOptions);
+
+                    if (fileWindowMustBeOpend == false)
+                    {
+                        window = item.Open(Constants.vsViewKindCode);
+
+                        window.Activate();
+                    }
+                }
+                else
+                {
+                    window.Document.Save();
                 }
 
                 if (fileWindowMustBeOpend == false)

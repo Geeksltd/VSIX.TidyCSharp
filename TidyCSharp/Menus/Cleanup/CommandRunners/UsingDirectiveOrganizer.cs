@@ -18,7 +18,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 window.Activate();
                 ProjectItemDetails.ProjectItem.Document.DTE.ExecuteCommand(UsingsCommands.REMOVE_AND_SORT_COMMAND_NAME);
-                window.Close(vsSaveChanges.vsSaveChangesYes);
+                window.Document.Save();
             }
             catch (Exception e)
             {
