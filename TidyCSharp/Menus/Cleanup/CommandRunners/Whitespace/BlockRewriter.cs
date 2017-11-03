@@ -13,7 +13,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
         public override SyntaxNode Visit(SyntaxNode node)
         {
-            if (CheckOption((int)CleanupTypes.Remove_Brackets_of_block_that_has_only_one_statement_with_length_shorter_than_70_chars) == false)
+            if (CheckOption((int)CleanupTypes.Remove_Brackets_of_block_that_has_only_one_statement_with_length_shorter_than_70_chars))
             {
                 if (node is BlockSyntax)
                 {
