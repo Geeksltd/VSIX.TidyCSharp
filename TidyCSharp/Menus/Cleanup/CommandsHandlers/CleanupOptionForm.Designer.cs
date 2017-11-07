@@ -36,10 +36,9 @@
             // 
             // btnApply
             // 
-            this.btnApply.Location = new System.Drawing.Point(449, 13);
-            this.btnApply.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnApply.Location = new System.Drawing.Point(299, 8);
             this.btnApply.Name = "btnApply";
-            this.btnApply.Size = new System.Drawing.Size(87, 34);
+            this.btnApply.Size = new System.Drawing.Size(58, 22);
             this.btnApply.TabIndex = 1;
             this.btnApply.Text = "Run";
             this.btnApply.UseVisualStyleBackColor = true;
@@ -50,32 +49,30 @@
             this.panel1.BackColor = System.Drawing.Color.Transparent;
             this.panel1.Controls.Add(this.btnApply);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 4);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.panel1.Location = new System.Drawing.Point(0, 778);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(963, 57);
+            this.panel1.Size = new System.Drawing.Size(788, 37);
             this.panel1.TabIndex = 2;
             // 
             // mainPanel
             // 
+            this.mainPanel.AutoScroll = true;
             this.mainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainPanel.Location = new System.Drawing.Point(0, 0);
-            this.mainPanel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.mainPanel.Name = "mainPanel";
-            this.mainPanel.Padding = new System.Windows.Forms.Padding(8);
-            this.mainPanel.Size = new System.Drawing.Size(963, 4);
+            this.mainPanel.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.mainPanel.Size = new System.Drawing.Size(788, 778);
             this.mainPanel.TabIndex = 3;
             // 
             // CleanupOptionForm
             // 
             this.AcceptButton = this.btnApply;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(963, 61);
+            this.ClientSize = new System.Drawing.Size(788, 815);
             this.Controls.Add(this.mainPanel);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "CleanupOptionForm";

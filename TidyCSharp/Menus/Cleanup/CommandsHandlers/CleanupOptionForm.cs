@@ -62,7 +62,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             newSubControl.Init((CodeCleanerType)checkBoxItem.CleanerType);
 
             mainPanel.Controls.Add(newSubControl);
-            this.Height += newSubControl.Height;
+            //this.Height += newSubControl.Height;
         }
 
 
@@ -105,31 +105,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             }
             DeserializeValues(Settings.Default.CleanupChoices);
             return;
-            try
-            {
-
-                var choices = Settings.Default.CleanupChoices.Split(new string[] { CleanupOptions.TO_STRING_SEPRATOR }, StringSplitOptions.RemoveEmptyEntries);
-                int value = 0;
-                foreach (var item in choices)
-                {
-                    var choiceItem = item.Split(new string[] { CleanupOptions.TO_STRING_SEPRATOR2 }, StringSplitOptions.RemoveEmptyEntries);
-
-                    var cleanUpType = (CodeCleanerType)int.Parse(choiceItem[0]);
-
-                    foreach (CleanupItemUserControl control in mainPanel.Controls.OfType<CleanupItemUserControl>())
-                    {
-                        if (control.MainCleanupItemType != cleanUpType) continue;
-
-                        var t = int.Parse(choiceItem[1]);
-                        control.SetMainItemSelection(t == -1 || t != 0);
-                        control.SetSubItems(int.Parse(choiceItem[1]));
-                    }
-                }
-            }
-            catch
-            {
-
-            }
         }
 
         private void ApplyCleanup()
@@ -155,11 +130,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             ApplyCleanup();
             this.DialogResult = DialogResult.OK;
             this.Close();
-        }
-
-        private void checkboxWhitespaceNormalizer_CheckedChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }
