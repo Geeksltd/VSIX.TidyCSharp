@@ -40,9 +40,8 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
                 this.Height += customCheckListBox1.Controls.Count * customCheckListBox1.Controls[0].Height;
                 return;
             }
-
-            this.Height = CustomCheckListBox.HEIGHT_OF_CHECKBOX + 5;
-
+            Margin = new Padding(0);
+            Padding = new Padding(0);
         }
 
         #region IMainCleanup

@@ -36,9 +36,9 @@
             // 
             // btnApply
             // 
-            this.btnApply.Location = new System.Drawing.Point(299, 8);
+            this.btnApply.Location = new System.Drawing.Point(331, 6);
             this.btnApply.Name = "btnApply";
-            this.btnApply.Size = new System.Drawing.Size(58, 22);
+            this.btnApply.Size = new System.Drawing.Size(135, 24);
             this.btnApply.TabIndex = 1;
             this.btnApply.Text = "Run";
             this.btnApply.UseVisualStyleBackColor = true;
@@ -60,7 +60,7 @@
             this.mainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainPanel.Location = new System.Drawing.Point(0, 0);
             this.mainPanel.Name = "mainPanel";
-            this.mainPanel.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.mainPanel.Padding = new System.Windows.Forms.Padding(5);
             this.mainPanel.Size = new System.Drawing.Size(788, 778);
             this.mainPanel.TabIndex = 3;
             // 
