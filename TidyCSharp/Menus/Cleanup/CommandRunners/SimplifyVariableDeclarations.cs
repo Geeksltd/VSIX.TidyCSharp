@@ -4,6 +4,7 @@ using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +42,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             private SyntaxNode ConvertToVar(VariableDeclarationSyntax node)
             {
                 if (node.Parent is LocalDeclarationStatementSyntax == false) return null;
+                if ((node.Parent as LocalDeclarationStatementSyntax).IsConst) return null;
                 if (node.Type is IdentifierNameSyntax varIdentifierNameSyntax)
                 {
                     if (varIdentifierNameSyntax.Identifier.ValueText == VarKeyword) return null;
