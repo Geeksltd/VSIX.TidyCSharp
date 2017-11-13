@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using EnvDTE;
 using Microsoft.CodeAnalysis;
@@ -32,8 +33,16 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             {
                 var encoding = DetectFileEncoding(filePath);
 
-                using (var write = new StreamWriter(filePath, false, encoding))
-                    write.Write(sourceCode.ToFullString());
+                var source = sourceCode.ToFullString().Trim(new[] { '\r', '\n' });
+                var fileText = File.ReadAllText(filePath).Trim(new[] { '\r', '\n' });
+
+                var bEqual = string.Compare(source, fileText, StringComparison.Ordinal) == 0;
+
+                if (!bEqual)
+                {
+                    using (var write = new StreamWriter(filePath, false, encoding))
+                        write.Write(sourceCode.ToFullString());
+                }
             }
         }
 
@@ -71,7 +80,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 {
                     encoding = new UTF32Encoding(false, true);
                 }
-                else encoding = new UTF8Encoding(false);
+                else
+                {
+                    encoding = new UTF8Encoding(false);
+                }
 
             }
             return encoding;
@@ -126,7 +138,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
         {
             return trivia.IsKind(SyntaxKind.EndOfLineTrivia) || trivia.IsKind(SyntaxKind.WhitespaceTrivia);
         }
-        public static bool HasNoneWhitespaceTrivia(this SyntaxNode node,SyntaxKind[] exceptionList = null)
+        public static bool HasNoneWhitespaceTrivia(this SyntaxNode node, SyntaxKind[] exceptionList = null)
         {
             if (node.ContainsDirectives) return true;
             if (node.HasStructuredTrivia) return true;
