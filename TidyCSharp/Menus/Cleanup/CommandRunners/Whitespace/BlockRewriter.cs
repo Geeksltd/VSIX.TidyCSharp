@@ -51,9 +51,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                           .WithTrailingTrivia(
                               CleanUpListWithExactNumberOfWhitespaces(
                                   SyntaxFactory.TriviaList(
-                                      singleStatement
-                                          .GetTrailingTrivia()
-                                          .AddRange(blockNode.GetTrailingTrivia())
+                                      blockNode.CloseBraceToken.LeadingTrivia
+                                      .AddRange(singleStatement.GetTrailingTrivia())
+                                      .AddRange(blockNode.GetTrailingTrivia())
                                   ), 1, null)
                           );
                     lastBlockToken = singleStatement.GetLastToken();
