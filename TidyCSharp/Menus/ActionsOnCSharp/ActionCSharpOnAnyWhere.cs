@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using EnvDTE;
 using Geeks.GeeksProductivityTools.Utils;
 using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
@@ -8,7 +9,11 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 {
     public class ActionCSharpOnAnyWhere
     {
-        public static void Invoke(TargetAction action, CleanupOptions cleanupOptions)
+        public static async Task Invoke(TargetAction action, CleanupOptions cleanupOptions)
+        {
+            await Task.Run(() => SyncInvoke(action, cleanupOptions));
+        }
+        static void SyncInvoke(TargetAction action, CleanupOptions cleanupOptions)
         {
             try
             {

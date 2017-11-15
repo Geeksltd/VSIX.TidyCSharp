@@ -13,7 +13,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             : base(menu, PkgCmdIDList.CmdCustomUpAllActions)
         { }
 
-        protected override void CallBack(object sender, EventArgs e)
+        protected override async void CallBack(object sender, EventArgs e)
         {
             var messageBoxResult = MessageBoxDisplay.Show(new MessageBoxDisplay.MessageBoxArgs
             {
@@ -33,7 +33,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             if (CleanupOptionForm.Instance.CleanupOptions != null)
             {
-                ActionsOnCSharp.ActionCSharpOnAnyWhere.Invoke(desiredAction, CleanupOptionForm.Instance.CleanupOptions);
+                await ActionsOnCSharp.ActionCSharpOnAnyWhere.Invoke(desiredAction, CleanupOptionForm.Instance.CleanupOptions);
                 TidyCSharpPackage.Instance.SaveSolutionChanges();
             }
         }
