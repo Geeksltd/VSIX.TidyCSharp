@@ -22,7 +22,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             if (newRoot != initialSourceNode && TidyCSharpPackage.Instance != null)
             {
-                initialSourceNode = Formatter.Format(initialSourceNode, TidyCSharpPackage.Instance.CleanupWorkingSolution.Workspace);
+                initialSourceNode = Formatter.Format(newRoot, TidyCSharpPackage.Instance.CleanupWorkingSolution.Workspace);
             }
             return initialSourceNode;
         }
