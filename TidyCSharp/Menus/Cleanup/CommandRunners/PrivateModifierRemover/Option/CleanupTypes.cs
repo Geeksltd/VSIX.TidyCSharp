@@ -6,20 +6,16 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.RemovePrivateModifier
     [Flags]
     public enum CleanupTypes
     {
-        [CleanupItem(Title = "Remove Class Private Modifier")]
-        Remove_Class_Private_Modifier = 0x01,
-
-        [CleanupItem(Title = "Remove Nested Class Private Modifier")]
+        [CleanupItem(Title = "Remove 'private' from nested classes")]
         Remove_Nested_Class_Private_Modifier = 0x02,
 
-        [CleanupItem(Title = "Remove Class Fields Private Modifier")]
+        [CleanupItem(Title = "Remove 'private' from fields")]
         Remove_Class_Fields_Private_Modifier = 0x04,
 
-        [CleanupItem(Title = "Remove Class Methods Private Modifier")]
+        [CleanupItem(Title = "Remove 'private' from methods")]
         Remove_Class_Methods_Private_Modifier = 0x08,
 
-        [CleanupItem(Title = "Remove Class Properties Private Modifier")]
+        [CleanupItem(Title = "Remove 'private' from properties")]
         Remove_Class_Properties_Private_Modifier = 0x10,
     }
-
 }

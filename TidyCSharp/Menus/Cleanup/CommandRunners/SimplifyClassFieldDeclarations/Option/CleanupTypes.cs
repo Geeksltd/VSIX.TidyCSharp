@@ -6,13 +6,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.SimplifyClassFieldDeclaration
     [Flags]
     public enum CleanupTypes
     {
-        [CleanupItem(Title = "Remove Class Fields Initializer when it is default value(default literal value for value types); (Except const)")]
+        [CleanupItem(Title = "Remove unnecessary explicit \"=0\" or \"=false\" from class fields.")]
         Remove_Class_Fields_Initializer_Literal = 0x01,
 
-        [CleanupItem(Title = "Remove Class Fields Initializer when it is default value(null for reference types); (Except const)")]
+        [CleanupItem(Title = "Remove unnecessary explicit \"=null\" from class fields.")]
         Remove_Class_Fields_Initializer_Null = 0x02,
 
-        [CleanupItem(Title = "Group and Merge class fields by their type and moved to the same line, If its total size is less than 70 or 80 chars")]
+        [CleanupItem(Title = "Declare multiple class fields [with the same type] on the same line (if total size < 80 chars)")]
         Group_And_Merge_class_fields = 0x04,
     }
 }

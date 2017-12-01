@@ -1,5 +1,4 @@
 {
-  "$schema":"http://gcop.co/public/js/gcop-schema.json",
   "ReadMe": "To learn how to configure this, see:http://gcop.co/doc/config",
   "Projects": [],
   "DomainProjectNames": "",

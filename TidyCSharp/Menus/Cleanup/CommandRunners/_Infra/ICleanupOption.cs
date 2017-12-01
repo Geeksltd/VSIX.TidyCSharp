@@ -12,7 +12,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.Infra
     }
     public static class ICleanupOptionHelper
     {
-        public static bool CheckOption(this ICleanupOption options, int? optionItem)
+        public static bool Should(this ICleanupOption options, int? optionItem)
         {
             if (options == null) return true;
             if (options.CleanupItemsInteger == null) return true;

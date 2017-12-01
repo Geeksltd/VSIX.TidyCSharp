@@ -68,32 +68,26 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             AwaitExpressionSyntax awaitStatementExpression = null;
 
-            if (singleStatement is ReturnStatementSyntax)
+            if (singleStatement is ReturnStatementSyntax retSS)
             {
-                awaitStatementExpression =
-                    (singleStatement as ReturnStatementSyntax).Expression as AwaitExpressionSyntax;
+                awaitStatementExpression = retSS.Expression as AwaitExpressionSyntax;
             }
-            else if (singleStatement is ExpressionStatementSyntax)
+            else if (singleStatement is ExpressionStatementSyntax eSS)
             {
-                awaitStatementExpression =
-                    (singleStatement as ExpressionStatementSyntax).Expression as AwaitExpressionSyntax;
+                awaitStatementExpression = eSS.Expression as AwaitExpressionSyntax;
             }
 
             if (awaitStatementExpression == null) return method;
 
             var newStatement = singleStatement;
 
-            if (singleStatement is ReturnStatementSyntax)
+            if (options.Should((int)SimplyAsyncCall.CleanupTypes.Single_Expression))
             {
-                if (options.CheckOption((int)SimplyAsyncCall.CleanupTypes.Single_Return_Statement))
+                if (singleStatement is ReturnStatementSyntax rss)
                 {
-                    newStatement =
-                        (singleStatement as ReturnStatementSyntax).WithExpression(awaitStatementExpression.Expression);
+                    newStatement = rss.WithExpression(awaitStatementExpression.Expression);
                 }
-            }
-            else if (singleStatement is ExpressionStatementSyntax)
-            {
-                if (options.CheckOption((int)SimplyAsyncCall.CleanupTypes.Single_Expression))
+                else if (singleStatement is ExpressionStatementSyntax)
                 {
                     var newReturnStatement =
                     SyntaxFactory

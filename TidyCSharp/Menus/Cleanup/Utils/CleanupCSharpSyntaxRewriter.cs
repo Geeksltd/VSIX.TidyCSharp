@@ -9,7 +9,7 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils
 
         protected bool CheckOption(int? o)
         {
-            return Options.CheckOption(o);
+            return Options.Should(o);
         }
 
         public CleanupCSharpSyntaxRewriter(ICleanupOption options)

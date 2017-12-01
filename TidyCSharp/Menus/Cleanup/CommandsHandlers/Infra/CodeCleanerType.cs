@@ -12,7 +12,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         [CleanupItem(Title = "Normalize white spaces", FirstOrder = 1, SubItemType = typeof(NormalizeWhitespace.CleanupTypes))]
         NormalizeWhiteSpaces = 0x01,
 
-        [CleanupItem(Title = "Remove unnecessary 'private' kewwords", FirstOrder = 2, SubItemType = typeof(RemovePrivateModifier.CleanupTypes))]
+        [CleanupItem(Title = "Remove unnecessary explicit 'private' where it's the default", FirstOrder = 2, SubItemType = typeof(RemovePrivateModifier.CleanupTypes))]
         PrivateAccessModifier = 0x02,
 
         [CleanupItem(Title = "Small methods properties -> Expression bodied", FirstOrder = 3, SubItemType = typeof(SimplifyClassFieldDeclaration.CleanupTypes))]
@@ -27,22 +27,23 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         [CleanupItem(Title = "Use 'var' for variable declarations", FirstOrder = 5)]
         SimplifyVariableDeclarations = 0x8000,
 
-        [CleanupItem(Title = "Convert properties to auto-Properties", FirstOrder = 5)]
+        [CleanupItem(Title = "Convert traditional properties to auto-properties", FirstOrder = 5)]
         ConvertPropertiesToAutoProperties = 0x10000,
 
-        [CleanupItem(Title = "Remove unnecessary 'this.'", FirstOrder = 6, SubItemType = typeof(RemoveExtraThisKeyword.CleanupTypes))]
+        [CleanupItem(Title = "Remove unnecessary \"this.\"", FirstOrder = 6, SubItemType = typeof(RemoveExtraThisKeyword.CleanupTypes))]
         RemoveExtraThisQualification = 0x400,
 
-        [CleanupItem(Title = "Local variables -> camelCased", FirstOrder = 7, SubItemType = typeof(CamelCasedMethodVariable.CleanupTypes))]
+        [CleanupItem(Title = "Use camelCase for...", FirstOrder = 7, SubItemType = typeof(CamelCasedMethodVariable.CleanupTypes))]
         CamelCasedMethodVariable = 0x800,
 
-        [CleanupItem(Title = "Change class fields _something -> Something or something", FirstOrder = 8, SubItemType = typeof(CamelCasedClassFields.CleanupTypes))]
+        [CleanupItem(Title = "Class field and const casing...", FirstOrder = 8,
+            SubItemType = typeof(CamelCasedClassFields.CleanupTypes))]
         CamelCasedFields = 0x1000,
 
         [CleanupItem(Title = "Move constructors before methods", FirstOrder = 9)]
         SortClassMembers = 0x40,
 
-        [CleanupItem(Title = "Remove unnecessary 'Attribute' (e.g. [SomethingAttribute] -> [Something]", FirstOrder = 10)]
+        [CleanupItem(Title = "Remove unnecessary 'Attribute' (e.g. [SomethingAttribute] -> [Something])", FirstOrder = 10)]
         RemoveAttributeKeywork = 0x100,
 
         [CleanupItem(Title = "Compact small if/else blocks", FirstOrder = 11)]

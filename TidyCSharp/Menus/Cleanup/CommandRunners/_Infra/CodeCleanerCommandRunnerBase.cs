@@ -40,7 +40,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         public bool CheckOption(int? optionItem)
         {
-            return Options.CheckOption(optionItem);
+            return Options.Should(optionItem);
         }
 
         public class ProjectItemDetailsType
