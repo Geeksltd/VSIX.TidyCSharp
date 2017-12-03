@@ -15,7 +15,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         [CleanupItem(Title = "Remove unnecessary explicit 'private' where it's the default", FirstOrder = 2, SubItemType = typeof(RemovePrivateModifier.CleanupTypes))]
         PrivateAccessModifier = 0x02,
 
-        [CleanupItem(Title = "Small methods properties -> Expression bodied", FirstOrder = 3, SubItemType = typeof(SimplifyClassFieldDeclaration.CleanupTypes))]
+        [CleanupItem(Title = "Small methods properties -> Expression bodied", FirstOrder = 3, SubItemType = typeof(MembersToExpressionBodied.CleanupTypes))]
         ConvertMembersToExpressionBodied = 0x08,
 
         [CleanupItem(Title = "Simplify async calls", FirstOrder = 4, SubItemType = typeof(SimplyAsyncCall.CleanupTypes))]
@@ -36,8 +36,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         [CleanupItem(Title = "Use camelCase for...", FirstOrder = 7, SubItemType = typeof(CamelCasedMethodVariable.CleanupTypes))]
         CamelCasedMethodVariable = 0x800,
 
-        [CleanupItem(Title = "Class field and const casing...", FirstOrder = 8,
-            SubItemType = typeof(CamelCasedClassFields.CleanupTypes))]
+        [CleanupItem(Title = "Class field and const casing...", FirstOrder = 8, SubItemType = typeof(CamelCasedClassFields.CleanupTypes))]
         CamelCasedFields = 0x1000,
 
         [CleanupItem(Title = "Move constructors before methods", FirstOrder = 9)]
