@@ -53,9 +53,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                     if
                     (
-                         nextToken != null &&
-                         mainIFnode.GetTrailingTrivia().Any(t => t.IsKind(SyntaxKind.EndOfLineTrivia)) == false &&
-                         nextToken.LeadingTrivia.Any(t => t.IsKind(SyntaxKind.EndOfLineTrivia)) == false
+                        nextToken != null &&
+                        mainIFnode.GetTrailingTrivia().Any(t => t.IsKind(SyntaxKind.EndOfLineTrivia)) == false &&
+                        nextToken.LeadingTrivia.Any(t => t.IsKind(SyntaxKind.EndOfLineTrivia)) == false
                     )
                     {
                         return newIfNode.WithTrailingTrivia(newIfNode.GetTrailingTrivia().Add(_endOfLineTrivia));
@@ -67,55 +67,64 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             SyntaxNode Cleanup(IfStatementSyntax originalIfNode)
             {
-                if (CanCleanupIF(originalIfNode) == false) return base.VisitIfStatement(originalIfNode);
+                if (originalIfNode.DescendantTrivia(descendIntoTrivia: true).HasNoneWhitespaceTrivia()) return base.VisitIfStatement(originalIfNode);
 
                 var singleStatementInsideIf = GetInsideStatement(originalIfNode.Statement);
-                if (singleStatementInsideIf != null && singleStatementInsideIf is IfStatementSyntax == false)
+
+                if (singleStatementInsideIf == null || singleStatementInsideIf is IfStatementSyntax) return base.VisitIfStatement(originalIfNode);
+
+                IfStatementSyntax newIf = GetNewIF(originalIfNode, singleStatementInsideIf);
+
+                if (newIf == originalIfNode) return base.VisitIfStatement(originalIfNode);
+                if (newIf.Else == null) return newIf;
+
+                var singleStatementInsideElse = GetInsideStatement(newIf.Else.Statement);
+
+                if (singleStatementInsideElse == null) return base.VisitIfStatement(originalIfNode);
+
+                if (singleStatementInsideElse is IfStatementSyntax ifSingleStatement)
                 {
-                    originalIfNode = GetNewIF(originalIfNode, singleStatementInsideIf);
+                    singleStatementInsideElse = Cleanup(ifSingleStatement) as IfStatementSyntax;
                 }
 
-                if (originalIfNode.Else != null)
-                {
-                    var singleStatementInsideElse = GetInsideStatement(originalIfNode.Else.Statement);
-                    if (singleStatementInsideElse != null)
-                    {
-                        if (singleStatementInsideElse is IfStatementSyntax ifSingleStatement)
-                        {
-                            singleStatementInsideElse = Cleanup(ifSingleStatement) as IfStatementSyntax;
-                        }
+                newIf = newIf.WithElse(GetNewIfWithElse(newIf.Else, singleStatementInsideElse));
 
-                        originalIfNode = GetNewIfWithElse(originalIfNode, singleStatementInsideElse);
-                    }
-                }
-
-                return originalIfNode;
+                return newIf;
             }
 
-            private bool CanCleanupIF(IfStatementSyntax originalIfNode)
-            {
-                if (originalIfNode.DescendantTrivia(descendIntoTrivia: true).Any(t => t.IsKind(SyntaxKind.EndOfLineTrivia)) == false) return false;
-                return true;
-            }
 
             IfStatementSyntax GetNewIF(IfStatementSyntax orginalIFnode, StatementSyntax singleStatementInsideIf)
             {
+                var closeParenTrivia = orginalIFnode.CloseParenToken.WithoutWhitespaceTrivia();
+                var trailingTriviaList =
+                    new SyntaxTriviaList()
+                    .AddRange(closeParenTrivia.TrailingTrivia.Where(t=>t.IsWhitespaceTrivia() == false))
+                    .AddRange(singleStatementInsideIf.GetTrailingTrivia().Where(t=>t.IsWhitespaceTrivia() == false));
+
+                if (singleStatementInsideIf != orginalIFnode.Statement)
+                {
+                    trailingTriviaList = trailingTriviaList.AddRange(orginalIFnode.Statement.GetTrailingTrivia().Where(t => t.IsWhitespaceTrivia() == false));
+                }
+
+                trailingTriviaList = trailingTriviaList.Add(_endOfLineTrivia);
+
                 var newIf =
                     orginalIFnode
                         .WithIfKeyword(orginalIFnode.IfKeyword.WithTrailingTrivia(SyntaxFactory.Space))
                         .WithOpenParenToken(orginalIFnode.OpenParenToken.WithoutWhitespaceTrivia())
-                        .WithCloseParenToken(orginalIFnode.CloseParenToken.WithoutWhitespaceTrivia())
+                        .WithCloseParenToken(closeParenTrivia.WithoutTrivia())
                         .WithCondition(orginalIFnode.Condition.WithoutWhitespaceTrivia())
                         .WithStatement(
                             singleStatementInsideIf
                                 .WithLeadingTrivia(SyntaxFactory.Space)
+                                .WithTrailingTrivia(trailingTriviaList)
                         );
 
                 if (singleStatementInsideIf is ReturnStatementSyntax returnStatement)
                 {
                     if
                     (
-                        returnStatement.Expression == null ||
+                        (returnStatement.Expression == null && newIf.WithElse(null).Span.Length <= 2 * MAX_IF_LINE_LENGTH) ||
                         (
                             newIf.WithElse(null).Span.Length <= MAX_IF_LINE_LENGTH
                             &&
@@ -134,22 +143,24 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return newIf;
             }
 
-            IfStatementSyntax GetNewIfWithElse(IfStatementSyntax ifNode, StatementSyntax singleStatementInsideElse)
+            ElseClauseSyntax GetNewIfWithElse(ElseClauseSyntax elseNode, StatementSyntax singleStatementInsideElse)
             {
                 var newElse =
-                        ifNode.Else
+                        elseNode
                             .WithElseKeyword(
-                                ifNode.Else.ElseKeyword
-                                .WithTrailingTrivia(
-                                    ifNode.Else.ElseKeyword.LeadingTrivia.WithoutWhitespaceTrivia()
-                                )
+                                elseNode.ElseKeyword
+                                .WithTrailingTrivia()
                             )
-                            .WithStatement(singleStatementInsideElse.WithLeadingTrivia(SyntaxFactory.Space));
+                            .WithStatement(
+                                singleStatementInsideElse
+                                .WithLeadingTrivia(SyntaxFactory.Space)
+                                //.WithTrailingTrivia(trailingTriviaList)
+                            );
 
                 if (singleStatementInsideElse is ReturnStatementSyntax returnStatement)
                 {
                     if (returnStatement.Expression == null || returnStatement.Expression is LiteralExpressionSyntax || returnStatement.Expression.Span.Length <= MAX_RETURN_STATEMENT_LENGTH)
-                        return ifNode.WithElse(newElse);
+                        return newElse;
                 }
 
                 if (singleStatementInsideElse is IfStatementSyntax == false)
@@ -159,12 +170,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         ||
                         singleStatementInsideElse.Span.Length + 5 > MAX_IF_LINE_LENGTH
                        )
-                        return ifNode.WithElse(ifNode.Else.WithStatement(singleStatementInsideElse));
+                        return elseNode.WithStatement(singleStatementInsideElse);
                 }
 
-
-
-                return ifNode.WithElse(newElse);
+                return newElse;
             }
 
             StatementSyntax GetInsideStatement(BlockSyntax block)
