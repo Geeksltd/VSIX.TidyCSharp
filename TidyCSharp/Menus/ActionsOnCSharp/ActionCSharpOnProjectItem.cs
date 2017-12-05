@@ -6,9 +6,9 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 {
     public class ActionCSharpOnProjectItem
     {
-        public static async void Action(ProjectItem item, TargetAction targetAction, CleanupOptions cleanupOptions)
+        public static void Action(ProjectItem item, TargetAction targetAction, CleanupOptions cleanupOptions)
         {
-            await targetAction(item, cleanupOptions);
+            targetAction(item, cleanupOptions);
 
             if (item.ProjectItems == null) return;
 

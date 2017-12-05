@@ -1,16 +1,20 @@
 using System;
-using System.Threading.Tasks;
 using EnvDTE;
 using Geeks.GeeksProductivityTools.Extensions;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
-using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
 using Geeks.GeeksProductivityTools.Utils;
+using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
 
 namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 {
     public class ActionsCSharpOnFile
     {
-        public static async Task DoCleanup(ProjectItem item, CleanupOptions cleanupOptions, bool fileWindowMustBeOpend = false)
+        public static void DoCleanup(ProjectItem item, CleanupOptions cleanupOptions)
+        {
+            DoCleanup(item, cleanupOptions, false);
+        }
+
+        public static void DoCleanup(ProjectItem item, CleanupOptions cleanupOptions, bool fileWindowMustBeOpend = false)
         {
             if (!item.IsCsharpFile() || item.IsCSharpDesignerFile()) return;
 
@@ -23,7 +27,18 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 
                 window.Activate();
 
-                await Run(item, cleanupOptions);
+                foreach (var actionTypeItem in cleanupOptions.ActionTypes)
+                {
+                    if (actionTypeItem == VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces) continue;
+                    if (actionTypeItem == VSIX.TidyCSharp.Cleanup.CodeCleanerType.OrganizeUsingDirectives) continue;
+
+                    CodeCleanerHost.Run(item, actionTypeItem, cleanupOptions);
+                }
+
+                if (cleanupOptions.ActionTypes.Contains(VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces))
+                {
+                    CodeCleanerHost.Run(item, VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces, cleanupOptions);
+                }
 
                 if (cleanupOptions.ActionTypes.Contains(VSIX.TidyCSharp.Cleanup.CodeCleanerType.OrganizeUsingDirectives))
                 {
@@ -52,22 +67,6 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
             {
                 ErrorNotification.EmailError(e);
                 ProcessActions.GeeksProductivityToolsProcess();
-            }
-        }
-
-        private static async Task Run(ProjectItem item, CleanupOptions cleanupOptions)
-        {
-            foreach (var actionTypeItem in cleanupOptions.ActionTypes)
-            {
-                if (actionTypeItem == VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces) continue;
-                if (actionTypeItem == VSIX.TidyCSharp.Cleanup.CodeCleanerType.OrganizeUsingDirectives) continue;
-
-                CodeCleanerHost.Run(item, actionTypeItem, cleanupOptions);
-            }
-
-            if (cleanupOptions.ActionTypes.Contains(VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces))
-            {
-                CodeCleanerHost.Run(item, VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces, cleanupOptions);
             }
         }
     }
