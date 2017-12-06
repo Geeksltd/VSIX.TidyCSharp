@@ -33,40 +33,36 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             base.WindowState = FormWindowState.Normal;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.FromArgb(0xF0, 0xF0, 0xF0);
-            this.Load += CleanupOptionForm_Load;
+
             CreateControls();
             LoadFromSetting();
         }
 
-
-        private void CleanupOptionForm_Load(object sender, EventArgs e)
+        void CreateControls()
         {
-        }
-
-        private void CreateControls()
-        {
-            CleanupItemUserControl.CreateControls(typeof(CodeCleanerType), checkBoxItem => NewCheckboxItem(checkBoxItem), true);
+            CleanupItemUserControl.CreateControls(typeof(CodeCleanerType), cleanupTypeItem => CreateCleanupTypeItemControl(cleanupTypeItem), true);
         }
 
         int TAB_INDEX_START = 3;
 
-        private void NewCheckboxItem(CheckBoxItemInfo checkBoxItem)
+        void CreateCleanupTypeItemControl(CleanerItemUIInfo cleanupTypeItem)
         {
-            var newSubControl = new CleanupItemUserControl()
+            var newControl = new CleanupItemUserControl()
             {
                 Dock = DockStyle.Top,
                 AutoSize = false,
                 TabIndex = TAB_INDEX_START++,
             };
 
-            newSubControl.Init((CodeCleanerType)checkBoxItem.CleanerType);
+            newControl.Init((CodeCleanerType)cleanupTypeItem.CleanerType);
 
-            mainPanel.Controls.Add(newSubControl);
+            mainPanel.Controls.Add(newControl);
             //this.Height += newSubControl.Height;
         }
 
 
-        public void DeserializeValues(string strValue)
+
+        void DeserializeValues(string strValue)
         {
             try
             {
@@ -83,8 +79,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
 
                     var selectedControls = controls.FirstOrDefault(c => c.MainCleanupItemType == cleanUpType);
 
-                    selectedControls.SetMainItemSelection(isSelected);
-                    selectedControls.SetSubItems(int.Parse(choiceItem[2]));
+                    selectedControls.SetMainItemCheckState(isSelected);
+                    selectedControls.SetItemsCheckState(int.Parse(choiceItem[2]), true);
                 }
             }
             catch
@@ -92,13 +88,13 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
 
             }
         }
-        private void LoadFromSetting()
+        void LoadFromSetting()
         {
             if (string.IsNullOrEmpty(Settings.Default.CleanupChoices))
             {
                 foreach (IMainCleanup control in mainPanel.Controls.OfType<IMainCleanup>())
                 {
-                    control.ReSetSubItems(true);
+                    control.ResetItemsCheckState();
                 }
 
                 return;

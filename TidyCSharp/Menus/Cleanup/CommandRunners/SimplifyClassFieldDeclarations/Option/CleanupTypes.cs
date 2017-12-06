@@ -12,7 +12,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.SimplifyClassFieldDeclaration
         [CleanupItem(Title = "Remove unnecessary explicit \"=null\" from class fields.")]
         Remove_Class_Fields_Initializer_Null = 0x02,
 
-        [CleanupItem(Title = "Declare multiple class fields [with the same type] on the same line (if total size < 80 chars)")]
+        [CleanupItem(Title = "Declare multiple class fields [with the same type] on the same line (if total size < 80 chars)", SelectedByDefault = false)]
         Group_And_Merge_class_fields = 0x04,
     }
 }

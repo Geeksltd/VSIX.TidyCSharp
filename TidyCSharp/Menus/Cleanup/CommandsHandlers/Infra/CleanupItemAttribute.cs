@@ -7,6 +7,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.Infra
     {
         public string Title { get; set; } = null;
         public int FirstOrder { get; set; } = int.MaxValue;
+        public bool SelectedByDefault { get; set; } = true;
+
         public int? Order
         {
             get

@@ -4,7 +4,7 @@ using System;
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     [Flags]
-    public enum CodeCleanerType
+    public enum CodeCleanerType   //CleanerMainType
     {
         [CleanupItem(Title = "Remove and sort Usings", FirstOrder = 0)]
         OrganizeUsingDirectives = 0x04,
@@ -45,7 +45,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         [CleanupItem(Title = "Remove unnecessary 'Attribute' (e.g. [SomethingAttribute] -> [Something])", FirstOrder = 10)]
         RemoveAttributeKeywork = 0x100,
 
-        [CleanupItem(Title = "Compact small if/else blocks", FirstOrder = 11)]
+        [CleanupItem(Title = "Compact small if/else blocks", FirstOrder = 11, SelectedByDefault = false)]
         CompactSmallIfElseStatements = 0x200,
 
         [CleanupItem(Title = "Use C# alias type names (e.g. System.Int32 -> int)", FirstOrder = 11)]
