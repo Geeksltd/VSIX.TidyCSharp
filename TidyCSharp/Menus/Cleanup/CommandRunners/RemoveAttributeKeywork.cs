@@ -33,11 +33,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 if (node.Name is IdentifierNameSyntax newNameNode)
                 {
-                    //var symbol = semanticModel.GetSymbolInfo(node.Name).Symbol;
-                    //var symbol2 = semanticModel.GetSymbolInfo(node).Symbol;
-                    //var symbol3 = semanticModel.GetTypeInfo(node.Name);
-
-
                     if (newNameNode.Identifier.ValueText.EndsWith(Attribute_Keywork))
                     {
                         var orginalNodeTypeInfo = semanticModel.GetTypeInfo(node.Name);
