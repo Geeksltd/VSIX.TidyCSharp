@@ -154,3 +154,6 @@ $RECYCLE.BIN/
 .vs
 /GeeksProductivityBase
 /TidyCSharpTotall.sln
+/__temp
+/TestCase
+*.rar

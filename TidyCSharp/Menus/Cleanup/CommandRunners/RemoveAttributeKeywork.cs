@@ -10,27 +10,46 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
     {
         public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
         {
-            return RemoveAttributeKeyworkHelper(initialSourceNode);
+            return RemoveAttributeKeyworkHelper(initialSourceNode, ProjectItemDetails.SemanticModel);
         }
 
-        public static SyntaxNode RemoveAttributeKeyworkHelper(SyntaxNode initialSourceNode)
+        private SyntaxNode RemoveAttributeKeyworkHelper(SyntaxNode initialSourceNode, SemanticModel semanticModel)
         {
-            initialSourceNode = new Rewriter().Visit(initialSourceNode);
+            initialSourceNode = new Rewriter(semanticModel).Visit(initialSourceNode);
             return initialSourceNode;
         }
 
         static string Attribute_Keywork = SyntaxKind.Attribute.ToString();
         class Rewriter : CSharpSyntaxRewriter
         {
+            private SemanticModel semanticModel;
+
+            public Rewriter(SemanticModel semanticModel)
+            {
+                this.semanticModel = semanticModel;
+            }
+
             public override SyntaxNode VisitAttribute(AttributeSyntax node)
             {
                 if (node.Name is IdentifierNameSyntax newNameNode)
                 {
+                    //var symbol = semanticModel.GetSymbolInfo(node.Name).Symbol;
+                    //var symbol2 = semanticModel.GetSymbolInfo(node).Symbol;
+                    //var symbol3 = semanticModel.GetTypeInfo(node.Name);
+
+
                     if (newNameNode.Identifier.ValueText.EndsWith(Attribute_Keywork))
                     {
-                        var newName = newNameNode.Identifier.ValueText.TrimEnd(Attribute_Keywork);
+                        var orginalNodeTypeInfo = semanticModel.GetTypeInfo(node.Name);
 
-                        node = node.WithName(SyntaxFactory.IdentifierName(newName));
+                        if(orginalNodeTypeInfo.Type == null) base.VisitAttribute(node);
+
+                        if (orginalNodeTypeInfo.Type.Name == newNameNode.Identifier.ValueText)
+                        {
+                            var newName = newNameNode.Identifier.ValueText.TrimEnd(Attribute_Keywork);
+
+                            node = node.WithName(SyntaxFactory.IdentifierName(newName));
+                        }
                     }
                 }
 
