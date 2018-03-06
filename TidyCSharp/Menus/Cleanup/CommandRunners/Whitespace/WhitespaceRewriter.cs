@@ -212,7 +212,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
             statementNode = statementNode.WithLeadingTrivia(leadingTriviaList);
 
-            _LastMember = null;
+            //_LastMember = null;
 
             return statementNode;
         }
