@@ -19,7 +19,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 case CodeCleanerType.SortClassMembers:
                     return new SortClassMembers();
                 case CodeCleanerType.SimplyAsyncCalls:
-                    return new SimplyAsyncCalls();
+                    return new SimplyAsyncCalls() { Options = cleanupOptions.SimplyAsyncCall};
                 case CodeCleanerType.SimplifyClassFieldDeclarations:
                     return new SimplifyClassFieldDeclarations() { Options = cleanupOptions.SimplifyClassFieldDeclarations };
                 case CodeCleanerType.RemoveAttributeKeywork:
@@ -29,9 +29,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 case CodeCleanerType.RemoveExtraThisQualification:
                     return new RemoveExtraThisQualification() { Options = cleanupOptions.RemoveExtraThisQualification };
                 case CodeCleanerType.CamelCasedMethodVariable:
-                    return new CamelCasedLocalVariable();
+                    return new CamelCasedLocalVariable() { Options = cleanupOptions.CamelCasedLocalVariable };
                 case CodeCleanerType.CamelCasedFields:
-                    return new CamelCasedFields();
+                    return new CamelCasedFields() { Options = cleanupOptions.CamelCasedFields };
                 case CodeCleanerType.PrivateAccessModifier:
                     return new PrivateModifierRemover();
                 case CodeCleanerType.OrganizeUsingDirectives:
