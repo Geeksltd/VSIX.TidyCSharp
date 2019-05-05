@@ -44,7 +44,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             var newEndOfFileToken = endOfFileToken.WithLeadingTrivia(leadingTriviList);
 
             newLeadingTriviaList = CleanUpListWithNoWhitespaces(beforeEndOfFileToken.TrailingTrivia, CleanupTypes.Trim_The_File);
-            var newBeforeEndOfFileToken = beforeEndOfFileToken.WithTrailingTrivia(newLeadingTriviaList);
+
+            var newBeforeEndOfFileToken = beforeEndOfFileToken.WithTrailingTrivia(newLeadingTriviaList)
+               .WithTrailingTrivia(leadingTriviList.Any() ? SyntaxFactory.CarriageReturn : SyntaxFactory.ElasticSpace);
 
             InitialSource = InitialSource.ReplaceTokens(new[] { endOfFileToken, beforeEndOfFileToken },
                 (token1, token2) =>
