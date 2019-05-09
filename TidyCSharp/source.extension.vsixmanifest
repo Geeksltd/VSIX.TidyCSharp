@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="c6176957-c61c-4beb-8dd8-e7c0170b0bf3" Version="2.43" Language="en-US" Publisher="Geeks Ltd"/>
+        <Identity Id="c6176957-c61c-4beb-8dd8-e7c0170b0bf3" Version="3.1.2" Language="en-US" Publisher="Geeks Ltd"/>
         <DisplayName>Tidy C#</DisplayName>
         <Description xml:space="preserve">Clean up your C# code.</Description>
-        <MoreInfo>http://www.geeks.ltd.uk</MoreInfo>
+        <MoreInfo>http://geeks.ltd</MoreInfo>
         <Icon>Resources\icon.png</Icon>
         <PreviewImage>Resources\Preview.png</PreviewImage>
         <Tags>extensions, geeks, geeks ltd, productivity tools, productivity</Tags>
