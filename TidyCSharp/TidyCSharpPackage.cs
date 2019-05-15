@@ -7,16 +7,19 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.CodeAnalysis;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using System.Linq;
+using System.Threading;
 
 namespace Geeks.GeeksProductivityTools
 {
-    [ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F")]    // Microsoft.VisualStudio.VSConstants.UICONTEXT_NoSolution
-    [PackageRegistration(UseManagedResourcesOnly = true)]
+
+    [ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F", PackageAutoLoadFlags.BackgroundLoad)]    // Microsoft.VisualStudio.VSConstants.UICONTEXT_NoSolution
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+    [ProvideService(typeof(IMenuCommandService), IsAsyncQueryable = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideOptionPage(typeof(OptionsPage), "Geeks productivity tools", "General", 0, 0, true)]
     [Guid(GuidList.GuidGeeksProductivityToolsPkgString)]
-    public sealed class TidyCSharpPackage : Package
+    public sealed class TidyCSharpPackage : AsyncPackage
     {
         public TidyCSharpPackage() { }
 
@@ -86,22 +89,24 @@ namespace Geeks.GeeksProductivityTools
             _CleanupWorkingSolution = null;
             bResetWorkingSolution = true;
         }
-        protected override void Initialize()
+        protected override async System.Threading.Tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            base.Initialize();
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+            await base.InitializeAsync(cancellationToken, progress);
+
             App.Initialize(GetDialogPage(typeof(OptionsPage)) as OptionsPage);
 
             Instance = this;
 
-            var componentModel = (IComponentModel)this.GetService(typeof(SComponentModel));
+            var componentModel = (IComponentModel)await GetServiceAsync(typeof(SComponentModel));
             VsWorkspace = componentModel.GetService<VisualStudioWorkspace>();
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
-            var menuCommandService = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            var menuCommandService = await GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
 
             if (null != menuCommandService)
             {
-                new Menus.Cleanup.ActionCustomCodeCleanup(menuCommandService).SetupCommands();
+                new ActionCustomCodeCleanup(menuCommandService).SetupCommands();
             }
 
             // Hook up event handlers
@@ -114,6 +119,7 @@ namespace Geeks.GeeksProductivityTools
 
         void DocumentEvents_DocumentSaved(EnvDTE.Document document)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
             try
             {
                 if (document.Name.EndsWith(".cs") ||

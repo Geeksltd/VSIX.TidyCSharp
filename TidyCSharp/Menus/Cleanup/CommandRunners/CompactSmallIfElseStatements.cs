@@ -98,8 +98,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 var closeParenTrivia = orginalIFnode.CloseParenToken.WithoutWhitespaceTrivia();
                 var trailingTriviaList =
                     new SyntaxTriviaList()
-                    .AddRange(closeParenTrivia.TrailingTrivia.Where(t=>t.IsWhitespaceTrivia() == false))
-                    .AddRange(singleStatementInsideIf.GetTrailingTrivia().Where(t=>t.IsWhitespaceTrivia() == false));
+                    .AddRange(closeParenTrivia.TrailingTrivia.Where(t => t.IsWhitespaceTrivia() == false))
+                    .AddRange(singleStatementInsideIf.GetTrailingTrivia().Where(t => t.IsWhitespaceTrivia() == false));
 
                 if (singleStatementInsideIf != orginalIFnode.Statement)
                 {
@@ -112,7 +112,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     orginalIFnode
                         .WithIfKeyword(orginalIFnode.IfKeyword.WithTrailingTrivia(SyntaxFactory.Space))
                         .WithOpenParenToken(orginalIFnode.OpenParenToken.WithoutWhitespaceTrivia())
-                        .WithCloseParenToken(closeParenTrivia.WithoutTrivia())
+                        .WithCloseParenToken(SyntaxTokenExtensions.WithoutTrivia(closeParenTrivia))
                         .WithCondition(orginalIFnode.Condition.WithoutWhitespaceTrivia())
                         .WithStatement(
                             singleStatementInsideIf
@@ -154,7 +154,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             .WithStatement(
                                 singleStatementInsideElse
                                 .WithLeadingTrivia(SyntaxFactory.Space)
-                                //.WithTrailingTrivia(trailingTriviaList)
+                            //.WithTrailingTrivia(trailingTriviaList)
                             );
 
                 if (singleStatementInsideElse is ReturnStatementSyntax returnStatement)
