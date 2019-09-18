@@ -50,5 +50,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
         [CleanupItem(Title = "Use C# alias type names (e.g. System.Int32 -> int)", FirstOrder = 11)]
         ConvertFullNameTypesToBuiltInTypes = 0x10,
+
+        [CleanupItem(Title = "Renew M# UI methods", FirstOrder = 12)]
+        ConvertMsharpUIMethods = 0x25,
     }
 }

@@ -40,7 +40,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                     return new SimplifyVariableDeclarations();
                 case CodeCleanerType.ConvertPropertiesToAutoProperties:
                     return new ConvertPropertiesToAutoProperties();
-                    
+                case CodeCleanerType.ConvertMsharpUIMethods:
+                    return new MSharpUICleaner();
+
                 default: return null; // TODO
             }
         }
