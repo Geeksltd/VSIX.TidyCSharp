@@ -11,5 +11,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.MembersToExpressionBodied
 
         [CleanupItem(Title = "Convert ReadOnly Property =>  ReadOnly Property with only a single return statement and lenth less than 100 chars(length of its Defenition and its single statement)")]
         Convert_ReadOnly_Property = 0x02,
+
+        [CleanupItem(Title = "Convert Constructors =>  Method with only a single return statement and lenth less than 100 chars(length of its signature and its single statement)")]
+        Convert_Constructors = 0x03,
     }
 }

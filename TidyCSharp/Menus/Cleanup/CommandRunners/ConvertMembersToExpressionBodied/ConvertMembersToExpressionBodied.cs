@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
@@ -36,6 +37,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     if (CheckOption((int)CleanupTypes.Convert_ReadOnly_Property))
                     {
                         node = ConvertToExpressionBodiedHelper(node as PropertyDeclarationSyntax);
+                    }
+                }
+                else if (node is ConstructorDeclarationSyntax)
+                {
+                    if (CheckOption((int)CleanupTypes.Convert_Constructors))
+                    {
+                        node = ConvertToExpressionBodiedHelper(node as ConstructorDeclarationSyntax);
                     }
                 }
 
@@ -193,5 +201,57 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             return semicolon.WithTrailingTrivia(trivia);
         }
+
+        public static ConstructorDeclarationSyntax ConvertToExpressionBodiedHelper(ConstructorDeclarationSyntax constructorDeclaration)
+        {
+            if (constructorDeclaration.Body == null) return null;
+            if (constructorDeclaration.Body.Statements.Count != 1) return null;
+            if (constructorDeclaration.Body.ContainsDirectives) return null;
+
+            var singleStatement = constructorDeclaration.Body.Statements.First();
+            if (singleStatement is IfStatementSyntax) return null;
+            if (singleStatement is ThrowStatementSyntax) return null;
+            if (singleStatement is YieldStatementSyntax) return null;
+            if (singleStatement is ExpressionStatementSyntax == false) return null;
+            if (singleStatement.HasLeadingTrivia)
+            {
+                if (HasNoneWhitespaceTrivia(singleStatement.GetLeadingTrivia()) == false) return null;
+            }
+            if (singleStatement.HasTrailingTrivia)
+            {
+                if (HasNoneWhitespaceTrivia(singleStatement.GetTrailingTrivia()) == false) return null;
+            }
+            if (constructorDeclaration.Body.CloseBraceToken.HasLeadingTrivia)
+            {
+                if (HasNoneWhitespaceTrivia(constructorDeclaration.Body.CloseBraceToken.LeadingTrivia) == false) return null;
+            }
+            if (constructorDeclaration.Body.OpenBraceToken.HasLeadingTrivia)
+            {
+                if (HasNoneWhitespaceTrivia(constructorDeclaration.Body.OpenBraceToken.LeadingTrivia) == false) return null;
+            }
+
+            var expression = (singleStatement as ExpressionStatementSyntax).Expression
+                .WithoutLeadingTrivia();
+
+            var length = expression.WithoutTrivia().Span.Length +
+                    constructorDeclaration.Span.Length - constructorDeclaration.Body.FullSpan.Length;
+            if (length > MembersToExpressionBodied.Options.MAX_EXPRESSION_BODIED_MEMBER_LENGTH) return null;
+            if (constructorDeclaration.Body.ChildNodes().OfType<UsingStatementSyntax>().Any()) return null;
+
+            constructorDeclaration =
+                constructorDeclaration
+                    .WithIdentifier(constructorDeclaration.Identifier.WithTrailingTrivia(_spaceTrivia))
+                    .WithBody(null)
+                    .WithoutTrailingTrivia()
+                    .WithLeadingTrivia(_spaceTrivia)
+                    .WithExpressionBody(
+                        SyntaxFactory.ArrowExpressionClause(expression.WithLeadingTrivia(_spaceTrivia)))
+                    .WithSemicolonToken(GetSemicolon(constructorDeclaration.Body))
+                    .WithAdditionalAnnotations(Formatter.Annotation);
+
+
+            return constructorDeclaration;
+        }
+
     }
 }
