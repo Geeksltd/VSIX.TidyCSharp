@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Geeks.VSIX.TidyCSharp.Cleanup.MembersToExpressionBodied;
@@ -8,6 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
+using System.Linq;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -80,7 +79,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     .WithSemicolonToken(GetSemicolon(methodDeclaration.Body))
                     .WithAdditionalAnnotations(Formatter.Annotation);
 
-
             return newMethod;
         }
 
@@ -100,14 +98,17 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 if (HasNoneWhitespaceTrivia(singleStatement.GetLeadingTrivia()) == false) return null;
             }
+
             if (singleStatement.HasTrailingTrivia)
             {
                 if (HasNoneWhitespaceTrivia(singleStatement.GetTrailingTrivia()) == false) return null;
             }
+
             if (method.Body.CloseBraceToken.HasLeadingTrivia)
             {
                 if (HasNoneWhitespaceTrivia(method.Body.CloseBraceToken.LeadingTrivia) == false) return null;
             }
+
             if (method.Body.OpenBraceToken.HasLeadingTrivia)
             {
                 if (HasNoneWhitespaceTrivia(method.Body.OpenBraceToken.LeadingTrivia) == false) return null;
@@ -204,30 +205,33 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
         public static ConstructorDeclarationSyntax ConvertToExpressionBodiedHelper(ConstructorDeclarationSyntax constructorDeclaration)
         {
-            if (constructorDeclaration.Body == null) return null;
-            if (constructorDeclaration.Body.Statements.Count != 1) return null;
-            if (constructorDeclaration.Body.ContainsDirectives) return null;
+            if (constructorDeclaration.Body == null) return constructorDeclaration;
+            if (constructorDeclaration.Body.Statements.Count != 1) return constructorDeclaration;
+            if (constructorDeclaration.Body.ContainsDirectives) return constructorDeclaration;
 
             var singleStatement = constructorDeclaration.Body.Statements.First();
-            if (singleStatement is IfStatementSyntax) return null;
-            if (singleStatement is ThrowStatementSyntax) return null;
-            if (singleStatement is YieldStatementSyntax) return null;
-            if (singleStatement is ExpressionStatementSyntax == false) return null;
+            if (singleStatement is IfStatementSyntax) return constructorDeclaration;
+            if (singleStatement is ThrowStatementSyntax) return constructorDeclaration;
+            if (singleStatement is YieldStatementSyntax) return constructorDeclaration;
+            if (singleStatement is ExpressionStatementSyntax == false) return constructorDeclaration;
             if (singleStatement.HasLeadingTrivia)
             {
-                if (HasNoneWhitespaceTrivia(singleStatement.GetLeadingTrivia()) == false) return null;
+                if (HasNoneWhitespaceTrivia(singleStatement.GetLeadingTrivia()) == false) return constructorDeclaration;
             }
+
             if (singleStatement.HasTrailingTrivia)
             {
-                if (HasNoneWhitespaceTrivia(singleStatement.GetTrailingTrivia()) == false) return null;
+                if (HasNoneWhitespaceTrivia(singleStatement.GetTrailingTrivia()) == false) return constructorDeclaration;
             }
+
             if (constructorDeclaration.Body.CloseBraceToken.HasLeadingTrivia)
             {
-                if (HasNoneWhitespaceTrivia(constructorDeclaration.Body.CloseBraceToken.LeadingTrivia) == false) return null;
+                if (HasNoneWhitespaceTrivia(constructorDeclaration.Body.CloseBraceToken.LeadingTrivia) == false) return constructorDeclaration;
             }
+
             if (constructorDeclaration.Body.OpenBraceToken.HasLeadingTrivia)
             {
-                if (HasNoneWhitespaceTrivia(constructorDeclaration.Body.OpenBraceToken.LeadingTrivia) == false) return null;
+                if (HasNoneWhitespaceTrivia(constructorDeclaration.Body.OpenBraceToken.LeadingTrivia) == false) return constructorDeclaration;
             }
 
             var expression = (singleStatement as ExpressionStatementSyntax).Expression
@@ -235,8 +239,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             var length = expression.WithoutTrivia().Span.Length +
                     constructorDeclaration.Span.Length - constructorDeclaration.Body.FullSpan.Length;
-            if (length > MembersToExpressionBodied.Options.MAX_EXPRESSION_BODIED_MEMBER_LENGTH) return null;
-            if (constructorDeclaration.Body.ChildNodes().OfType<UsingStatementSyntax>().Any()) return null;
+            if (length > MembersToExpressionBodied.Options.MAX_EXPRESSION_BODIED_MEMBER_LENGTH) return constructorDeclaration;
+            if (constructorDeclaration.Body.ChildNodes().OfType<UsingStatementSyntax>().Any()) return constructorDeclaration;
 
             constructorDeclaration =
                 constructorDeclaration
@@ -249,9 +253,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     .WithSemicolonToken(GetSemicolon(constructorDeclaration.Body))
                     .WithAdditionalAnnotations(Formatter.Annotation);
 
-
             return constructorDeclaration;
         }
-
     }
 }
