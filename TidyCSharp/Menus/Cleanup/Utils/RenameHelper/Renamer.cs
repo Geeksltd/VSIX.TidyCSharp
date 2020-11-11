@@ -38,9 +38,12 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 if (workingRenamingResult != null)
                 {
                     renamingResult = workingRenamingResult;
-                    newNode = renamingResult.Node;
-                    WorkingDocument = renamingResult.Document;
-                    _semanticModel = renamingResult.Document.GetSemanticModelAsync().Result;
+                    if (workingRenamingResult.Node != null)
+                    {
+                        newNode = renamingResult.Node;
+                        WorkingDocument = renamingResult.Document;
+                        _semanticModel = renamingResult.Document.GetSemanticModelAsync().Result;
+                    }
                 }
             }
             while (workingRenamingResult != null && newNode != currentNode);
@@ -85,14 +88,14 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             return null;
         }
 
-        KeyValuePair<RenameResult,string>? RenameIdentifierOfContainerNode(SyntaxNode containerNode, SyntaxToken identifierToRename, string newVarName)
+        KeyValuePair<RenameResult, string>? RenameIdentifierOfContainerNode(SyntaxNode containerNode, SyntaxToken identifierToRename, string newVarName)
         {
             RenameResult result = null;
 
             var currentName = identifierToRename.ValueText;
             string selectedName = currentName;
 
-            if (string.Compare(newVarName, currentName, false) == 0)  return null;
+            if (string.Compare(newVarName, currentName, false) == 0) return null;
             if (ValidateNewName(newVarName) == false) return null;
 
             var identifierDeclarationNode = identifierToRename.Parent;

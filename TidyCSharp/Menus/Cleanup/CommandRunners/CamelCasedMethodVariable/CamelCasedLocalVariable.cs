@@ -34,7 +34,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 if (CheckOption((int)CamelCasedMethodVariable.CleanupTypes.Local_variable))
                 {
                     var renamingResult = new VariableRenamer(WorkingDocument).RenameDeclarations(methodNode);
-                    if (renamingResult != null)
+                    if (renamingResult != null && renamingResult.Node != null)
                     {
                         methodNode = renamingResult.Node as MethodDeclarationSyntax;
                         WorkingDocument = renamingResult.Document;
@@ -44,7 +44,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 if (CheckOption((int)CamelCasedMethodVariable.CleanupTypes.Method_Parameter))
                 {
                     var renamingResult = new ParameterRenamer(WorkingDocument).RenameDeclarations(methodNode);
-                    if (renamingResult != null)
+                    if (renamingResult != null && renamingResult.Node != null)
                     {
                         methodNode = renamingResult.Node as MethodDeclarationSyntax;
                         WorkingDocument = renamingResult.Document;

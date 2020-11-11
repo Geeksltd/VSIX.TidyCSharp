@@ -36,7 +36,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 if (CheckOption((int)CamelCasedClassFields.CleanupTypes.Normal_Fields))
                 {
                     var renamingResult = new FieldRenamer(WorkingDocument).RenameDeclarations(classNode);
-                    if (renamingResult != null)
+                    if (renamingResult != null && renamingResult.Node != null)
                     {
                         classNode = renamingResult.Node as ClassDeclarationSyntax;
                         WorkingDocument = renamingResult.Document;
@@ -45,7 +45,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 if (CheckOption((int)CamelCasedClassFields.CleanupTypes.Const_Fields))
                 {
                     var renamingResult = new CONSTRenamer(WorkingDocument).RenameDeclarations(classNode);
-                    if (renamingResult != null)
+                    if (renamingResult != null && renamingResult.Node != null)
                     {
                         classNode = renamingResult.Node as ClassDeclarationSyntax;
                         WorkingDocument = renamingResult.Document;

@@ -66,6 +66,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             return initialSourceNode;
         }
+
         protected override void SaveResult(SyntaxNode initialSourceNode)
         {
             if (string.Compare(WorkingDocument.GetTextAsync().Result.ToString(), ProjectItemDetails.InitialSourceNode.GetText().ToString(), false) != 0)
@@ -77,8 +78,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         class MyWalker : CSharpSyntaxWalker
         {
             const string VarKeyword = "var";
-            private readonly ProjectItemDetailsType projectItemDetails;
-            private readonly SemanticModel semanticModel;
+            readonly ProjectItemDetailsType projectItemDetails;
+            readonly SemanticModel semanticModel;
 
             public MyWalker(ProjectItemDetailsType projectItemDetails, ICleanupOption options)
             {
@@ -195,6 +196,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         }
                     }
                 }
+
                 return true;
             }
 
@@ -219,17 +221,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                         return null;
                     }
-                    //else if (singleStatement.Expression is LiteralExpressionSyntax literalExpression)
-                    //{
-                    //}
-                    //else
-                    {
-                        return null;
-                    }
+
+                    return null;
+
                 }
                 else // if(getNode)
                 {
-
                 }
 
                 return null;
@@ -237,7 +234,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             IdentifierNameSyntax HasJustReturnValue(AccessorDeclarationSyntax getNode)
             {
-
                 if (getNode.Body != null)
                 {
                     if (getNode.Body.Statements.Count > 1) return null;
@@ -247,17 +243,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     {
                         return identifierExpression;
                     }
-                    //else if (singleStatement.Expression is LiteralExpressionSyntax literalExpression)
-                    //{
-                    //}
-                    //else
-                    {
-                        return null;
-                    }
+
+                    return null;
+
                 }
                 else // if(getNode)
                 {
-
                 }
 
                 return null;
@@ -267,9 +258,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         class Rewriter : CleanupCSharpSyntaxRewriter
         {
             const string VarKeyword = "var";
-            private readonly MyWalker walker;
-            private readonly ProjectItemDetailsType projectItemDetails;
-            private readonly SemanticModel semanticModel;
+            readonly MyWalker walker;
+            readonly ProjectItemDetailsType projectItemDetails;
+            readonly SemanticModel semanticModel;
             Document WorkingDocument;
 
             public Rewriter(MyWalker walker, ProjectItemDetailsType projectItemDetails, ICleanupOption options) : base(options)
@@ -289,11 +280,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     {
                         node = node.WithAdditionalAnnotations(new SyntaxAnnotation(SELECTED_METHOD_ANNOTATION_RENAME, foundedItem.Item2.Identifier.ValueText));
                     }
-                    node = node.WithAdditionalAnnotations(new SyntaxAnnotation(SELECTED_METHOD_ANNOTATION_REMOVE));
 
+                    node = node.WithAdditionalAnnotations(new SyntaxAnnotation(SELECTED_METHOD_ANNOTATION_REMOVE));
                 }
+
                 return base.VisitVariableDeclarator(node);
             }
+
             public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax propertyDeclaration)
             {
                 var foundedItem = walker.VariablesToRemove.FirstOrDefault(x => x.Item2 == propertyDeclaration);
@@ -301,6 +294,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 {
                     propertyDeclaration = ConvertProperty(foundedItem.Item2, foundedItem.Item1.Parent.Parent as FieldDeclarationSyntax);
                 }
+
                 return base.VisitPropertyDeclaration(propertyDeclaration);
             }
 
