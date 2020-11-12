@@ -1,8 +1,7 @@
-﻿using System.Linq;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
-using System;
+using System.Linq;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -24,16 +23,16 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         protected override string[] GetNewName(string currentName)
         {
-            if(currentName.StartsWith("_"))
+            if (currentName.StartsWith("_"))
             {
                 currentName = currentName.TrimStart('_');
                 if (currentName.Length == 0) return null;
-                if(Char.IsLetter(currentName[0]))
+                if (char.IsLetter(currentName[0]))
                 {
                     return new[] { GetCamelCased(currentName) };
                 }
             }
-            else if(Char.IsLetter(currentName[0]) && Char.IsUpper(currentName[0]))
+            else if (char.IsLetter(currentName[0]) && char.IsUpper(currentName[0]))
             {
                 return new[] { GetCamelCased(currentName) };
             }

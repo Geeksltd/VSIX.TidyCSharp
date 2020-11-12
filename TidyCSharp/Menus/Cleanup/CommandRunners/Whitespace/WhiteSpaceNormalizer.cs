@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Formatting;
+using Geeks.GeeksProductivityTools;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace;
-using Geeks.GeeksProductivityTools;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Formatting;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {

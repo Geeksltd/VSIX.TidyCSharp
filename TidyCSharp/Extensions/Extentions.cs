@@ -116,10 +116,9 @@ namespace System
         public static bool EndsWithAny(this string input, params string[] listOfEndings)
         {
             foreach (var option in listOfEndings)
-            {
                 if (input.EndsWith(option))
                     return true;
-            }
+
 
             return false;
         }

@@ -1,28 +1,17 @@
-﻿using System;
+﻿using Geeks.VSIX.TidyCSharp.Cleanup;
+using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers;
+using Geeks.VSIX.TidyCSharp.Properties;
+using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
-using Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers;
-using Geeks.VSIX.TidyCSharp.Cleanup;
-using Geeks.VSIX.TidyCSharp.Properties;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
 {
     public partial class CleanupOptionForm : Form
     {
-        static CleanupOptionForm _Instance = new CleanupOptionForm();
-        public static CleanupOptionForm Instance
-        {
-            get
-            {
-                return _Instance;
-            }
-            set
-            {
-                _Instance = value;
-            }
-        }
+        public static CleanupOptionForm Instance { get; set; }
         public CleanupOptions CleanupOptions { get; private set; }
 
         CleanupOptionForm()
@@ -31,8 +20,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             mainPanel.Padding = new Padding(5, 5, 5, 0);
             base.ShowInTaskbar = false;
             base.WindowState = FormWindowState.Normal;
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.BackColor = Color.FromArgb(0xF0, 0xF0, 0xF0);
+            StartPosition = FormStartPosition.CenterScreen;
+            BackColor = Color.FromArgb(0xF0, 0xF0, 0xF0);
 
             CreateControls();
             LoadFromSetting();
@@ -57,10 +46,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             newControl.Init((CodeCleanerType)cleanupTypeItem.CleanerType);
 
             mainPanel.Controls.Add(newControl);
-            //this.Height += newSubControl.Height;
+            // this.Height += newSubControl.Height;
         }
-
-
 
         void DeserializeValues(string strValue)
         {
@@ -85,47 +72,44 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             }
             catch
             {
-
             }
         }
+
         void LoadFromSetting()
         {
             if (string.IsNullOrEmpty(Settings.Default.CleanupChoices))
             {
                 foreach (IMainCleanup control in mainPanel.Controls.OfType<IMainCleanup>())
-                {
                     control.ResetItemsCheckState();
-                }
 
                 return;
             }
+
             DeserializeValues(Settings.Default.CleanupChoices);
             return;
         }
 
-        private void ApplyCleanup()
+        void ApplyCleanup()
         {
             CleanupOptions = new CleanupOptions();
 
             foreach (CleanupItemUserControl item in mainPanel.Controls)
-            {
                 CleanupOptions.Accept(item);
-            }
-
 
             Settings.Default.CleanupChoices = CleanupOptions.SerializeValues();
             if (string.IsNullOrEmpty(Settings.Default.CleanupChoices))
             {
                 Settings.Default.CleanupChoices = "null";
             }
+
             Settings.Default.Save();
         }
 
-        private void btnApply_Click(object sender, EventArgs e)
+        void btnApply_Click(object sender, EventArgs e)
         {
             ApplyCleanup();
-            this.DialogResult = DialogResult.OK;
-            this.Close();
+            DialogResult = DialogResult.OK;
+            Close();
         }
     }
 }

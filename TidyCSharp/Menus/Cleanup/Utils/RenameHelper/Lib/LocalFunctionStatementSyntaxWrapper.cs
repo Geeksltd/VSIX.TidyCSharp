@@ -8,29 +8,29 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
     using System.Reflection;
     internal struct LocalFunctionStatementSyntaxWrapper : ISyntaxWrapper<StatementSyntax>
     {
-        private const string LocalFunctionStatementSyntaxTypeName = "Microsoft.CodeAnalysis.CSharp.Syntax.LocalFunctionStatementSyntax";
-        private static readonly Type LocalFunctionStatementSyntaxType;
+        const string LocalFunctionStatementSyntaxTypeName = "Microsoft.CodeAnalysis.CSharp.Syntax.LocalFunctionStatementSyntax";
+        static readonly Type LocalFunctionStatementSyntaxType;
 
-        private static readonly Func<StatementSyntax, SyntaxTokenList> ModifiersAccessor;
-        private static readonly Func<StatementSyntax, TypeSyntax> ReturnTypeAccessor;
-        private static readonly Func<StatementSyntax, SyntaxToken> IdentifierAccessor;
-        private static readonly Func<StatementSyntax, TypeParameterListSyntax> TypeParameterListAccessor;
-        private static readonly Func<StatementSyntax, ParameterListSyntax> ParameterListAccessor;
-        private static readonly Func<StatementSyntax, SyntaxList<TypeParameterConstraintClauseSyntax>> ConstraintClausesAccessor;
-        private static readonly Func<StatementSyntax, BlockSyntax> BodyAccessor;
-        private static readonly Func<StatementSyntax, ArrowExpressionClauseSyntax> ExpressionBodyAccessor;
-        private static readonly Func<StatementSyntax, SyntaxToken> SemicolonTokenAccessor;
-        private static readonly Func<StatementSyntax, SyntaxTokenList, StatementSyntax> WithModifiersAccessor;
-        private static readonly Func<StatementSyntax, TypeSyntax, StatementSyntax> WithReturnTypeAccessor;
-        private static readonly Func<StatementSyntax, SyntaxToken, StatementSyntax> WithIdentifierAccessor;
-        private static readonly Func<StatementSyntax, TypeParameterListSyntax, StatementSyntax> WithTypeParameterListAccessor;
-        private static readonly Func<StatementSyntax, ParameterListSyntax, StatementSyntax> WithParameterListAccessor;
-        private static readonly Func<StatementSyntax, SyntaxList<TypeParameterConstraintClauseSyntax>, StatementSyntax> WithConstraintClausesAccessor;
-        private static readonly Func<StatementSyntax, BlockSyntax, StatementSyntax> WithBodyAccessor;
-        private static readonly Func<StatementSyntax, ArrowExpressionClauseSyntax, StatementSyntax> WithExpressionBodyAccessor;
-        private static readonly Func<StatementSyntax, SyntaxToken, StatementSyntax> WithSemicolonTokenAccessor;
+        static readonly Func<StatementSyntax, SyntaxTokenList> ModifiersAccessor;
+        static readonly Func<StatementSyntax, TypeSyntax> ReturnTypeAccessor;
+        static readonly Func<StatementSyntax, SyntaxToken> IdentifierAccessor;
+        static readonly Func<StatementSyntax, TypeParameterListSyntax> TypeParameterListAccessor;
+        static readonly Func<StatementSyntax, ParameterListSyntax> ParameterListAccessor;
+        static readonly Func<StatementSyntax, SyntaxList<TypeParameterConstraintClauseSyntax>> ConstraintClausesAccessor;
+        static readonly Func<StatementSyntax, BlockSyntax> BodyAccessor;
+        static readonly Func<StatementSyntax, ArrowExpressionClauseSyntax> ExpressionBodyAccessor;
+        static readonly Func<StatementSyntax, SyntaxToken> SemicolonTokenAccessor;
+        static readonly Func<StatementSyntax, SyntaxTokenList, StatementSyntax> WithModifiersAccessor;
+        static readonly Func<StatementSyntax, TypeSyntax, StatementSyntax> WithReturnTypeAccessor;
+        static readonly Func<StatementSyntax, SyntaxToken, StatementSyntax> WithIdentifierAccessor;
+        static readonly Func<StatementSyntax, TypeParameterListSyntax, StatementSyntax> WithTypeParameterListAccessor;
+        static readonly Func<StatementSyntax, ParameterListSyntax, StatementSyntax> WithParameterListAccessor;
+        static readonly Func<StatementSyntax, SyntaxList<TypeParameterConstraintClauseSyntax>, StatementSyntax> WithConstraintClausesAccessor;
+        static readonly Func<StatementSyntax, BlockSyntax, StatementSyntax> WithBodyAccessor;
+        static readonly Func<StatementSyntax, ArrowExpressionClauseSyntax, StatementSyntax> WithExpressionBodyAccessor;
+        static readonly Func<StatementSyntax, SyntaxToken, StatementSyntax> WithSemicolonTokenAccessor;
 
-        private readonly StatementSyntax node;
+        readonly StatementSyntax node;
 
         static LocalFunctionStatementSyntaxWrapper()
         {
@@ -54,53 +54,19 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             WithExpressionBodyAccessor = LightupHelpers.CreateSyntaxWithPropertyAccessor<StatementSyntax, ArrowExpressionClauseSyntax>(LocalFunctionStatementSyntaxType, nameof(ExpressionBody));
             WithSemicolonTokenAccessor = LightupHelpers.CreateSyntaxWithPropertyAccessor<StatementSyntax, SyntaxToken>(LocalFunctionStatementSyntaxType, nameof(SemicolonToken));
         }
-
-        private LocalFunctionStatementSyntaxWrapper(StatementSyntax node)
-        {
-            this.node = node;
-        }
+        private LocalFunctionStatementSyntaxWrapper(StatementSyntax node) => this.node = node;
 
         public StatementSyntax SyntaxNode => this.node;
 
-        public SyntaxTokenList Modifiers
-        {
-            get
-            {
-                return ModifiersAccessor(this.SyntaxNode);
-            }
-        }
+        public SyntaxTokenList Modifiers => ModifiersAccessor(this.SyntaxNode);
 
-        public TypeSyntax ReturnType
-        {
-            get
-            {
-                return ReturnTypeAccessor(this.SyntaxNode);
-            }
-        }
+        public TypeSyntax ReturnType => ReturnTypeAccessor(this.SyntaxNode);
 
-        public SyntaxToken Identifier
-        {
-            get
-            {
-                return IdentifierAccessor(this.SyntaxNode);
-            }
-        }
+        public SyntaxToken Identifier => IdentifierAccessor(this.SyntaxNode);
 
-        public TypeParameterListSyntax TypeParameterList
-        {
-            get
-            {
-                return TypeParameterListAccessor(this.SyntaxNode);
-            }
-        }
+        public TypeParameterListSyntax TypeParameterList => TypeParameterListAccessor(this.SyntaxNode);
 
-        public ParameterListSyntax ParameterList
-        {
-            get
-            {
-                return ParameterListAccessor(this.SyntaxNode);
-            }
-        }
+        public ParameterListSyntax ParameterList => ParameterListAccessor(this.SyntaxNode);
 
         public SyntaxList<TypeParameterConstraintClauseSyntax> ConstraintClauses
         {
@@ -110,29 +76,11 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             }
         }
 
-        public BlockSyntax Body
-        {
-            get
-            {
-                return BodyAccessor(this.SyntaxNode);
-            }
-        }
+        public BlockSyntax Body => BodyAccessor(this.SyntaxNode);
 
-        public ArrowExpressionClauseSyntax ExpressionBody
-        {
-            get
-            {
-                return ExpressionBodyAccessor(this.SyntaxNode);
-            }
-        }
+        public ArrowExpressionClauseSyntax ExpressionBody => ExpressionBodyAccessor(this.SyntaxNode);
 
-        public SyntaxToken SemicolonToken
-        {
-            get
-            {
-                return SemicolonTokenAccessor(this.SyntaxNode);
-            }
-        }
+        public SyntaxToken SemicolonToken => SemicolonTokenAccessor(this.SyntaxNode);
 
         public static explicit operator LocalFunctionStatementSyntaxWrapper(SyntaxNode node)
         {

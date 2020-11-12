@@ -11,7 +11,7 @@ namespace Geeks.GeeksProductivityTools
         {
         }
 
-        //---------------------------------------
+        // ---------------------------------------
 
         string FilePath
         {
@@ -35,7 +35,7 @@ namespace Geeks.GeeksProductivityTools
             return Path.GetDirectoryName(solution.FullName);
         }
 
-        //---------------------------------------
+        // ---------------------------------------
 
         public GlobalSettings Load()
         {
@@ -50,7 +50,7 @@ namespace Geeks.GeeksProductivityTools
 
         public void Save()
         {
-            string json = JsonConvert.SerializeObject(App.Settings, Formatting.Indented);
+            var json = JsonConvert.SerializeObject(App.Settings, Formatting.Indented);
 
             File.WriteAllText(FilePath, json);
 

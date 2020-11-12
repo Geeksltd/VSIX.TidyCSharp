@@ -1,9 +1,8 @@
-﻿using System.Linq;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
-using System;
+using System.Linq;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -22,14 +21,13 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                     .Members.OfType<FieldDeclarationSyntax>()
                     .Where(
                         x =>
-                            IsPrivate(x) && 
+                            IsPrivate(x) &&
                             x.Modifiers.Any(m => m.IsKind(SyntaxKind.ConstKeyword)) == false
                     );
 
             foreach (var item in selectedFields)
-            {
                 output.AddRange(item.Declaration.Variables);
-            }
+
 
             return output.Select(x => x.Identifier);
         }
@@ -39,7 +37,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             if (currentName.StartsWith("_"))
             {
                 currentName = currentName.TrimStart('_');
-                if (Char.IsLetter(currentName[0]))
+                if (char.IsLetter(currentName[0]))
                 {
                     return new[] { GetCamelCased(currentName), GetPascalCased(currentName) };
                 }

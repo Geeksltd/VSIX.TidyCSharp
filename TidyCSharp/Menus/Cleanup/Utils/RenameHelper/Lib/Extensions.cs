@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
+using System.Linq;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 {
@@ -14,9 +14,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             }
 
             // get the rest of the full namespace string
-            string restOfResult = symbol.ContainingNamespace.GetFullNamespace();
+            var restOfResult = symbol.ContainingNamespace.GetFullNamespace();
 
-            string result = symbol.ContainingNamespace.Name;
+            var result = symbol.ContainingNamespace.Name;
 
             if (restOfResult != null)
                 // if restOfResult is not null, append it after a period
@@ -27,14 +27,14 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 
         public static string GetFullTypeString(this INamedTypeSymbol type)
         {
-            string result = type.Name;
+            var result = type.Name;
 
             if (type.TypeArguments.Count() > 0)
             {
                 result += "<";
 
                 bool isFirstIteration = true;
-                foreach(INamedTypeSymbol typeArg in type.TypeArguments)
+                foreach (INamedTypeSymbol typeArg in type.TypeArguments)
                 {
                     if (isFirstIteration)
                     {
@@ -75,7 +75,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 
         public static string GetMethodSignature(this IMethodSymbol methodSymbol)
         {
-            string result = methodSymbol.DeclaredAccessibility.ConvertAccessabilityToString();
+            var result = methodSymbol.DeclaredAccessibility.ConvertAccessabilityToString();
 
             if (methodSymbol.IsAsync)
                 result += " async";
@@ -110,7 +110,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             result += " " + methodSymbol.Name + "(";
 
             bool isFirstParameter = true;
-            foreach(IParameterSymbol parameter in methodSymbol.Parameters)
+            foreach (IParameterSymbol parameter in methodSymbol.Parameters)
             {
                 if (isFirstParameter)
                 {
@@ -130,11 +130,11 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
                     result += "ref ";
                 }
 
-                string parameterTypeString = 
+                var parameterTypeString =
                     (parameter.Type as INamedTypeSymbol).GetFullTypeString();
 
                 result += parameterTypeString;
-                    
+
                 result += " " + parameter.Name;
 
                 if (parameter.HasExplicitDefaultValue)
@@ -150,9 +150,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 
         public static object GetAttributeConstructorValueByParameterName(this AttributeData attributeData, string argName)
         {
-
             // Get the parameter
-            IParameterSymbol parameterSymbol = attributeData.AttributeConstructor
+            var parameterSymbol = attributeData.AttributeConstructor
                 .Parameters
                 .Where((constructorParam) => constructorParam.Name == argName).FirstOrDefault();
 

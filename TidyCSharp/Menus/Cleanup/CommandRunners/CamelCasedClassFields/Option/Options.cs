@@ -6,9 +6,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CamelCasedClassFields
     {
         public CleanupTypes? CleanupItems => (CleanupTypes?)CleanupItemsInteger;
 
-        public override CodeCleanerType GetCodeCleanerType()
-        {
-            return CodeCleanerType.CamelCasedFields;
-        }
+        public override CodeCleanerType GetCodeCleanerType() => CodeCleanerType.CamelCasedFields;
     }
 }

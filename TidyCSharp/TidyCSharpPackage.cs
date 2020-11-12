@@ -1,17 +1,16 @@
-using System;
-using System.ComponentModel.Design;
-using System.Runtime.InteropServices;
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using Microsoft.CodeAnalysis;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.LanguageServices;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.CodeAnalysis;
-using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using System;
+using System.ComponentModel.Design;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Geeks.GeeksProductivityTools
 {
-
     [ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F", PackageAutoLoadFlags.BackgroundLoad)]    // Microsoft.VisualStudio.VSConstants.UICONTEXT_NoSolution
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [ProvideService(typeof(IMenuCommandService), IsAsyncQueryable = true)]
@@ -31,8 +30,8 @@ namespace Geeks.GeeksProductivityTools
         public static TidyCSharpPackage Instance { get; private set; }
         public Workspace VsWorkspace { get; set; }
 
-        bool bResetWorkingSolution = false;
-        Solution _CleanupWorkingSolution = null;
+        bool bResetWorkingSolution;
+        Solution _CleanupWorkingSolution;
         public Solution CleanupWorkingSolution
         {
             get
@@ -42,6 +41,7 @@ namespace Geeks.GeeksProductivityTools
                     _CleanupWorkingSolution = VsWorkspace.CurrentSolution;
                     bResetWorkingSolution = false;
                 }
+
                 return _CleanupWorkingSolution;
             }
         }
@@ -50,7 +50,7 @@ namespace Geeks.GeeksProductivityTools
             _CleanupWorkingSolution = ExtactChanges(_CleanupWorkingSolution, newSolution);
         }
 
-        private Solution ExtactChanges(Solution oldSolution, Solution newSolution)
+        Solution ExtactChanges(Solution oldSolution, Solution newSolution)
         {
             lock (Instance)
             {
@@ -77,6 +77,7 @@ namespace Geeks.GeeksProductivityTools
                         }
                     }
                 }
+
                 return changedSolution;
             }
         }
@@ -89,6 +90,7 @@ namespace Geeks.GeeksProductivityTools
             _CleanupWorkingSolution = null;
             bResetWorkingSolution = true;
         }
+
         protected override async System.Threading.Tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
@@ -131,11 +133,9 @@ namespace Geeks.GeeksProductivityTools
                 }
 
                 if (!document.Saved) document.Save();
-
             }
             catch
             {
-
             }
         }
     }

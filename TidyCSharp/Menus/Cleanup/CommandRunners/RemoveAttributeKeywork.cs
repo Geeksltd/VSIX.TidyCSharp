@@ -13,7 +13,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             return RemoveAttributeKeyworkHelper(initialSourceNode, ProjectItemDetails.SemanticModel);
         }
 
-        private SyntaxNode RemoveAttributeKeyworkHelper(SyntaxNode initialSourceNode, SemanticModel semanticModel)
+        SyntaxNode RemoveAttributeKeyworkHelper(SyntaxNode initialSourceNode, SemanticModel semanticModel)
         {
             initialSourceNode = new Rewriter(semanticModel).Visit(initialSourceNode);
             return initialSourceNode;
@@ -22,12 +22,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         static string Attribute_Keywork = SyntaxKind.Attribute.ToString();
         class Rewriter : CSharpSyntaxRewriter
         {
-            private SemanticModel semanticModel;
-
-            public Rewriter(SemanticModel semanticModel)
-            {
-                this.semanticModel = semanticModel;
-            }
+            SemanticModel semanticModel;
+            public Rewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
 
             public override SyntaxNode VisitAttribute(AttributeSyntax node)
             {
@@ -37,7 +33,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     {
                         var orginalNodeTypeInfo = semanticModel.GetTypeInfo(node.Name);
 
-                        if(orginalNodeTypeInfo.Type == null) base.VisitAttribute(node);
+                        if (orginalNodeTypeInfo.Type == null) base.VisitAttribute(node);
 
                         if (orginalNodeTypeInfo.Type.Name == newNameNode.Identifier.ValueText)
                         {
@@ -50,7 +46,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 return base.VisitAttribute(node);
             }
-
         }
     }
 }

@@ -1,5 +1,5 @@
-using System.ComponentModel;
 using Microsoft.VisualStudio.Shell;
+using System.ComponentModel;
 
 namespace Geeks.GeeksProductivityTools
 {

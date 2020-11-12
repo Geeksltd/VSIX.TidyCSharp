@@ -1,8 +1,7 @@
-using System.Linq;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
+using Microsoft.CodeAnalysis;
+using System.Linq;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -14,7 +13,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
         {
-            SyntaxAnnotation annotationForSelectedNode = new SyntaxAnnotation(SELECTED_METHOD_ANNOTATION);
+            var annotationForSelectedNode = new SyntaxAnnotation(SELECTED_METHOD_ANNOTATION);
             orginalDocument = ProjectItemDetails.ProjectItemDocument;
             WorkingDocument = ProjectItemDetails.ProjectItemDocument;
 
@@ -38,11 +37,11 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
                 rewriter.Visit(annotatedNode);
                 WorkingDocument = rewriter.WorkingDocument;
-
             } while (workingNode != null);
 
             return null;
         }
+
         protected override void SaveResult(SyntaxNode initialSourceNode)
         {
             if (string.Compare(WorkingDocument.GetTextAsync().Result.ToString(), ProjectItemDetails.InitialSourceNode.GetText().ToString(), false) != 0)

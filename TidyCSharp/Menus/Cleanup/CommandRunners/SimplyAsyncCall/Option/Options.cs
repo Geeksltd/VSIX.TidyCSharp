@@ -6,9 +6,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.SimplyAsyncCall
     {
         public CleanupTypes? CleanupItems => (CleanupTypes?)CleanupItemsInteger;
 
-        public override CodeCleanerType GetCodeCleanerType()
-        {
-            return CodeCleanerType.SimplyAsyncCalls;
-        }
+        public override CodeCleanerType GetCodeCleanerType() => CodeCleanerType.SimplyAsyncCalls;
     }
 }

@@ -9,18 +9,11 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.Infra
         public int FirstOrder { get; set; } = int.MaxValue;
         public bool SelectedByDefault { get; set; } = true;
 
-        public int? Order
-        {
-            get
-            {
-                return FirstOrder == int.MaxValue ? (int?)null : FirstOrder;
-            }
-        }
+        public int? Order => FirstOrder == int.MaxValue ? (int?)null : FirstOrder;
         public Type SubItemType { get; set; }
 
         public CleanupItemAttribute()
         {
         }
     }
-
 }

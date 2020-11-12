@@ -14,19 +14,19 @@ namespace Geeks.GeeksProductivityTools
 
             // TODO: Add feature to Settings for sending the error log to the dev team if requested by end users
 
-            //var message = new MailMessage("Geeks.Productivity.Tools@gmail.com",
+            // var message = new MailMessage("Geeks.Productivity.Tools@gmail.com",
             //                              "ali.ashoori@geeks.ltd.uk",
             //                              $"Error from Geeks Productivity Tools {DateTime.Now.Date}", GenerateErrorBody(ex))
-            //{
+            // {
             //    IsBodyHtml = true
-            //};
+            // };
 
-            //var client = new SmtpClient("smtp.gmail.com", 587)
-            //{
+            // var client = new SmtpClient("smtp.gmail.com", 587)
+            // {
             //    Credentials = new NetworkCredential("Geeks.Productivity.Tools@gmail.com", "Espresso123"),
             //    EnableSsl = true
-            //};
-            //client.Send(message);
+            // };
+            // client.Send(message);
         }
 
         static string GenerateErrorBody(Exception e)

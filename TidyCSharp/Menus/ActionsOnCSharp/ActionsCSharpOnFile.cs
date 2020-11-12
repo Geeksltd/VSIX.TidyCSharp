@@ -1,9 +1,9 @@
-using System;
 using EnvDTE;
 using Geeks.GeeksProductivityTools.Extensions;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.GeeksProductivityTools.Utils;
 using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
+using System;
 
 namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 {

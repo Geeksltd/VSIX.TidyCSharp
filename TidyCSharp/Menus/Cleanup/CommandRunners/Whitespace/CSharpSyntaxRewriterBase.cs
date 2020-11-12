@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 {
@@ -54,9 +52,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             {
                 var newList = syntaxTrivias.ToList();
                 for (var i = lineBreaksAtBeginning; i < exactNumberOfBlanks; i++)
-                {
                     newList.Insert(0, _endOfLineTrivia);
-                }
+
+
                 syntaxTrivias = new SyntaxTriviaList().AddRange(newList);
             }
 
@@ -128,15 +126,18 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                             {
                                 outputTriviasList.Add(syntaxTrivias[i]);
                             }
+
                             i = syntaxTrivias.Count;
                         }
                         else
                         {
                             outputTriviasList.Add(syntaxTrivias[i]);
                         }
+
                         continue;
                     }
                 }
+
                 if
                 (
                     (
@@ -162,6 +163,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                     {
                         outputTriviasList.Add(syntaxTrivias[i]);
                     }
+
                     specialTiviasCount++;
                     continue;
                 }
@@ -179,6 +181,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                     i += countOfChars + 1;
                     bAddedBlankLine = true;
                 }
+
                 if ((countOfChars = RemoveBlankDuplication(syntaxTrivias, SyntaxKind.WhitespaceTrivia, i)) != -1)
                 {
                     outputTriviasList.Add(syntaxTrivias[i]);
@@ -188,8 +191,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                 {
                     i--;
                 }
+
                 bAddedBlankLine = false;
             }
+
             return outputTriviasList.ToSyntaxTriviaList();
         }
 
@@ -207,6 +212,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                     }
                 }
             }
+
             return syntaxTrivias;
         }
 

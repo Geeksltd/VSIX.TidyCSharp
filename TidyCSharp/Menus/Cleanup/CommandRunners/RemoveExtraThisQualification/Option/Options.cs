@@ -13,5 +13,4 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.RemoveExtraThisKeyword
             return CodeCleanerType.RemoveExtraThisQualification;
         }
     }
-
 }

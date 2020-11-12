@@ -2,9 +2,9 @@
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 {
-    using System.Linq;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     internal abstract class SyntaxWrapper<TNode>
@@ -15,7 +15,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 
         public abstract SyntaxNode Unwrap(TNode node);
 
-        private static SyntaxWrapper<TNode> FindDefaultSyntaxWrapper()
+        static SyntaxWrapper<TNode> FindDefaultSyntaxWrapper()
         {
             if (typeof(SyntaxNode).GetTypeInfo().IsAssignableFrom(typeof(TNode).GetTypeInfo()))
             {
@@ -25,27 +25,21 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             return new ConversionSyntaxWrapper();
         }
 
-        private sealed class DirectCastSyntaxWrapper : SyntaxWrapper<TNode>
+        sealed class DirectCastSyntaxWrapper : SyntaxWrapper<TNode>
         {
-            public override SyntaxNode Unwrap(TNode node)
-            {
-                return (SyntaxNode)(object)node;
-            }
+            public override SyntaxNode Unwrap(TNode node) => (SyntaxNode)(object)node;
 
-            public override TNode Wrap(SyntaxNode node)
-            {
-                return (TNode)(object)node;
-            }
+            public override TNode Wrap(SyntaxNode node) => (TNode)(object)node;
         }
 
-        private sealed class ConversionSyntaxWrapper : SyntaxWrapper<TNode>
+        sealed class ConversionSyntaxWrapper : SyntaxWrapper<TNode>
         {
-            private readonly Func<TNode, SyntaxNode> unwrapAccessor;
-            private readonly Func<SyntaxNode, TNode> wrapAccessor;
+            readonly Func<TNode, SyntaxNode> unwrapAccessor;
+            readonly Func<SyntaxNode, TNode> wrapAccessor;
 
             public ConversionSyntaxWrapper()
             {
-                this.unwrapAccessor = LightupHelpers.CreateSyntaxPropertyAccessor<TNode, SyntaxNode>(typeof(TNode), nameof(ISyntaxWrapper<SyntaxNode>.SyntaxNode));
+                unwrapAccessor = LightupHelpers.CreateSyntaxPropertyAccessor<TNode, SyntaxNode>(typeof(TNode), nameof(ISyntaxWrapper<SyntaxNode>.SyntaxNode));
 
                 var explicitOperator = typeof(TNode).GetTypeInfo().GetDeclaredMethods("op_Explicit")
                     .Single(m => m.ReturnType == typeof(TNode) && m.GetParameters()[0].ParameterType == typeof(SyntaxNode));
@@ -55,18 +49,12 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
                         Expression.Call(explicitOperator, syntaxParameter),
                         syntaxParameter);
 
-                this.wrapAccessor = wrapAccessorExpression.Compile();
+                wrapAccessor = wrapAccessorExpression.Compile();
             }
 
-            public override SyntaxNode Unwrap(TNode node)
-            {
-                return this.unwrapAccessor(node);
-            }
+            public override SyntaxNode Unwrap(TNode node) => unwrapAccessor(node);
 
-            public override TNode Wrap(SyntaxNode node)
-            {
-                return this.wrapAccessor(node);
-            }
+            public override TNode Wrap(SyntaxNode node) => wrapAccessor(node);
         }
     }
 }

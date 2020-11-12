@@ -1,20 +1,14 @@
-﻿using System.Text;
-using System.Threading.Tasks;
-
-namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
+﻿namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 {
-    using System.Collections.Immutable;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Rename;
-    using System;
-    using System.Collections.Generic;
-    using static Geeks.GeeksProductivityTools.Menus.Cleanup.Renamer;
+    using System.Collections.Immutable;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     internal static partial class RenameHelper
     {
@@ -102,14 +96,14 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             }
             else if (containingSymbol.Kind == SymbolKind.Method)
             {
-                IMethodSymbol methodSymbol = (IMethodSymbol)containingSymbol;
+                var methodSymbol = (IMethodSymbol)containingSymbol;
                 if (methodSymbol.Parameters.Any(i => i.Name == name)
                     || methodSymbol.TypeParameters.Any(i => i.Name == name))
                 {
                     return false;
                 }
 
-                IMethodSymbol outermostMethod = methodSymbol;
+                var outermostMethod = methodSymbol;
                 while (outermostMethod.ContainingSymbol.Kind == SymbolKind.Method)
                 {
                     outermostMethod = (IMethodSymbol)outermostMethod.ContainingSymbol;
@@ -122,8 +116,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 
                 foreach (var syntaxReference in outermostMethod.DeclaringSyntaxReferences)
                 {
-                    SyntaxNode syntaxNode = await syntaxReference.GetSyntaxAsync(cancellationToken).ConfigureAwait(false);
-                    LocalNameFinder localNameFinder = new LocalNameFinder(name);
+                    var syntaxNode = await syntaxReference.GetSyntaxAsync(cancellationToken).ConfigureAwait(false);
+                    var localNameFinder = new LocalNameFinder(name);
                     localNameFinder.Visit(syntaxNode);
                     if (localNameFinder.Found)
                     {
@@ -141,7 +135,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 
         public static SyntaxNode GetParentDeclaration(SyntaxToken token)
         {
-            SyntaxNode parent = token.Parent;
+            var parent = token.Parent;
 
             while (parent != null)
             {
@@ -181,14 +175,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             return null;
         }
 
-        private class LocalNameFinder : CSharpSyntaxWalker
+        class LocalNameFinder : CSharpSyntaxWalker
         {
-            private readonly string name;
-
-            public LocalNameFinder(string name)
-            {
-                this.name = name;
-            }
+            readonly string name;
+            public LocalNameFinder(string name) => this.name = name;
 
             public bool Found
             {
@@ -201,11 +191,11 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
                 switch ((SyntaxKind)node.RawKind)
                 {
                     case SyntaxKindEx.LocalFunctionStatement:
-                        this.Found |= ((LocalFunctionStatementSyntaxWrapper)node).Identifier.ValueText == this.name;
+                        Found |= ((LocalFunctionStatementSyntaxWrapper)node).Identifier.ValueText == name;
                         break;
 
                     case SyntaxKindEx.SingleVariableDesignation:
-                        this.Found |= ((SingleVariableDesignationSyntaxWrapper)node).Identifier.ValueText == this.name;
+                        Found |= ((SingleVariableDesignationSyntaxWrapper)node).Identifier.ValueText == name;
                         break;
 
                     default:
@@ -217,76 +207,75 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 
             public override void VisitVariableDeclarator(VariableDeclaratorSyntax node)
             {
-                this.Found |= node.Identifier.ValueText == this.name;
+                Found |= node.Identifier.ValueText == name;
                 base.VisitVariableDeclarator(node);
             }
 
             public override void VisitParameter(ParameterSyntax node)
             {
-                this.Found |= node.Identifier.ValueText == this.name;
+                Found |= node.Identifier.ValueText == name;
                 base.VisitParameter(node);
             }
 
             public override void VisitTypeParameter(TypeParameterSyntax node)
             {
-                this.Found |= node.Identifier.ValueText == this.name;
+                Found |= node.Identifier.ValueText == name;
                 base.VisitTypeParameter(node);
             }
 
             public override void VisitCatchDeclaration(CatchDeclarationSyntax node)
             {
-                this.Found |= node.Identifier.ValueText == this.name;
+                Found |= node.Identifier.ValueText == name;
                 base.VisitCatchDeclaration(node);
             }
 
             public override void VisitQueryContinuation(QueryContinuationSyntax node)
             {
-                this.Found |= node.Identifier.ValueText == this.name;
+                Found |= node.Identifier.ValueText == name;
                 base.VisitQueryContinuation(node);
             }
 
             public override void VisitFromClause(FromClauseSyntax node)
             {
-                this.Found |= node.Identifier.ValueText == this.name;
+                Found |= node.Identifier.ValueText == name;
                 base.VisitFromClause(node);
             }
 
             public override void VisitLetClause(LetClauseSyntax node)
             {
-                this.Found |= node.Identifier.ValueText == this.name;
+                Found |= node.Identifier.ValueText == name;
                 base.VisitLetClause(node);
             }
 
             public override void VisitJoinClause(JoinClauseSyntax node)
             {
-                this.Found |= node.Identifier.ValueText == this.name;
+                Found |= node.Identifier.ValueText == name;
                 base.VisitJoinClause(node);
             }
 
             public override void VisitJoinIntoClause(JoinIntoClauseSyntax node)
             {
-                this.Found |= node.Identifier.ValueText == this.name;
+                Found |= node.Identifier.ValueText == name;
                 base.VisitJoinIntoClause(node);
             }
 
             public override void VisitForEachStatement(ForEachStatementSyntax node)
             {
-                this.Found |= node.Identifier.ValueText == this.name;
+                Found |= node.Identifier.ValueText == name;
                 base.VisitForEachStatement(node);
             }
 
             public override void VisitLabeledStatement(LabeledStatementSyntax node)
             {
-                this.Found |= node.Identifier.ValueText == this.name;
+                Found |= node.Identifier.ValueText == name;
                 base.VisitLabeledStatement(node);
             }
 
             public override void VisitAnonymousObjectMemberDeclarator(AnonymousObjectMemberDeclaratorSyntax node)
             {
-                this.Found |= node.NameEquals?.Name?.Identifier.ValueText == this.name;
+                Found |= node.NameEquals?.Name?.Identifier.ValueText == name;
                 base.VisitAnonymousObjectMemberDeclarator(node);
             }
         }
-
     }
 }

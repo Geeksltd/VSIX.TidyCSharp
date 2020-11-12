@@ -10,22 +10,18 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
     {
         internal struct VariableDesignationSyntaxWrapper : ISyntaxWrapper<CSharpSyntaxNode>
         {
-            private const string VariableDesignationSyntaxTypeName = "Microsoft.CodeAnalysis.CSharp.Syntax.VariableDesignationSyntax";
-            private static readonly Type VariableDesignationSyntaxType;
+            const string VariableDesignationSyntaxTypeName = "Microsoft.CodeAnalysis.CSharp.Syntax.VariableDesignationSyntax";
+            static readonly Type VariableDesignationSyntaxType;
 
-            private readonly CSharpSyntaxNode node;
+            readonly CSharpSyntaxNode node;
 
             static VariableDesignationSyntaxWrapper()
             {
                 VariableDesignationSyntaxType = typeof(CSharpSyntaxNode).GetTypeInfo().Assembly.GetType(VariableDesignationSyntaxTypeName);
             }
+            private VariableDesignationSyntaxWrapper(CSharpSyntaxNode node) => this.node = node;
 
-            private VariableDesignationSyntaxWrapper(CSharpSyntaxNode node)
-            {
-                this.node = node;
-            }
-
-            public CSharpSyntaxNode SyntaxNode => this.node;
+            public CSharpSyntaxNode SyntaxNode => node;
 
             public static explicit operator VariableDesignationSyntaxWrapper(SyntaxNode node)
             {

@@ -1,13 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using EnvDTE;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -51,9 +50,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             Encoding encoding = null;
 
             using (var reader = new StreamReader(filePath))
-            {
                 encoding = reader.CurrentEncoding;
-            }
+
 
             using (var reader = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
@@ -74,7 +72,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 else if (bom[0] == 0xfe && bom[1] == 0xff)
                 {
                     encoding = new UTF8Encoding(false);
-                    //encoding = new BigEndianUnicode(true);
+                    // encoding = new BigEndianUnicode(true);
                 }
                 else if (bom[0] == 0 && bom[1] == 0 && bom[2] == 0xfe && bom[3] == 0xff)
                 {
@@ -84,8 +82,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 {
                     encoding = new UTF8Encoding(false);
                 }
-
             }
+
             return encoding;
         }
 
@@ -107,6 +105,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
         {
             return token.WithLeadingTrivia().WithTrailingTrivia();
         }
+
         public static SyntaxTriviaList WithoutWhitespaceTrivia(this SyntaxTriviaList triviaList)
         {
             return new SyntaxTriviaList().AddRange(triviaList.Where(t => !t.IsWhitespaceTrivia()));
@@ -119,6 +118,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                     .WithLeadingTrivia(token.LeadingTrivia.Where(t => !t.IsWhitespaceTrivia()))
                     .WithTrailingTrivia(token.TrailingTrivia.Where(t => !t.IsWhitespaceTrivia()));
         }
+
         public static T WithoutWhitespaceTrivia<T>(this T token)
             where T : SyntaxNode
         {
@@ -127,6 +127,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                     .WithLeadingTrivia(token.GetLeadingTrivia().Where(t => !t.IsWhitespaceTrivia()))
                     .WithTrailingTrivia(token.GetTrailingTrivia().Where(t => !t.IsWhitespaceTrivia()));
         }
+
         public static bool HasNoneWhitespaceTrivia(this IEnumerable<SyntaxTrivia> triviaList, SyntaxKind[] exceptionList = null)
         {
             if (exceptionList == null)
@@ -134,10 +135,12 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             return triviaList.Any(t => !t.IsWhitespaceTrivia() && exceptionList.Any(e => t.IsKind(e)) == false);
         }
+
         public static bool IsWhitespaceTrivia(this SyntaxTrivia trivia)
         {
             return trivia.IsKind(SyntaxKind.EndOfLineTrivia) || trivia.IsKind(SyntaxKind.WhitespaceTrivia);
         }
+
         public static bool HasNoneWhitespaceTrivia(this SyntaxNode node, SyntaxKind[] exceptionList = null)
         {
             if (node.ContainsDirectives) return true;
@@ -145,6 +148,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             if (node.DescendantTrivia(descendIntoTrivia: true).HasNoneWhitespaceTrivia(exceptionList)) return true;
             return false;
         }
+
         public static bool HasNoneWhitespaceTrivia(this SyntaxToken token, SyntaxKind[] exceptionList = null)
         {
             if (token.ContainsDirectives) return true;
@@ -153,10 +157,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             return false;
         }
 
-        public static bool IsPrivate(this FieldDeclarationSyntax field)
-        {
-            return IsPrivate(field.Modifiers);
-        }
+        public static bool IsPrivate(this FieldDeclarationSyntax field) => IsPrivate(field.Modifiers);
+
         public static bool IsPrivate(this PropertyDeclarationSyntax field)
         {
             return IsPrivate(field.Modifiers);
@@ -166,22 +168,27 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
         {
             return field.Modifiers.Any(m => m.IsKind(SyntaxKind.PublicKeyword));
         }
+
         public static bool IsPublic(this PropertyDeclarationSyntax field)
         {
             return field.Modifiers.Any(m => m.IsKind(SyntaxKind.PublicKeyword));
         }
+
         public static bool IsProtected(this FieldDeclarationSyntax field)
         {
             return field.Modifiers.Any(m => m.IsKind(SyntaxKind.ProtectedKeyword));
         }
+
         public static bool IsProtected(this PropertyDeclarationSyntax field)
         {
             return field.Modifiers.Any(m => m.IsKind(SyntaxKind.ProtectedKeyword));
         }
+
         public static bool IsInternal(this FieldDeclarationSyntax field)
         {
             return field.Modifiers.Any(m => m.IsKind(SyntaxKind.InternalKeyword));
         }
+
         public static bool IsInternal(this PropertyDeclarationSyntax field)
         {
             return field.Modifiers.Any(m => m.IsKind(SyntaxKind.InternalKeyword));
@@ -192,7 +199,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             return IsPrivate(local.Modifiers);
         }
 
-        private static bool IsPrivate(SyntaxTokenList modifiers)
+        static bool IsPrivate(SyntaxTokenList modifiers)
         {
             return
                 modifiers.Any(m => m.IsKind(SyntaxKind.PrivateKeyword)) ||

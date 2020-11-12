@@ -6,10 +6,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.RemovePrivateModifier
     {
         public CleanupTypes? CleanupItems => (CleanupTypes?)CleanupItemsInteger;
 
-        public override CodeCleanerType GetCodeCleanerType()
-        {
-            return CodeCleanerType.PrivateAccessModifier;
-        }
+        public override CodeCleanerType GetCodeCleanerType() => CodeCleanerType.PrivateAccessModifier;
     }
-
 }

@@ -1,10 +1,10 @@
-using System;
 using EnvDTE;
+using Geeks.GeeksProductivityTools;
 using Geeks.GeeksProductivityTools.Definition;
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.GeeksProductivityTools.Utils;
 using Microsoft.CodeAnalysis;
-using Geeks.GeeksProductivityTools.Menus.Cleanup;
-using Geeks.GeeksProductivityTools;
+using System;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -25,6 +25,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 ErrorNotification.EmailError(e);
                 ProcessActions.GeeksProductivityToolsProcess();
             }
+
             return ProjectItemDetails.ProjectItem.ToSyntaxNode();
         }
     }

@@ -1,7 +1,7 @@
-using System.Linq;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Linq;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -43,6 +43,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             var symbol = ProjectItemDetails.SemanticModel.GetSymbolInfo(oldNode1).Symbol;
                             if (symbol != null && symbol.Kind != SymbolKind.NamedType) return oldNode1;
                         }
+
                         return
                             builtInTypesMapDic[oldNode1.WithoutTrivia().ToFullString()]
                                 .NewNode

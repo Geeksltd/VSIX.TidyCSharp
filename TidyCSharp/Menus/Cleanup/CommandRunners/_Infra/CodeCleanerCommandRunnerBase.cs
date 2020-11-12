@@ -1,7 +1,7 @@
-using System.Linq;
 using EnvDTE;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Microsoft.CodeAnalysis;
+using System.Linq;
 using RoslynDocument = Microsoft.CodeAnalysis.Document;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
@@ -30,18 +30,17 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 initialSourceNode.WriteSourceTo(ProjectItemDetails.FilePath);
                 return;
             }
+
             var newDocument = ProjectItemDetails.ProjectItemDocument.WithText(initialSourceNode.GetText());
 
             TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
         }
+
         public abstract SyntaxNode CleanUp(SyntaxNode initialSourceNode);
 
         public ICleanupOption Options { get; set; }
 
-        public bool CheckOption(int? optionItem)
-        {
-            return Options.Should(optionItem);
-        }
+        public bool CheckOption(int? optionItem) => Options.Should(optionItem);
 
         public class ProjectItemDetailsType
         {
@@ -56,6 +55,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                     {
                         _projectItemDocument = GetRoslynDomuentByProjectItem(ProjectItem);
                     }
+
                     return _projectItemDocument;
                 }
             }
@@ -69,6 +69,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                     {
                         _semanticModel = ProjectItemDocument.GetSemanticModelAsync().Result;
                     }
+
                     return _semanticModel;
                 }
             }

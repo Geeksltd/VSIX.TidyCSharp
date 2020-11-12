@@ -1,8 +1,8 @@
-using System.Collections.Generic;
-using System.Linq;
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -77,7 +77,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             }
 
             return classNode;
-
         }
     }
 }

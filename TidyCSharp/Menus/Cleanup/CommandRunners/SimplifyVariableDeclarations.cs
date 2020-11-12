@@ -1,13 +1,9 @@
-using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Geeks.GeeksProductivityTools.Menus.Cleanup;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -27,7 +23,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         class Rewriter : CleanupCSharpSyntaxRewriter
         {
             const string VarKeyword = "var";
-            private readonly ProjectItemDetailsType projectItemDetails;
+            readonly ProjectItemDetailsType projectItemDetails;
 
             public Rewriter(ProjectItemDetailsType projectItemDetails, ICleanupOption options) : base(options)
             {
@@ -39,7 +35,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return ConvertToVar(node) ?? node;
             }
 
-            private SyntaxNode ConvertToVar(VariableDeclarationSyntax node)
+            SyntaxNode ConvertToVar(VariableDeclarationSyntax node)
             {
                 if (node.Parent is LocalDeclarationStatementSyntax == false) return null;
                 if ((node.Parent as LocalDeclarationStatementSyntax).IsConst) return null;
@@ -47,6 +43,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 {
                     if (varIdentifierNameSyntax.Identifier.ValueText == VarKeyword) return null;
                 }
+
                 if (node.Variables.Count > 1) return null;
 
                 var variable = node.Variables.First();

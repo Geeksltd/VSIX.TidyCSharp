@@ -15,19 +15,16 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return ChangeMethodHelper(initialSourceNode, ProjectItemDetails.SemanticModel);
             return initialSourceNode;
         }
-        private SyntaxNode ChangeMethodHelper(SyntaxNode initialSourceNode, SemanticModel semanticModel)
+
+        SyntaxNode ChangeMethodHelper(SyntaxNode initialSourceNode, SemanticModel semanticModel)
         {
             initialSourceNode = new Rewriter(semanticModel).Visit(initialSourceNode);
             return initialSourceNode;
         }
         class Rewriter : CSharpSyntaxRewriter
         {
-            private SemanticModel semanticModel;
-
-            public Rewriter(SemanticModel semanticModel)
-            {
-                this.semanticModel = semanticModel;
-            }
+            SemanticModel semanticModel;
+            public Rewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
 
             public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
             {
@@ -70,6 +67,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             return node.WithExpression(SyntaxFactory.ParseExpression("search.Button"));
                     }
                 }
+
                 return base.VisitInvocationExpression(node);
             }
         }

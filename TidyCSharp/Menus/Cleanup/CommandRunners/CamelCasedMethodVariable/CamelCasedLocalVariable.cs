@@ -1,8 +1,8 @@
-using System.Linq;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Linq;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -16,6 +16,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     .OfType<MethodDeclarationSyntax>()
                     .FirstOrDefault(m => !m.HasAnnotation(annotationForSelectedNodes));
         }
+
         protected override VariableRenamingBaseRewriter GetRewriter(Document workingDocument)
         {
             return new Rewriter(workingDocument, Options);
@@ -50,6 +51,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         WorkingDocument = renamingResult.Document;
                     }
                 }
+
                 return methodNode;
             }
         }

@@ -1,5 +1,5 @@
-using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -31,7 +31,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                if(CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Group_And_Merge_class_fields))
+                if (CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Group_And_Merge_class_fields))
                 {
                     node = Apply(node) as ClassDeclarationSyntax;
                     return node;
@@ -51,12 +51,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 if
                 (
-                    !CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Null) && 
+                    !CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Null) &&
                     !CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Literal)
                 )
                     return base.VisitVariableDeclarator(node);
 
-                if (value is LiteralExpressionSyntax)             
+                if (value is LiteralExpressionSyntax)
                 {
                     var variableTypeNode = GetSystemTypeOfTypeNode((node.Parent as VariableDeclarationSyntax));
                     var valueObj = (value as LiteralExpressionSyntax).Token.Value;
@@ -81,7 +81,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 return base.VisitVariableDeclarator(node);
             }
-
 
             SyntaxTrivia spaceTrivia = SyntaxFactory.Whitespace(" ");
             SyntaxNode Apply(ClassDeclarationSyntax classDescriptionNode)
@@ -155,9 +154,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     else
                     {
                         foreach (var item in newDelarationItem.Value.OldFieldDeclarations)
-                        {
                             fieldDeclarations.Remove(item);
-                        }
+
                     }
                 }
 
@@ -180,6 +178,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                     .WithLeadingTrivia(dicItem.FirstOldFieldDeclarations.GetLeadingTrivia())
                                     .WithTrailingTrivia(dicItem.FirstOldFieldDeclarations.GetTrailingTrivia());
                              }
+
                              return null;
                          }
                     );
@@ -198,6 +197,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 {
                     header.Modifiers = fieldDeclarationItem.Modifiers.Select(x => x.ValueText).ToArray();
                 }
+
                 return header;
             }
 
@@ -209,9 +209,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return (d.Type.ToFullString().Trim());
             }
 
-
             struct NewFieldDeclarationDicKey : IEquatable<NewFieldDeclarationDicKey>
             {
+
                 public string TypeName { get; set; }
                 public string[] Modifiers { get; set; }
 
@@ -237,19 +237,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 {
                     return !(left == right);
                 }
-
             }
             class NewFieldDeclarationDicItem
             {
                 public List<VariableDeclaratorSyntax> VariablesWithoutInitializer { get; set; }
                 public List<VariableDeclaratorSyntax> VariablesWithInitializer { get; set; }
-                public FieldDeclarationSyntax FirstOldFieldDeclarations
-                {
-                    get
-                    {
-                        return OldFieldDeclarations.First();
-                    }
-                }
+                public FieldDeclarationSyntax FirstOldFieldDeclarations => OldFieldDeclarations.First();
                 public List<FieldDeclarationSyntax> OldFieldDeclarations { get; set; }
                 public FieldDeclarationSyntax NewFieldDeclaration { get; set; }
             }

@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.CodeDom;
-using System.Collections.Generic;
-using Microsoft.CodeAnalysis.CSharp;
+﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CSharp;
+using System;
+using System.CodeDom;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -14,7 +14,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
         public string FullName { get; set; }
         public string BuiltInName { get; set; }
 
-        Type _builtInType = null;
+        Type _builtInType;
         public Type BuiltInType
         {
             get
@@ -30,16 +30,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             }
         }
 
-        object _defaultValue = null;
-        public object DefaultValue
-        {
-            get
-            {
-                return GetTypeDefaultValue();
-            }
-        }
+        object _defaultValue;
+        public object DefaultValue => GetTypeDefaultValue();
 
-        private object GetTypeDefaultValue()
+        object GetTypeDefaultValue()
         {
             if (BuiltInType == null) return null;
             if (_defaultValue != null) return _defaultValue;
@@ -54,7 +48,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         public TypeSyntax NewNode { get; set; }
 
-
         internal static TypesMapItem GetBuiltInTypes(Type type, TypeSyntax node, CSharpCodeProvider provider)
         {
             return new TypesMapItem
@@ -65,6 +58,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 NewNode = node
             };
         }
+
         internal static TypeSyntax GetPredefineType(SyntaxKind keyword)
         {
             return SyntaxFactory.PredefinedType(SyntaxFactory.Token(keyword));
@@ -108,7 +102,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             }
         }
 
-
         static Dictionary<string, TypesMapItem> _predefinedTypesDic;
         internal static Dictionary<string, TypesMapItem> GetAllPredefinedTypesDic()
         {
@@ -126,10 +119,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                     output.Add(item.BuiltInName, new TypesMapItem { BuiltInName = item.BuiltInName, Name = item.BuiltInName, FullName = item.FullName });
                 }
 
-
                 return _predefinedTypesDic = output;
             }
         }
     }
-
 }

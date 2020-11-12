@@ -1,8 +1,8 @@
-using System.Linq;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Linq;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -42,6 +42,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         WorkingDocument = renamingResult.Document;
                     }
                 }
+
                 if (CheckOption((int)CamelCasedClassFields.CleanupTypes.Const_Fields))
                 {
                     var renamingResult = new CONSTRenamer(WorkingDocument).RenameDeclarations(classNode);
@@ -51,6 +52,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         WorkingDocument = renamingResult.Document;
                     }
                 }
+
                 return classNode;
             }
         }

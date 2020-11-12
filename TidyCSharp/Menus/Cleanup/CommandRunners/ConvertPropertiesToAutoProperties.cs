@@ -223,7 +223,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     }
 
                     return null;
-
                 }
                 else // if(getNode)
                 {
@@ -245,7 +244,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     }
 
                     return null;
-
                 }
                 else // if(getNode)
                 {
@@ -312,7 +310,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 {
                     var endOfLine = relatedField.GetLeadingTrivia().FirstOrDefault(x => x.IsKind(SyntaxKind.EndOfLineTrivia));
 
-                    if (endOfLine != null)
+                    if (!endOfLine.IsKind(SyntaxKind.None))
                     {
                         leadingList = leadingList.Add(endOfLine);
                     }

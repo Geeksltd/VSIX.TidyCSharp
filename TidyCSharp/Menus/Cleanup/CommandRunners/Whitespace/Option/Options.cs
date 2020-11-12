@@ -8,10 +8,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
         public CleanupTypes? CleanupItems => (CleanupTypes?)CleanupItemsInteger;
 
-        public override CodeCleanerType GetCodeCleanerType()
-        {
-            return CodeCleanerType.NormalizeWhiteSpaces;
-        }
+        public override CodeCleanerType GetCodeCleanerType() => CodeCleanerType.NormalizeWhiteSpaces;
     }
-
 }

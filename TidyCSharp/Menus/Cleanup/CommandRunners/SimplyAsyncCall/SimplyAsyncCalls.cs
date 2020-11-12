@@ -1,11 +1,11 @@
-using System.Linq;
-using System.Threading.Tasks;
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Geeks.GeeksProductivityTools.Menus.Cleanup;
-using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
-using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -14,9 +14,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
         {
             return SimplyAsyncCallsHelper(initialSourceNode, Options);
-            //return SimplyAsyncCallsHelper2(initialSourceNode);
+            // return SimplyAsyncCallsHelper2(initialSourceNode);
         }
-
 
         public static SyntaxNode SimplyAsyncCallsHelper2(SyntaxNode initialSourceNode, ICleanupOption options)
         {

@@ -2,16 +2,16 @@
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 {
-    using System.Collections.Immutable;
-    using System.Linq;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
-    using System.Linq.Expressions;
     using System.Collections.Concurrent;
+    using System.Collections.Immutable;
+    using System.Linq;
+    using System.Linq.Expressions;
     using System.Reflection;
     internal static class LightupHelpers
     {
-        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<SyntaxKind, bool>> SupportedWrappers
+        static readonly ConcurrentDictionary<Type, ConcurrentDictionary<SyntaxKind, bool>> SupportedWrappers
             = new ConcurrentDictionary<Type, ConcurrentDictionary<SyntaxKind, bool>>();
 
         public static bool SupportsCSharp7 { get; }
@@ -35,7 +35,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 
             // Avoid creating the delegate if the value already exists
             bool canCast;
-            if (!wrappedSyntax.TryGetValue((SyntaxKind) node.RawKind, out canCast))
+            if (!wrappedSyntax.TryGetValue((SyntaxKind)node.RawKind, out canCast))
             {
                 canCast = wrappedSyntax.GetOrAdd(
                     (SyntaxKind)node.RawKind,
@@ -52,9 +52,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
                 {
                     if (syntax == null)
                     {
-                            // Unlike an extension method which would throw ArgumentNullException here, the light-up
-                            // behavior needs to match behavior of the underlying property.
-                            throw new NullReferenceException();
+                        // Unlike an extension method which would throw ArgumentNullException here, the light-up
+                        // behavior needs to match behavior of the underlying property.
+                        throw new NullReferenceException();
                     }
 
                     return default(TProperty);
@@ -82,7 +82,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             }
 
             var syntaxParameter = Expression.Parameter(typeof(TSyntax), "syntax");
-            Expression instance =
+            var instance =
                 type.GetTypeInfo().IsAssignableFrom(typeof(TSyntax).GetTypeInfo())
                 ? (Expression)syntaxParameter
                 : Expression.Convert(syntaxParameter, type);
@@ -101,9 +101,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
                 {
                     if (syntax == null)
                     {
-                            // Unlike an extension method which would throw ArgumentNullException here, the light-up
-                            // behavior needs to match behavior of the underlying property.
-                            throw new NullReferenceException();
+                        // Unlike an extension method which would throw ArgumentNullException here, the light-up
+                        // behavior needs to match behavior of the underlying property.
+                        throw new NullReferenceException();
                     }
 
                     return SeparatedSyntaxListWrapper<TProperty>.UnsupportedEmpty;
@@ -133,7 +133,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             var propertySyntaxType = property.PropertyType.GenericTypeArguments[0];
 
             var syntaxParameter = Expression.Parameter(typeof(TSyntax), "syntax");
-            Expression instance =
+            var instance =
                 type.GetTypeInfo().IsAssignableFrom(typeof(TSyntax).GetTypeInfo())
                 ? (Expression)syntaxParameter
                 : Expression.Convert(syntaxParameter, type);
@@ -157,9 +157,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
                 {
                     if (syntax == null)
                     {
-                            // Unlike an extension method which would throw ArgumentNullException here, the light-up
-                            // behavior needs to match behavior of the underlying property.
-                            throw new NullReferenceException();
+                        // Unlike an extension method which would throw ArgumentNullException here, the light-up
+                        // behavior needs to match behavior of the underlying property.
+                        throw new NullReferenceException();
                     }
 
                     if (Equals(newValue, default(TProperty)))
@@ -196,11 +196,11 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 
             var syntaxParameter = Expression.Parameter(typeof(TSyntax), "syntax");
             var valueParameter = Expression.Parameter(typeof(TProperty), methodInfo.GetParameters()[0].Name);
-            Expression instance =
+            var instance =
                 type.GetTypeInfo().IsAssignableFrom(typeof(TSyntax).GetTypeInfo())
                 ? (Expression)syntaxParameter
                 : Expression.Convert(syntaxParameter, type);
-            Expression value =
+            var value =
                 property.PropertyType.GetTypeInfo().IsAssignableFrom(typeof(TProperty).GetTypeInfo())
                 ? (Expression)valueParameter
                 : Expression.Convert(valueParameter, property.PropertyType);
@@ -220,9 +220,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
                 {
                     if (syntax == null)
                     {
-                            // Unlike an extension method which would throw ArgumentNullException here, the light-up
-                            // behavior needs to match behavior of the underlying property.
-                            throw new NullReferenceException();
+                        // Unlike an extension method which would throw ArgumentNullException here, the light-up
+                        // behavior needs to match behavior of the underlying property.
+                        throw new NullReferenceException();
                     }
 
                     if (ReferenceEquals(newValue, null))
@@ -261,7 +261,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 
             var syntaxParameter = Expression.Parameter(typeof(TSyntax), "syntax");
             var valueParameter = Expression.Parameter(typeof(SeparatedSyntaxListWrapper<TProperty>), methodInfo.GetParameters()[0].Name);
-            Expression instance =
+            var instance =
                 type.GetTypeInfo().IsAssignableFrom(typeof(TSyntax).GetTypeInfo())
                 ? (Expression)syntaxParameter
                 : Expression.Convert(syntaxParameter, type);

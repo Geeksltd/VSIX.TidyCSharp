@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers;
+﻿using Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers;
+using System.Linq;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup.Infra
 {
@@ -18,17 +18,15 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.Infra
                 CleanupItemsInteger = selectedItems.FirstOrDefault();
 
                 foreach (var item in selectedItems)
-                {
                     CleanupItemsInteger |= item;
-                }
+
             }
         }
 
         public override string ToString()
         {
             return $"{(CleanupItemsInteger ?? 0).ToString()}";
-            //return $"{(int)GetCodeCleanerType()}:{(CleanupItemsInteger ?? 0).ToString()}";
+            // return $"{(int)GetCodeCleanerType()}:{(CleanupItemsInteger ?? 0).ToString()}";
         }
     }
-
 }

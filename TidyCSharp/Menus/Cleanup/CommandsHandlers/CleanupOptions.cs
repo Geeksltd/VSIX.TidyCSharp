@@ -1,5 +1,4 @@
-﻿using Geeks.GeeksProductivityTools.Definition;
-using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
+﻿using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,9 +28,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers
         public void Accept(IMainCleanup mainCleanup)
         {
             foreach (var item in optionItems)
-            {
                 item.Accept(mainCleanup);
-            }
+
+
             if (mainCleanup.IsMainObjectSelected)
             {
                 ActionTypes.Add(mainCleanup.MainCleanupItemType);
@@ -64,7 +63,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers
                         return $"{enumValueAsObject}{TO_STRING_SEPRATOR2}{IsParentSelected}{TO_STRING_SEPRATOR2}{0}";
 
                     return $"{enumValueAsObject}{TO_STRING_SEPRATOR2}{IsParentSelected}{TO_STRING_SEPRATOR2}{optionItem.CleanupItemsInteger.Value}";
-
                 })
             );
         }
@@ -78,7 +76,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers
                     if (optionItem == null) return $"{(int)x}{TO_STRING_SEPRATOR2}{-1}";
                     if (optionItem.CleanupItemsInteger.HasValue == false) return $"{(int)x}{TO_STRING_SEPRATOR2}{0}";
                     return $"{(int)x}{TO_STRING_SEPRATOR2}{optionItem.CleanupItemsInteger.Value}";
-
                 })
             );
         }

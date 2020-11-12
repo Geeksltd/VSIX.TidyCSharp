@@ -13,5 +13,4 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.SimplifyClassFieldDeclaration
             return CodeCleanerType.SimplifyClassFieldDeclarations;
         }
     }
-
 }

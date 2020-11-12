@@ -1,11 +1,11 @@
-using System;
-using System.Linq;
 using Geeks.GeeksProductivityTools;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
+using System;
+using System.Linq;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -24,6 +24,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 initialSourceNode = Formatter.Format(newRoot, TidyCSharpPackage.Instance.CleanupWorkingSolution.Workspace);
             }
+
             return initialSourceNode;
         }
 
@@ -60,8 +61,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     {
                         return newIfNode.WithTrailingTrivia(newIfNode.GetTrailingTrivia().Add(_endOfLineTrivia));
                     }
+
                     return newIfNode.WithTrailingTrivia(newIfNode.GetTrailingTrivia());
                 }
+
                 return mainIFnode;
             }
 
@@ -73,7 +76,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 if (singleStatementInsideIf == null || singleStatementInsideIf is IfStatementSyntax) return base.VisitIfStatement(originalIfNode);
 
-                IfStatementSyntax newIf = GetNewIF(originalIfNode, singleStatementInsideIf);
+                var newIf = GetNewIF(originalIfNode, singleStatementInsideIf);
 
                 if (newIf == originalIfNode) return base.VisitIfStatement(originalIfNode);
                 if (newIf.Else == null) return newIf;
@@ -91,7 +94,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 return newIf;
             }
-
 
             IfStatementSyntax GetNewIF(IfStatementSyntax orginalIFnode, StatementSyntax singleStatementInsideIf)
             {
@@ -137,6 +139,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     if (newIf.WithElse(null).WithoutTrivia().Span.Length <= MAX_IF_LINE_LENGTH) return newIf;
                     return orginalIFnode;
                 }
+
                 if (singleStatementInsideIf.WithoutTrivia().DescendantTrivia().Any(t => t.IsKind(SyntaxKind.EndOfLineTrivia))) return orginalIFnode;
                 if (newIf.WithElse(null).Span.Length > MAX_IF_LINE_LENGTH) return orginalIFnode;
 

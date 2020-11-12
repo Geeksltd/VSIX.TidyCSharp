@@ -7,14 +7,8 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils
     {
         protected ICleanupOption Options { get; private set; }
 
-        protected bool CheckOption(int? o)
-        {
-            return Options.Should(o);
-        }
+        protected bool CheckOption(int? o) => Options.Should(o);
 
-        public CleanupCSharpSyntaxRewriter(ICleanupOption options)
-        {
-            Options = options;
-        }
+        public CleanupCSharpSyntaxRewriter(ICleanupOption options) => Options = options;
     }
 }

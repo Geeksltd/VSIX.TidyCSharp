@@ -1,9 +1,9 @@
-using System;
-using Microsoft.VisualStudio.Shell;
 using Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra;
-using System.Windows.Forms;
 using Geeks.GeeksProductivityTools.Utility;
 using Geeks.VSIX.TidyCSharp;
+using Microsoft.VisualStudio.Shell;
+using System;
+using System.Windows.Forms;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {

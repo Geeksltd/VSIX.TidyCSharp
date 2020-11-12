@@ -1,5 +1,4 @@
 ﻿using System.Windows.Forms;
-using static Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers.CleanupItemUserControl;
 
 namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
 {

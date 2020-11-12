@@ -1,11 +1,9 @@
-﻿using System;
+﻿using Geeks.VSIX.TidyCSharp.Cleanup;
+using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using Geeks.VSIX.TidyCSharp.Cleanup;
-using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
-using Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers.Infra;
 
 namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
 {
@@ -28,10 +26,9 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
             MainCleannerItemAttribute = ExtractCleannerItemAttribute(typeof(CodeCleanerType), mainCleanupItemType).Value;
 
             SetUIProps();
-
         }
 
-        private void SetUIProps()
+        void SetUIProps()
         {
             checkboxCleanupItem.Text =
                 MainCleannerItemAttribute != null ?
@@ -43,11 +40,12 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
                 HasSubItems = true;
 
                 CreateControls(MainCleannerItemAttribute.SubItemType, checkBoxItem => AddNewCheckboxItem(checkBoxItem));
-                this.BorderStyle = BorderStyle.FixedSingle;
+                BorderStyle = BorderStyle.FixedSingle;
 
-                this.Height += customCheckListBox1.Controls.Count * customCheckListBox1.Controls[0].Height;
+                Height += customCheckListBox1.Controls.Count * customCheckListBox1.Controls[0].Height;
                 return;
             }
+
             Margin = new Padding(0);
             Padding = new Padding(0);
         }
@@ -57,10 +55,8 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
         public CodeCleanerType MainCleanupItemType { get; private set; }
         public bool HasSubItems { get; private set; } = false;
 
-        public void SetMainItemCheckState(bool isSelected)
-        {
-            checkboxCleanupItem.Checked = isSelected;
-        }
+        public void SetMainItemCheckState(bool isSelected) => checkboxCleanupItem.Checked = isSelected;
+
         public void SetItemsCheckState(int value, bool checkedState)
         {
             customCheckListBox1.SetItemsChecked(value, checkedState);
@@ -123,16 +119,14 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
             }
             catch (System.Exception exp)
             {
-
             }
         }
 
         static IEnumerable<KeyValuePair<int, CleanupItemAttribute>> ExtractCleannerItemsAttributes(Type subItemType)
         {
             foreach (var item in Enum.GetValues(subItemType))
-            {
                 yield return ExtractCleannerItemAttribute(subItemType, item);
-            }
+
         }
 
         static KeyValuePair<int, CleanupItemAttribute> ExtractCleannerItemAttribute(Type subItemType, object item)
@@ -150,6 +144,7 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
         {
             customCheckListBox1.AddItem(checkBoxItem);
         }
+
         void CheckboxCleanupItem_CheckedChanged(object sender, EventArgs e)
         {
             customCheckListBox1.Enabled = checkboxCleanupItem.Checked;

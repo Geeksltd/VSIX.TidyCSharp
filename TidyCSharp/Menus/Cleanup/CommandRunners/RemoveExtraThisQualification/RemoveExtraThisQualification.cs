@@ -1,11 +1,11 @@
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.CSharp;
-using Geeks.GeeksProductivityTools.Menus.Cleanup;
-using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
-using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -16,10 +16,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             return new Rewriter(ProjectItemDetails, Options).Visit(initialSourceNode);
         }
 
-
         class Rewriter : CleanupCSharpSyntaxRewriter
         {
-            private readonly SemanticModel semanticModel;
+            readonly SemanticModel semanticModel;
 
             public Rewriter(ProjectItemDetailsType projectItemDetails, ICleanupOption options) : base(options)
             {
@@ -62,7 +61,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return classNode;
             }
 
-            private SyntaxNode GetMemberAccessWithoutThis(MemberAccessExpressionSyntax thisItemAsMemberAccessException)
+            SyntaxNode GetMemberAccessWithoutThis(MemberAccessExpressionSyntax thisItemAsMemberAccessException)
             {
                 var thisItemAsMemberAccessExceptionSymbol = semanticModel.GetSymbolInfo(thisItemAsMemberAccessException).Symbol;
 
@@ -76,6 +75,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 {
                     return right.WithLeadingTrivia(thisItemAsMemberAccessException.GetLeadingTrivia());
                 }
+
                 return null;
             }
         }

@@ -1,7 +1,7 @@
-using System;
 using EnvDTE;
 using Geeks.GeeksProductivityTools.Utils;
 using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
+using System;
 using static Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp.CSharpActionDelegate;
 
 namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
@@ -48,7 +48,7 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
             }
         }
 
-        private static void DoActionForItems(ProjectItems projectItems, TargetAction action, CleanupOptions cleanupOptions)
+        static void DoActionForItems(ProjectItems projectItems, TargetAction action, CleanupOptions cleanupOptions)
         {
             for (int subItemIndex = 1; subItemIndex <= projectItems.Count; subItemIndex++)
             {

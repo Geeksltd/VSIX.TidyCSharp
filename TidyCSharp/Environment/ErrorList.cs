@@ -1,11 +1,11 @@
-using System.Collections.Generic;
 using Microsoft.VisualStudio.Shell;
+using System.Collections.Generic;
 
 namespace Geeks.GeeksProductivityTools
 {
     public static class ErrorList
     {
-        static ErrorListProvider _errorListProvider = null;
+        static ErrorListProvider _errorListProvider;
         static Dictionary<string, Microsoft.VisualStudio.Shell.Task> ListOfErrors = new Dictionary<string, Microsoft.VisualStudio.Shell.Task>();
 
         public static void AddOrOverrideError(string key, Microsoft.VisualStudio.Shell.Task task)

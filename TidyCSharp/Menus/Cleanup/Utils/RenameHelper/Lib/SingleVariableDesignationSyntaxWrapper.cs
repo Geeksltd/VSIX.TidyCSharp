@@ -9,13 +9,13 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 
     internal struct SingleVariableDesignationSyntaxWrapper : ISyntaxWrapper<CSharpSyntaxNode>
     {
-        private const string SingleVariableDesignationSyntaxTypeName = "Microsoft.CodeAnalysis.CSharp.Syntax.SingleVariableDesignationSyntax";
-        private static readonly Type SingleVariableDesignationSyntaxType;
+        const string SingleVariableDesignationSyntaxTypeName = "Microsoft.CodeAnalysis.CSharp.Syntax.SingleVariableDesignationSyntax";
+        static readonly Type SingleVariableDesignationSyntaxType;
 
-        private static readonly Func<CSharpSyntaxNode, SyntaxToken> IdentifierAccessor;
-        private static readonly Func<CSharpSyntaxNode, SyntaxToken, CSharpSyntaxNode> WithIdentifierAccessor;
+        static readonly Func<CSharpSyntaxNode, SyntaxToken> IdentifierAccessor;
+        static readonly Func<CSharpSyntaxNode, SyntaxToken, CSharpSyntaxNode> WithIdentifierAccessor;
 
-        private readonly CSharpSyntaxNode node;
+        readonly CSharpSyntaxNode node;
 
         static SingleVariableDesignationSyntaxWrapper()
         {
@@ -23,21 +23,11 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             IdentifierAccessor = LightupHelpers.CreateSyntaxPropertyAccessor<CSharpSyntaxNode, SyntaxToken>(SingleVariableDesignationSyntaxType, nameof(Identifier));
             WithIdentifierAccessor = LightupHelpers.CreateSyntaxWithPropertyAccessor<CSharpSyntaxNode, SyntaxToken>(SingleVariableDesignationSyntaxType, nameof(Identifier));
         }
-
-        private SingleVariableDesignationSyntaxWrapper(CSharpSyntaxNode node)
-        {
-            this.node = node;
-        }
+        private SingleVariableDesignationSyntaxWrapper(CSharpSyntaxNode node) => this.node = node;
 
         public CSharpSyntaxNode SyntaxNode => this.node;
 
-        public SyntaxToken Identifier
-        {
-            get
-            {
-                return IdentifierAccessor(this.SyntaxNode);
-            }
-        }
+        public SyntaxToken Identifier => IdentifierAccessor(this.SyntaxNode);
 
         public static explicit operator SingleVariableDesignationSyntaxWrapper(VariableDesignationSyntaxWrapper node)
         {
@@ -79,5 +69,4 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             return new SingleVariableDesignationSyntaxWrapper(WithIdentifierAccessor(this.SyntaxNode, identifier));
         }
     }
-
 }

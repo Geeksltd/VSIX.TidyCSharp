@@ -1,5 +1,5 @@
-using System;
 using Microsoft.VisualStudio.Shell;
+using System;
 using System.ComponentModel.Design;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
@@ -8,7 +8,11 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
     {
         protected OleMenuCommandService Menu { get; private set; }
         protected uint CommandID { get; private set; }
-
+        protected BaseCodeCleanupCommand(OleMenuCommandService menu, uint commandID)
+        {
+            Menu = menu;
+            CommandID = commandID;
+        }
 
         protected abstract void CallBack(object sender, EventArgs e);
 
@@ -23,17 +27,13 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 cmd.Visible = true;
             }
         }
+
         public virtual void SetupCommands()
         {
             var menuCommandID = new CommandID(GuidList.GuidCleanupCmdSet, (int)CommandID);
             var menuItem = new OleMenuCommand(CallBack, menuCommandID);
             menuItem.BeforeQueryStatus += Item_BeforeQueryStatus;
             Menu.AddCommand(menuItem);
-        }
-        protected BaseCodeCleanupCommand(OleMenuCommandService menu, uint commandID)
-        {
-            Menu = menu;
-            CommandID = commandID;
         }
     }
 }

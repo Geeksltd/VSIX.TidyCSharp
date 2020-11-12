@@ -1,9 +1,6 @@
-﻿using System;
-using System.Linq;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 {
@@ -21,8 +18,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                     return base.Visit(newNode);
                 }
             }
+
             return base.Visit(node);
         }
+
         SyntaxToken lastBlockToken = default(SyntaxToken);
         SyntaxNode ApplyNodeChange(BlockSyntax blockNode)
         {
@@ -36,7 +35,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             if (blockNode.Parent is FinallyClauseSyntax) return blockNode;
             if (blockNode.Parent is IfStatementSyntax) return blockNode;
             if (blockNode.Parent is ElseClauseSyntax) return blockNode;
-            //if (blockNode.Parent is ParenthesizedExpressionSyntax) return blockNode;
+            // if (blockNode.Parent is ParenthesizedExpressionSyntax) return blockNode;
             if (blockNode.Parent is SimpleLambdaExpressionSyntax) return blockNode;
             if (blockNode.Parent is ParenthesizedLambdaExpressionSyntax) return blockNode;
             if (blockNode.Parent is AnonymousMethodExpressionSyntax) return blockNode;

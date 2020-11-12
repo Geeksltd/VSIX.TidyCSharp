@@ -1,10 +1,10 @@
-using System;
-using System.Windows.Forms;
 using Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp;
 using Geeks.GeeksProductivityTools.Utility;
-using Microsoft.VisualStudio.Shell;
 using Geeks.VSIX.TidyCSharp;
 using Geeks.VSIX.TidyCSharp.Cleanup;
+using Microsoft.VisualStudio.Shell;
+using System;
+using System.Windows.Forms;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {

@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 {
-    using System.Linq;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Text;
-    using System.ComponentModel;
     using System.Collections;
+    using System.ComponentModel;
+    using System.Linq;
 
     internal abstract class SeparatedSyntaxListWrapper<TNode> : IEquatable<SeparatedSyntaxListWrapper<TNode>>, IReadOnlyList<TNode>
     {
-        private static readonly SyntaxWrapper<TNode> SyntaxWrapper = SyntaxWrapper<TNode>.Default;
+        static readonly SyntaxWrapper<TNode> SyntaxWrapper = SyntaxWrapper<TNode>.Default;
 
         public static SeparatedSyntaxListWrapper<TNode> UnsupportedEmpty { get; } =
             new UnsupportedSyntaxList();
@@ -65,7 +64,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
         //   node:
         //     The node to add.
         public SeparatedSyntaxListWrapper<TNode> Add(TNode node)
-            => this.Insert(this.Count, node);
+            => Insert(Count, node);
 
         // Summary:
         //     Creates a new list with the specified nodes added to the end.
@@ -74,7 +73,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
         //   nodes:
         //     The nodes to add.
         public SeparatedSyntaxListWrapper<TNode> AddRange(IEnumerable<TNode> nodes)
-            => this.InsertRange(this.Count, nodes);
+            => InsertRange(Count, nodes);
 
         public abstract bool Any();
 
@@ -104,10 +103,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             throw new NotImplementedException();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable<TNode>)this).GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<TNode>)this).GetEnumerator();
 
         public override abstract int GetHashCode();
 
@@ -149,6 +145,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 
         public struct Enumerator
         {
+
             public TNode Current
             {
                 get
@@ -181,7 +178,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
         internal sealed class AutoWrapSeparatedSyntaxList<TSyntax> : SeparatedSyntaxListWrapper<TNode>
             where TSyntax : SyntaxNode
         {
-            private readonly SeparatedSyntaxList<TSyntax> syntaxList;
+            readonly SeparatedSyntaxList<TSyntax> syntaxList;
 
             public AutoWrapSeparatedSyntaxList(SeparatedSyntaxList<TSyntax> syntaxList)
             {
@@ -189,96 +186,96 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             }
 
             public override int Count
-                => this.syntaxList.Count;
+                => syntaxList.Count;
 
             public override TextSpan FullSpan
-                => this.syntaxList.FullSpan;
+                => syntaxList.FullSpan;
 
             public override int SeparatorCount
-                => this.syntaxList.SeparatorCount;
+                => syntaxList.SeparatorCount;
 
             public override TextSpan Span
-                => this.syntaxList.Span;
+                => syntaxList.Span;
 
             public override object UnderlyingList
-                => this.syntaxList;
+                => syntaxList;
 
             public override TNode this[int index]
-                => SyntaxWrapper.Wrap(this.syntaxList[index]);
+                => SyntaxWrapper.Wrap(syntaxList[index]);
 
             public override bool Any()
-                => this.syntaxList.Any();
+                => syntaxList.Any();
 
             public override bool Contains(TNode node)
-                => this.syntaxList.Contains(SyntaxWrapper.Unwrap(node));
+                => syntaxList.Contains(SyntaxWrapper.Unwrap(node));
 
             public override TNode First()
-                => SyntaxWrapper.Wrap(this.syntaxList.First());
+                => SyntaxWrapper.Wrap(syntaxList.First());
 
             public override TNode FirstOrDefault()
-                => SyntaxWrapper.Wrap(this.syntaxList.FirstOrDefault());
+                => SyntaxWrapper.Wrap(syntaxList.FirstOrDefault());
 
             public override int GetHashCode()
-                => this.syntaxList.GetHashCode();
+                => syntaxList.GetHashCode();
 
             public override SyntaxToken GetSeparator(int index)
-                => this.syntaxList.GetSeparator(index);
+                => syntaxList.GetSeparator(index);
 
             public override IEnumerable<SyntaxToken> GetSeparators()
-                => this.syntaxList.GetSeparators();
+                => syntaxList.GetSeparators();
 
             public override SyntaxNodeOrTokenList GetWithSeparators()
-                => this.syntaxList.GetWithSeparators();
+                => syntaxList.GetWithSeparators();
 
             public override int IndexOf(TNode node)
-                => this.syntaxList.IndexOf((TSyntax)SyntaxWrapper.Unwrap(node));
+                => syntaxList.IndexOf((TSyntax)SyntaxWrapper.Unwrap(node));
 
             public override int IndexOf(Func<TNode, bool> predicate)
-                => this.syntaxList.IndexOf(node => predicate(SyntaxWrapper.Wrap(node)));
+                => syntaxList.IndexOf(node => predicate(SyntaxWrapper.Wrap(node)));
 
             public override SeparatedSyntaxListWrapper<TNode> Insert(int index, TNode node)
-                => new AutoWrapSeparatedSyntaxList<TSyntax>(this.syntaxList.Insert(index, (TSyntax)SyntaxWrapper.Unwrap(node)));
+                => new AutoWrapSeparatedSyntaxList<TSyntax>(syntaxList.Insert(index, (TSyntax)SyntaxWrapper.Unwrap(node)));
 
             public override SeparatedSyntaxListWrapper<TNode> InsertRange(int index, IEnumerable<TNode> nodes)
-                => new AutoWrapSeparatedSyntaxList<TSyntax>(this.syntaxList.InsertRange(index, nodes.Select(node => (TSyntax)SyntaxWrapper.Unwrap(node))));
+                => new AutoWrapSeparatedSyntaxList<TSyntax>(syntaxList.InsertRange(index, nodes.Select(node => (TSyntax)SyntaxWrapper.Unwrap(node))));
 
             public override TNode Last()
-                => SyntaxWrapper.Wrap(this.syntaxList.Last());
+                => SyntaxWrapper.Wrap(syntaxList.Last());
 
             public override int LastIndexOf(TNode node)
-                => this.syntaxList.LastIndexOf((TSyntax)SyntaxWrapper.Unwrap(node));
+                => syntaxList.LastIndexOf((TSyntax)SyntaxWrapper.Unwrap(node));
 
             public override int LastIndexOf(Func<TNode, bool> predicate)
-                => this.syntaxList.LastIndexOf(node => predicate(SyntaxWrapper.Wrap(node)));
+                => syntaxList.LastIndexOf(node => predicate(SyntaxWrapper.Wrap(node)));
 
             public override TNode LastOrDefault()
-                => SyntaxWrapper.Wrap(this.syntaxList.LastOrDefault());
+                => SyntaxWrapper.Wrap(syntaxList.LastOrDefault());
 
             public override SeparatedSyntaxListWrapper<TNode> Remove(TNode node)
-                => new AutoWrapSeparatedSyntaxList<TSyntax>(this.syntaxList.Remove((TSyntax)SyntaxWrapper.Unwrap(node)));
+                => new AutoWrapSeparatedSyntaxList<TSyntax>(syntaxList.Remove((TSyntax)SyntaxWrapper.Unwrap(node)));
 
             public override SeparatedSyntaxListWrapper<TNode> RemoveAt(int index)
-                => new AutoWrapSeparatedSyntaxList<TSyntax>(this.syntaxList.RemoveAt(index));
+                => new AutoWrapSeparatedSyntaxList<TSyntax>(syntaxList.RemoveAt(index));
 
             public override SeparatedSyntaxListWrapper<TNode> Replace(TNode nodeInList, TNode newNode)
-                => new AutoWrapSeparatedSyntaxList<TSyntax>(this.syntaxList.Replace((TSyntax)SyntaxWrapper.Unwrap(nodeInList), (TSyntax)SyntaxWrapper.Unwrap(newNode)));
+                => new AutoWrapSeparatedSyntaxList<TSyntax>(syntaxList.Replace((TSyntax)SyntaxWrapper.Unwrap(nodeInList), (TSyntax)SyntaxWrapper.Unwrap(newNode)));
 
             public override SeparatedSyntaxListWrapper<TNode> ReplaceRange(TNode nodeInList, IEnumerable<TNode> newNodes)
-                => new AutoWrapSeparatedSyntaxList<TSyntax>(this.syntaxList.ReplaceRange((TSyntax)SyntaxWrapper.Unwrap(nodeInList), newNodes.Select(node => (TSyntax)SyntaxWrapper.Unwrap(node))));
+                => new AutoWrapSeparatedSyntaxList<TSyntax>(syntaxList.ReplaceRange((TSyntax)SyntaxWrapper.Unwrap(nodeInList), newNodes.Select(node => (TSyntax)SyntaxWrapper.Unwrap(node))));
 
             public override SeparatedSyntaxListWrapper<TNode> ReplaceSeparator(SyntaxToken separatorToken, SyntaxToken newSeparator)
-                => new AutoWrapSeparatedSyntaxList<TSyntax>(this.syntaxList.ReplaceSeparator(separatorToken, newSeparator));
+                => new AutoWrapSeparatedSyntaxList<TSyntax>(syntaxList.ReplaceSeparator(separatorToken, newSeparator));
 
             public override string ToFullString()
-                => this.syntaxList.ToFullString();
+                => syntaxList.ToFullString();
 
             public override string ToString()
-                => this.syntaxList.ToString();
+                => syntaxList.ToString();
         }
 
-        private sealed class UnsupportedSyntaxList : SeparatedSyntaxListWrapper<TNode>
+        sealed class UnsupportedSyntaxList : SeparatedSyntaxListWrapper<TNode>
         {
-            private static readonly SeparatedSyntaxList<SyntaxNode> SyntaxList = default(SeparatedSyntaxList<SyntaxNode>);
+            static readonly SeparatedSyntaxList<SyntaxNode> SyntaxList = default(SeparatedSyntaxList<SyntaxNode>);
 
             public UnsupportedSyntaxList()
             {

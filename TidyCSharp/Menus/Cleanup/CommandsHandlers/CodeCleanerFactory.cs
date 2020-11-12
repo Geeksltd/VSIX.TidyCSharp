@@ -1,4 +1,3 @@
-using System;
 using Geeks.VSIX.TidyCSharp.Cleanup;
 using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
 
@@ -19,7 +18,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 case CodeCleanerType.SortClassMembers:
                     return new SortClassMembers();
                 case CodeCleanerType.SimplyAsyncCalls:
-                    return new SimplyAsyncCalls() { Options = cleanupOptions.SimplyAsyncCall};
+                    return new SimplyAsyncCalls() { Options = cleanupOptions.SimplyAsyncCall };
                 case CodeCleanerType.SimplifyClassFieldDeclarations:
                     return new SimplifyClassFieldDeclarations() { Options = cleanupOptions.SimplifyClassFieldDeclarations };
                 case CodeCleanerType.RemoveAttributeKeywork:

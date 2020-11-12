@@ -1,5 +1,5 @@
-﻿using System;
-using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
+﻿using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
+using System;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup.CamelCasedMethodVariable
 {

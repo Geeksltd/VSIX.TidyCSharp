@@ -20,6 +20,5 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.Infra
 
             return (options.CleanupItemsInteger & optionItem) == optionItem;
         }
-
     }
 }
