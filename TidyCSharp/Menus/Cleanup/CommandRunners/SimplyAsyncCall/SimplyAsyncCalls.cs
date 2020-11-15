@@ -78,6 +78,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             if (awaitStatementExpression == null) return method;
 
+            if (awaitStatementExpression.Expression is InvocationExpressionSyntax invSS)
+            {
+                if (invSS.ArgumentList.Arguments.Any(a => a.Expression.IsKind(SyntaxKind.AwaitExpression)))
+                    return method;
+            }
+
             var newStatement = singleStatement;
 
             if (options.Should((int)SimplyAsyncCall.CleanupTypes.Single_Expression))
