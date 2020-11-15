@@ -352,11 +352,18 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                  )
                          )
                          .WithOpenBraceToken(propertyDeclaration.AccessorList.OpenBraceToken.WithLeadingTrivia().WithTrailingTrivia())
-                         .WithCloseBraceToken(propertyDeclaration.AccessorList.CloseBraceToken.WithLeadingTrivia())
+                         .WithCloseBraceToken(propertyDeclaration.AccessorList.CloseBraceToken.WithLeadingTrivia()).WithoutTrailingTrivia()
                      )
-                     .WithIdentifier(propertyDeclaration.Identifier.WithTrailingTrivia(SyntaxFactory.Space))
-                     .WithLeadingTrivia(leadingList);
+                     .WithLeadingTrivia(leadingList)
+                     .WithIdentifier(propertyDeclaration.Identifier.WithTrailingTrivia(SyntaxFactory.Space));
 
+                if (relatedField.Declaration.Variables.First().Initializer != null)
+                {
+                    propertyDeclaration =
+                        propertyDeclaration.WithInitializer(
+                            relatedField.Declaration.Variables.First().Initializer)
+                    .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken));
+                }
                 return propertyDeclaration;
             }
         }
