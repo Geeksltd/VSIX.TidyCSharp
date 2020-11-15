@@ -11,13 +11,14 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
 {
     public partial class CleanupOptionForm : Form
     {
-        public static CleanupOptionForm Instance { get; set; }
+        public static CleanupOptionForm Instance { get; set; } = new CleanupOptionForm();
         public CleanupOptions CleanupOptions { get; private set; }
 
         CleanupOptionForm()
         {
             InitializeComponent();
             mainPanel.Padding = new Padding(5, 5, 5, 0);
+            this.Height = Screen.PrimaryScreen.WorkingArea.Height;
             base.ShowInTaskbar = false;
             base.WindowState = FormWindowState.Normal;
             StartPosition = FormStartPosition.CenterScreen;
@@ -45,7 +46,18 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
 
             newControl.Init((CodeCleanerType)cleanupTypeItem.CleanerType);
 
-            mainPanel.Controls.Add(newControl);
+            if ((leftTableLayoutPanel.Height <= rightTableLayoutPanel.Height) &&
+                (leftTableLayoutPanel.Height + newControl.Height <= mainPanel.Height ||
+                rightTableLayoutPanel.Height >= mainPanel.Height))
+            {
+                leftTableLayoutPanel.Controls.Add(newControl);
+            }
+            else
+            {
+                rightTableLayoutPanel.Controls.Add(newControl);
+            }
+
+            //mainPanel.Controls.Add(newControl);
             // this.Height += newSubControl.Height;
         }
 
@@ -55,7 +67,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             {
                 var choices = strValue.Split(new string[] { CleanupOptions.TO_STRING_SEPRATOR }, System.StringSplitOptions.RemoveEmptyEntries);
 
-                var controls = mainPanel.Controls.OfType<CleanupItemUserControl>();
+                var controls = rightTableLayoutPanel.Controls.OfType<CleanupItemUserControl>()
+                    .Union(leftTableLayoutPanel.Controls.OfType<CleanupItemUserControl>());
 
                 foreach (var item in choices)
                 {
@@ -79,7 +92,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
         {
             if (string.IsNullOrEmpty(Settings.Default.CleanupChoices))
             {
-                foreach (IMainCleanup control in mainPanel.Controls.OfType<IMainCleanup>())
+                foreach (IMainCleanup control in rightTableLayoutPanel.Controls.OfType<IMainCleanup>()
+                    .Union(leftTableLayoutPanel.Controls.OfType<IMainCleanup>()))
                     control.ResetItemsCheckState();
 
                 return;
@@ -93,7 +107,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
         {
             CleanupOptions = new CleanupOptions();
 
-            foreach (CleanupItemUserControl item in mainPanel.Controls)
+            foreach (CleanupItemUserControl item in rightTableLayoutPanel.Controls)
+                CleanupOptions.Accept(item);
+
+            foreach (CleanupItemUserControl item in leftTableLayoutPanel.Controls)
                 CleanupOptions.Accept(item);
 
             Settings.Default.CleanupChoices = CleanupOptions.SerializeValues();
@@ -111,5 +128,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             DialogResult = DialogResult.OK;
             Close();
         }
+
     }
 }
