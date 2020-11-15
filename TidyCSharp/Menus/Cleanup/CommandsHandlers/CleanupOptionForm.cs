@@ -3,6 +3,7 @@ using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers;
 using Geeks.VSIX.TidyCSharp.Properties;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -13,6 +14,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
     {
         public static CleanupOptionForm Instance { get; set; } = new CleanupOptionForm();
         public CleanupOptions CleanupOptions { get; private set; }
+        public IList<Control> AllControls { get; private set; } = new List<Control>();
 
         CleanupOptionForm()
         {
@@ -31,6 +33,18 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
         void CreateControls()
         {
             CleanupItemUserControl.CreateControls(typeof(CodeCleanerType), cleanupTypeItem => CreateCleanupTypeItemControl(cleanupTypeItem), true);
+            foreach (var itemControl in AllControls.OrderByDescending(x => x.Height))
+            {
+                itemControl.TabIndex = TAB_INDEX_START++;
+                if (rightTableLayoutPanel.Height + itemControl.Height >= leftTableLayoutPanel.Height)
+                {
+                    leftTableLayoutPanel.Controls.Add(itemControl);
+                }
+                else
+                {
+                    rightTableLayoutPanel.Controls.Add(itemControl);
+                }
+            }
         }
 
         int TAB_INDEX_START = 3;
@@ -41,21 +55,21 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             {
                 Dock = DockStyle.Top,
                 AutoSize = false,
-                TabIndex = TAB_INDEX_START++,
             };
 
             newControl.Init((CodeCleanerType)cleanupTypeItem.CleanerType);
+            AllControls.Add(newControl);
 
-            if ((leftTableLayoutPanel.Height <= rightTableLayoutPanel.Height) &&
-                (leftTableLayoutPanel.Height + newControl.Height <= mainPanel.Height ||
-                rightTableLayoutPanel.Height >= mainPanel.Height))
-            {
-                leftTableLayoutPanel.Controls.Add(newControl);
-            }
-            else
-            {
-                rightTableLayoutPanel.Controls.Add(newControl);
-            }
+            //if ((leftTableLayoutPanel.Height <= rightTableLayoutPanel.Height) &&
+            //    (leftTableLayoutPanel.Height + newControl.Height <= mainPanel.Height ||
+            //    rightTableLayoutPanel.Height >= mainPanel.Height))
+            //{
+            //    leftTableLayoutPanel.Controls.Add(newControl);
+            //}
+            //else
+            //{
+            //    rightTableLayoutPanel.Controls.Add(newControl);
+            //}
 
             //mainPanel.Controls.Add(newControl);
             // this.Height += newSubControl.Height;
