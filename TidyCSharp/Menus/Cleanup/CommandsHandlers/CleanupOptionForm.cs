@@ -20,7 +20,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
         {
             InitializeComponent();
             mainPanel.Padding = new Padding(5, 5, 5, 0);
-            this.Height = Screen.PrimaryScreen.WorkingArea.Height;
+            this.MaximumSize = new Size(1000, Screen.PrimaryScreen.WorkingArea.Height);
             base.ShowInTaskbar = false;
             base.WindowState = FormWindowState.Normal;
             StartPosition = FormStartPosition.CenterScreen;

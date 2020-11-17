@@ -47,8 +47,9 @@
             this.customCheckListBox1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.customCheckListBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.customCheckListBox1.Location = new System.Drawing.Point(20, 17);
+            this.customCheckListBox1.MaximumSize = new System.Drawing.Size(460, 0);
             this.customCheckListBox1.Name = "customCheckListBox1";
-            this.customCheckListBox1.Size = new System.Drawing.Size(525, 3);
+            this.customCheckListBox1.Size = new System.Drawing.Size(458, 3);
             this.customCheckListBox1.TabIndex = 16;
             // 
             // checkboxCleanupItem
@@ -57,8 +58,9 @@
             this.checkboxCleanupItem.Dock = System.Windows.Forms.DockStyle.Top;
             this.checkboxCleanupItem.Location = new System.Drawing.Point(2, 0);
             this.checkboxCleanupItem.Margin = new System.Windows.Forms.Padding(2);
+            this.checkboxCleanupItem.MaximumSize = new System.Drawing.Size(476, 0);
             this.checkboxCleanupItem.Name = "checkboxCleanupItem";
-            this.checkboxCleanupItem.Size = new System.Drawing.Size(543, 17);
+            this.checkboxCleanupItem.Size = new System.Drawing.Size(476, 17);
             this.checkboxCleanupItem.TabIndex = 9;
             this.checkboxCleanupItem.Text = "checkboxCleanupItem";
             this.checkboxCleanupItem.UseVisualStyleBackColor = true;
@@ -74,7 +76,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.Name = "CleanupItemUserControl";
             this.Padding = new System.Windows.Forms.Padding(2, 0, 2, 2);
-            this.Size = new System.Drawing.Size(547, 22);
+            this.Size = new System.Drawing.Size(480, 22);
             this.ResumeLayout(false);
             this.PerformLayout();
 

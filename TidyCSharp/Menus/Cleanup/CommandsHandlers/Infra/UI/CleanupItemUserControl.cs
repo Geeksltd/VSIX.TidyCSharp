@@ -42,7 +42,8 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
                 CreateControls(MainCleannerItemAttribute.SubItemType, checkBoxItem => AddNewCheckboxItem(checkBoxItem));
                 BorderStyle = BorderStyle.FixedSingle;
 
-                Height += customCheckListBox1.Controls.Count * customCheckListBox1.Controls[0].Height;
+                for (int i = 0; i < customCheckListBox1.Controls.Count; i++)
+                    Height += customCheckListBox1.Controls[i].Height;
                 return;
             }
 

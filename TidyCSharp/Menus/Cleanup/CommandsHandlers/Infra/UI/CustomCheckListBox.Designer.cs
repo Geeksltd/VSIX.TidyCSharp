@@ -38,6 +38,7 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.Name = "CustomCheckListBox";
             this.Size = new System.Drawing.Size(0, 0);
+            this.MaximumSize = new System.Drawing.Size(360, 0);
             this.ResumeLayout(false);
 
         }

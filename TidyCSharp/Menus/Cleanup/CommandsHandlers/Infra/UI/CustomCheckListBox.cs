@@ -14,9 +14,11 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers.Infra
                 {
                     Text = itemInfo.Name,
                     Info = itemInfo,
-                    Dock = DockStyle.Top,
                     Margin = new Padding(0),
                     Padding = new Padding(0),
+                    MaximumSize = new System.Drawing.Size(460, 0),
+                    AutoSize = true,
+                    Dock = DockStyle.Top,
                 };
             Controls.Add(newControl);
         }

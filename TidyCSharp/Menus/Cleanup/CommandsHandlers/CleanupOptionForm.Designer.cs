@@ -39,7 +39,7 @@
             // 
             // btnApply
             // 
-            this.btnApply.Location = new System.Drawing.Point(331, 6);
+            this.btnApply.Location = new System.Drawing.Point(426, 7);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(135, 24);
             this.btnApply.TabIndex = 1;
@@ -52,14 +52,15 @@
             this.panel1.BackColor = System.Drawing.Color.Transparent;
             this.panel1.Controls.Add(this.btnApply);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 712);
+            this.panel1.Location = new System.Drawing.Point(0, 82);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(788, 37);
+            this.panel1.Size = new System.Drawing.Size(984, 37);
             this.panel1.TabIndex = 2;
             // 
             // mainPanel
             // 
             this.mainPanel.AutoScroll = true;
+            this.mainPanel.AutoSize = true;
             this.mainPanel.ColumnCount = 2;
             this.mainPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.mainPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -71,7 +72,7 @@
             this.mainPanel.Padding = new System.Windows.Forms.Padding(5);
             this.mainPanel.RowCount = 1;
             this.mainPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.mainPanel.Size = new System.Drawing.Size(788, 712);
+            this.mainPanel.Size = new System.Drawing.Size(984, 82);
             this.mainPanel.TabIndex = 3;
             // 
             // leftTableLayoutPanel
@@ -91,7 +92,7 @@
             this.rightTableLayoutPanel.AutoSize = true;
             this.rightTableLayoutPanel.ColumnCount = 1;
             this.rightTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.rightTableLayoutPanel.Location = new System.Drawing.Point(397, 8);
+            this.rightTableLayoutPanel.Location = new System.Drawing.Point(495, 8);
             this.rightTableLayoutPanel.Name = "rightTableLayoutPanel";
             this.rightTableLayoutPanel.RowCount = 1;
             this.rightTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -104,7 +105,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(788, 749);
+            this.ClientSize = new System.Drawing.Size(984, 119);
             this.Controls.Add(this.mainPanel);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -116,6 +117,7 @@
             this.mainPanel.ResumeLayout(false);
             this.mainPanel.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
