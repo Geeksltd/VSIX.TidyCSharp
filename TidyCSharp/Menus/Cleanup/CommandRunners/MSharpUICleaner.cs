@@ -37,6 +37,25 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 public List<int> RemovedIndexPositions { get; set; }
             }
 
+            public override SyntaxNode Visit(SyntaxNode node)
+            {
+                if (node == null) return base.Visit(node);
+
+                if (node is ConstructorDeclarationSyntax)
+                {
+                    return VisitConstructorDeclaration(node as ConstructorDeclarationSyntax);
+                }
+                else if (node is InvocationExpressionSyntax)
+                {
+                    return VisitInvocationExpression(node as InvocationExpressionSyntax);
+                }
+                else if (node is ExpressionStatementSyntax)
+                {
+                    return VisitExpressionStatement(node as ExpressionStatementSyntax);
+                }
+                return base.Visit(node);
+            }
+
             public override SyntaxNode VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
             {
                 var t = node.DescendantNodes().OfType<ExpressionStatementSyntax>()

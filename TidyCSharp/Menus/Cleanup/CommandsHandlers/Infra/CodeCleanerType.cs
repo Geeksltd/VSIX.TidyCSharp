@@ -53,5 +53,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
         [CleanupItem(Title = "Renew M# UI methods", FirstOrder = 12)]
         ConvertMsharpUIMethods = 0x25,
+
+        [CleanupItem(Title = "Renew M# Model methods", FirstOrder = 13)]
+        ConvertMsharpModelMethods = 0x26,
     }
 }
