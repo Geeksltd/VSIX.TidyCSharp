@@ -242,18 +242,17 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             if (length > MembersToExpressionBodied.Options.MAX_EXPRESSION_BODIED_MEMBER_LENGTH) return constructorDeclaration;
             if (constructorDeclaration.Body.ChildNodes().OfType<UsingStatementSyntax>().Any()) return constructorDeclaration;
 
-            constructorDeclaration =
-                constructorDeclaration
-                    .WithIdentifier(constructorDeclaration.Identifier.WithTrailingTrivia(_spaceTrivia))
-                    .WithBody(null)
-                    .WithoutTrailingTrivia()
-                    .WithLeadingTrivia(_spaceTrivia)
-                    .WithExpressionBody(
-                        SyntaxFactory.ArrowExpressionClause(expression.WithLeadingTrivia(_spaceTrivia)))
-                    .WithSemicolonToken(GetSemicolon(constructorDeclaration.Body))
-                    .WithAdditionalAnnotations(Formatter.Annotation);
+            var newconstructorDeclaration = constructorDeclaration
+                                .WithIdentifier(constructorDeclaration.Identifier.WithTrailingTrivia(_spaceTrivia))
+                                .WithBody(null)
+                                .WithTrailingTrivia(_spaceTrivia)
+                                .WithLeadingTrivia(constructorDeclaration.GetLeadingTrivia())
+                                .WithExpressionBody(
+                                    SyntaxFactory.ArrowExpressionClause(expression.WithLeadingTrivia(_spaceTrivia)))
+                                .WithSemicolonToken(GetSemicolon(constructorDeclaration.Body))
+                                .WithAdditionalAnnotations(Formatter.Annotation);
 
-            return constructorDeclaration;
+            return newconstructorDeclaration;
         }
     }
 }

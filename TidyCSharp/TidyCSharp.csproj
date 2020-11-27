@@ -450,11 +450,13 @@
     <Compile Include="Menus\ActionsOnCSharp\ActionsCSharpOnFile.cs" />
     <Compile Include="Menus\ActionsOnCSharp\CSharpActionDelegate.cs" />
     <Compile Include="Menus\ActionsOnCSharp\DteServiceProvider.cs" />
-    <Compile Include="Menus\Cleanup\CommandRunners\MSharpUICleaner.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\MSharpUICleaner\MSharpUICleaner.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\CamelCasedClassFields\CamelCasedFields.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\CamelCasedClassFields\Option\CleanupTypes.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\CamelCasedClassFields\Option\Options.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\ConvertPropertiesToAutoProperties.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\MSharpUICleaner\Option\CleanupTypes.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\MSharpUICleaner\Option\Options.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\SimplifyVariableDeclarations.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\SimplyAsyncCall\Option\CleanupTypes.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\SimplyAsyncCall\Option\Options.cs" />
