@@ -237,6 +237,22 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             return node.WithExpression(SyntaxFactory.ParseExpression("search.Button"));
                     }
                 }
+
+                if (methodName == "Send")
+                {
+                    if (node.ArgumentList.Arguments.Count == 2 &&
+                        node.ArgumentList.Arguments.FirstOrDefault().ToString() == "\"item\"" &&
+                        node.ArgumentList.Arguments.LastOrDefault().ToString() == "\"item.ID\"")
+                    {
+                        var member = node.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+                        member = member
+                            .WithTrailingTrivia(member.GetTrailingTrivia().Union(node.GetLeadingTrivia()));
+                        return SyntaxFactory.InvocationExpression(
+                            SyntaxFactory.MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression, member, SyntaxFactory.IdentifierName("SendItemId")),
+                            SyntaxFactory.ArgumentList());
+                    }
+                }
                 return base.VisitInvocationExpression(node);
             }
 
