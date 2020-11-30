@@ -221,7 +221,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     if (node.ArgumentList.Arguments.Count == 1 && node.ArgumentList.Arguments[0].Expression is SimpleLambdaExpressionSyntax)
                     {
                         var arg = ((MemberAccessExpressionSyntax)((SimpleLambdaExpressionSyntax)node.ArgumentList.Arguments[0].Expression).Body).Name;
-                        return SyntaxFactory.ParseExpression($"{methodName.ToLower()}.{arg}()");
+                        return SyntaxFactory.ParseExpression($"{methodName.ToLower()}.{arg}()")
+                            .WithLeadingTrivia(node.GetLeadingTrivia());
                     }
                 }
 
@@ -230,11 +231,14 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     switch (methodName)
                     {
                         case "ButtonColumn":
-                            return node.WithExpression(SyntaxFactory.ParseExpression("column.Button"));
+                            return node.WithExpression(SyntaxFactory.ParseExpression("column.Button"))
+                                .WithLeadingTrivia(node.GetLeadingTrivia()); ;
                         case "LinkColumn":
-                            return node.WithExpression(SyntaxFactory.ParseExpression("column.Link"));
+                            return node.WithExpression(SyntaxFactory.ParseExpression("column.Link"))
+                                .WithLeadingTrivia(node.GetLeadingTrivia());
                         case "SearchButton":
-                            return node.WithExpression(SyntaxFactory.ParseExpression("search.Button"));
+                            return node.WithExpression(SyntaxFactory.ParseExpression("search.Button"))
+                                .WithLeadingTrivia(node.GetLeadingTrivia());
                     }
                 }
 
@@ -260,6 +264,54 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 var s = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
                         .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnClick").FirstOrDefault();
+                var customColumnNode = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                    .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "CustomColumn").FirstOrDefault();
+                if (customColumnNode != null)
+                {
+                    var newNode = node.ReplaceNodes(node.DescendantNodes().OfType<InvocationExpressionSyntax>(),
+                        (nde1, nde2) =>
+                        {
+                            if (nde1.ToString() == "CustomColumn()")
+                            {
+                                SeparatedSyntaxList<ArgumentSyntax> args = new SeparatedSyntaxList<ArgumentSyntax>();
+                                var argsHeaderText = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                                    .Where(x => ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() ==
+                                    "HeaderText").FirstOrDefault().ArgumentList;
+                                var argsDisplayExpr = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                                    .Where(x => ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == "DisplayExpression").FirstOrDefault().ArgumentList;
+
+                                if (argsHeaderText.Arguments.Count == 1)
+                                    args = args.Add(argsHeaderText.Arguments.FirstOrDefault());
+
+                                if (argsDisplayExpr.Arguments.Count == 1)
+                                    args = args.Add(argsDisplayExpr.Arguments.FirstOrDefault());
+
+                                return SyntaxFactory.InvocationExpression(
+                                    SyntaxFactory.MemberAccessExpression(
+                                         SyntaxKind.SimpleMemberAccessExpression,
+                                        SyntaxFactory.ParseExpression("column"),
+                                    SyntaxFactory.IdentifierName("Custom")),
+                                    SyntaxFactory.ArgumentList(args))
+                                .WithLeadingTrivia(nde1.GetLeadingTrivia());
+                            }
+                            else if (((MemberAccessExpressionSyntax)nde1.Expression).Name.ToString() ==
+                               "HeaderText" &&
+                               nde1.ArgumentList.Arguments.Count == 1)
+                            {
+                                return nde2.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+                            }
+                            else if (((MemberAccessExpressionSyntax)nde1.Expression).Name.ToString() ==
+                              "DisplayExpression" &&
+                              nde1.ArgumentList.Arguments.Count == 1)
+                            {
+                                return nde2.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+                            }
+
+                            return nde2;
+                        });
+                    return newNode;
+                }
+
                 if (s == null)
                     return base.VisitExpressionStatement(node);
                 var methodSymbol = (semanticModel.GetSymbolInfo(s).Symbol as IMethodSymbol);
