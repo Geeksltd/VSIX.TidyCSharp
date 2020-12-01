@@ -266,6 +266,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnClick").FirstOrDefault();
                 var customColumnNode = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
                     .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "CustomColumn").FirstOrDefault();
+
                 if (customColumnNode != null)
                 {
                     var newNode = node.ReplaceNodes(node.DescendantNodes().OfType<InvocationExpressionSyntax>(),
@@ -326,8 +327,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     var deleteModalMethods = new string[] { "CloseModal(Refresh.Full)", "DeleteItem" };
                     var optionalMethods = new string[] { "GentleMessage(\"Deleted successfully.\")" };
 
-                    var invocations = s.DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().FirstOrDefault()
-                        .DescendantNodes().OfType<InvocationExpressionSyntax>();
+                    var lambdaExpressionArgument = s.DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().FirstOrDefault();
+                    var invocations = lambdaExpressionArgument.DescendantNodes().OfType<InvocationExpressionSyntax>();
                     if (invocations.Count() == 1 &&
                         (invocations.All(x => cancelMethods.Any(y => x.ToString().Contains(y))) ||
                      (invocations.All(x => cancelModalMethods.Any(y => x.ToString().Contains(y))))))
@@ -396,7 +397,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             .WithLeadingTrivia(node.GetLeadingTrivia())
                             .WithTrailingTrivia(node.GetTrailingTrivia());
                     }
-                    if ((invocations.Count() == 2 || invocations.Count() == 3) &&
+                    else if (((invocations.Count() == 2 || invocations.Count() == 3) &&
+                        invocations.All(x => x.Expression is MemberAccessExpressionSyntax &&
+                        ((MemberAccessExpressionSyntax)(x.Expression)).Expression is IdentifierNameSyntax)) &&
                         (invocations.All(x => saveMethods.Any(y => x.ToString().Contains(y))) ||
                         invocations.All(x => saveModalMethods.Any(y => x.ToString().Contains(y)))))
                     {
@@ -466,7 +469,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             .WithLeadingTrivia(node.GetLeadingTrivia())
                             .WithTrailingTrivia(node.GetTrailingTrivia());
                     }
-                    if ((invocations.Count() == 2 || invocations.Count() == 3) &&
+                    else if (((invocations.Count() == 2 || invocations.Count() == 3) &&
+                        invocations.All(x => x.Expression is MemberAccessExpressionSyntax &&
+                        ((MemberAccessExpressionSyntax)(x.Expression)).Expression is IdentifierNameSyntax)) &&
                         (invocations.All(x => deleteMethods.Union(optionalMethods).Any(y => x.ToString().Contains(y))) ||
                         invocations.All(x => deleteModalMethods.Union(optionalMethods).Any(y => x.ToString().Contains(y)))))
                     {
@@ -544,9 +549,53 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             .WithLeadingTrivia(node.GetLeadingTrivia())
                             .WithTrailingTrivia(node.GetTrailingTrivia());
                     }
+
+
                 }
                 return base.VisitExpressionStatement(node);
             }
+
+            public override SyntaxNode VisitSimpleLambdaExpression(SimpleLambdaExpressionSyntax node)
+            {
+                var ifNode = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                    .Where(x => ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == "If" &&
+                    !(((MemberAccessExpressionSyntax)x.Expression).Expression is IdentifierNameSyntax))
+                    .FirstOrDefault();
+                if (ifNode != null)
+                {
+                    node = node.ReplaceNodes(ifNode.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>(),
+                        (nde1, nde2) =>
+                        {
+                            if (((MemberAccessExpressionSyntax)nde1.Expression).Name.ToString() == "If" &&
+                                !(((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax))
+                            {
+                                return nde2.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+                            }
+                            else if (((MemberAccessExpressionSyntax)nde1.Expression).Name.ToString() == "If" &&
+                               (((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax))
+                            {
+                                return nde2;
+                            }
+                            if (((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax)
+                            {
+                                return SyntaxFactory.InvocationExpression(
+                                       SyntaxFactory.MemberAccessExpression(
+                                           SyntaxKind.SimpleMemberAccessExpression,
+                                           SyntaxFactory.InvocationExpression(
+                                                SyntaxFactory.MemberAccessExpression(
+                                                    SyntaxKind.SimpleMemberAccessExpression,
+                                                    SyntaxFactory.ParseExpression(((MemberAccessExpressionSyntax)nde1.Expression).Expression.ToString()),
+                                                    SyntaxFactory.IdentifierName("If"))
+                                                , SyntaxFactory.ArgumentList(ifNode.ArgumentList.Arguments)), ((MemberAccessExpressionSyntax)nde1.Expression).Name),
+                                    SyntaxFactory.ArgumentList(nde1.ArgumentList.Arguments)).WithLeadingTrivia(nde1.GetLeadingTrivia());
+                            }
+                            return nde2;
+                        });
+                    return VisitSimpleLambdaExpression(node);
+                }
+                return node;
+            }
+
         }
     }
 }
