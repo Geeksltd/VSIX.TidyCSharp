@@ -20,7 +20,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         SyntaxNode ChangeMethodHelper(SyntaxNode initialSourceNode, SemanticModel semanticModel)
         {
             initialSourceNode = new Rewriter(semanticModel).Visit(initialSourceNode);
-
+            this.RefreshResult(initialSourceNode);
             return initialSourceNode;
         }
 
@@ -56,6 +56,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return base.Visit(node);
             }
 
+            //cancelsave,deletecancelsave
             public override SyntaxNode VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
             {
                 var t = node.DescendantNodes().OfType<ExpressionStatementSyntax>()
@@ -196,6 +197,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return node;
             }
 
+            //senditemid, column.search.field.
             public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
             {
                 var methodSymbol = semanticModel.GetSymbolInfo(node).Symbol as IMethodSymbol;
@@ -257,9 +259,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             SyntaxFactory.ArgumentList());
                     }
                 }
+
+
                 return base.VisitInvocationExpression(node);
             }
 
+            //customColumn and cancel/save/delete
             public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
             {
                 var s = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
@@ -555,6 +560,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return base.VisitExpressionStatement(node);
             }
 
+            //if problem
             public override SyntaxNode VisitSimpleLambdaExpression(SimpleLambdaExpressionSyntax node)
             {
                 var ifNode = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
@@ -595,7 +601,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 }
                 return node;
             }
-
         }
     }
 }

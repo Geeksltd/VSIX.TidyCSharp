@@ -21,6 +21,14 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             SaveResult(initialSourceNode);
         }
 
+        protected virtual void RefreshResult(SyntaxNode initialSourceNode)
+        {
+            var newDocument = ProjectItemDetails.ProjectItemDocument.WithText(initialSourceNode.GetText());
+            TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
+            ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
+        }
+
+
         protected virtual void SaveResult(SyntaxNode initialSourceNode)
         {
             if (initialSourceNode == null || initialSourceNode == ProjectItemDetails.InitialSourceNode) return;
@@ -32,7 +40,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             }
 
             var newDocument = ProjectItemDetails.ProjectItemDocument.WithText(initialSourceNode.GetText());
-
             TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
         }
 
