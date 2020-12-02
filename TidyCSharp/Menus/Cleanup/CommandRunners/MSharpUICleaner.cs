@@ -31,20 +31,25 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             initialSourceNode = new ElementsNewSyntaxRewriter(ProjectItemDetails.SemanticModel)
                 .Visit(initialSourceNode);
             initialSourceNode = this.RefreshResult(initialSourceNode);
-            initialSourceNode = new TypicalWorkFlowRewriter(ProjectItemDetails.SemanticModel)
+            initialSourceNode = new FormModuleWorkFlowRewriter(ProjectItemDetails.SemanticModel)
                 .Visit(initialSourceNode);
             initialSourceNode = this.RefreshResult(initialSourceNode);
-            initialSourceNode = new TypicalModuleFormRewriter(ProjectItemDetails.SemanticModel)
+            initialSourceNode = new GeneralWorkFlowRewriter(ProjectItemDetails.SemanticModel)
                 .Visit(initialSourceNode);
             initialSourceNode = this.RefreshResult(initialSourceNode);
+            initialSourceNode = new CombinedExpressionsFormRewriter(ProjectItemDetails.SemanticModel)
+                .Visit(initialSourceNode);
+            initialSourceNode = this.RefreshResult(initialSourceNode);
+            initialSourceNode = new ListModuleWorkFlowRewriter(ProjectItemDetails.SemanticModel)
+                .Visit(initialSourceNode);
             return initialSourceNode;
         }
 
         //cancelsave,deletecancelsave
-        class TypicalModuleFormRewriter : CSharpSyntaxRewriter
+        class CombinedExpressionsFormRewriter : CSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
-            public TypicalModuleFormRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
+            public CombinedExpressionsFormRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
             class StatementType
             {
                 public int Index { get; set; }
@@ -189,6 +194,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             }
                             return arg2;
                         });
+                return node;
+            }
+            public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
+            {
+                if (node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
+                     ((GenericNameSyntax)x.Type).Identifier.Text == "FormModule"))
+                    return base.VisitClassDeclaration(node);
                 return node;
             }
         }
@@ -375,10 +387,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             }
         }
         //cancel/save/delete
-        class TypicalWorkFlowRewriter : CSharpSyntaxRewriter
+        class FormModuleWorkFlowRewriter : CSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
-            public TypicalWorkFlowRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
+            public FormModuleWorkFlowRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
             public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
             {
                 var s = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
@@ -386,35 +398,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 if (s == null)
                     return base.VisitExpressionStatement(node);
                 var methodSymbol = (semanticModel.GetSymbolInfo(s).Symbol as IMethodSymbol);
-
-                if (s.ArgumentList.Arguments.Count() == 1 &&
-                    s.ArgumentList.Arguments.FirstOrDefault()
-                    .DescendantNodes().OfType<ExpressionStatementSyntax>().Count() == 1 &&
-                    s.ArgumentList.Arguments.FirstOrDefault()
-                    .DescendantNodes().OfType<GenericNameSyntax>().Any(x => x.Identifier.ToString() == "Go"))
-                {
-                    GenericNameSyntax goIdentifier = s.ArgumentList.Arguments.FirstOrDefault()
-                        .DescendantNodes().OfType<GenericNameSyntax>().FirstOrDefault(x => x.Identifier.ToString() == "Go");
-                    var newNode = node.ReplaceNodes(s.ArgumentList.Arguments.FirstOrDefault()
-                        .DescendantNodes().OfType<InvocationExpressionSyntax>(),
-                        (nde1, nde2) =>
-                        {
-                            if (((MemberAccessExpressionSyntax)nde1.Expression).Name is GenericNameSyntax &&
-                            ((MemberAccessExpressionSyntax)nde1.Expression).Name.Identifier.ToString() == "Go" &&
-                                nde1.ArgumentList.Arguments.Count == 0)
-                            {
-                                if (!(((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax))
-                                    return nde2.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
-                                else return nde2.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
-                            }
-                            return nde2;
-                        });
-
-                    newNode = newNode.ReplaceNode(newNode.DescendantNodes().OfType<IdentifierNameSyntax>()
-                            .FirstOrDefault(x => x.Identifier.ToString() == "OnClick"),
-                                SyntaxFactory.GenericName(goIdentifier.Identifier, goIdentifier.TypeArgumentList));
-                    return newNode;
-                }
 
                 if (s.DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().Count() == 1 &&
                     methodSymbol?.ReturnType.OriginalDefinition?.ToString() == "MSharp.ModuleButton")
@@ -653,6 +636,81 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 }
                 return base.VisitExpressionStatement(node);
+            }
+
+            public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
+            {
+                if (node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
+                     ((GenericNameSyntax)x.Type).Identifier.Text == "FormModule"))
+                    return base.VisitClassDeclaration(node);
+                return node;
+            }
+        }
+        //onlick-go -> go
+        class GeneralWorkFlowRewriter : CSharpSyntaxRewriter
+        {
+            SemanticModel semanticModel;
+            public GeneralWorkFlowRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
+
+            public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
+            {
+                var s = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                        .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnClick").FirstOrDefault();
+                if (s == null)
+                    return base.VisitExpressionStatement(node);
+                var methodSymbol = (semanticModel.GetSymbolInfo(s).Symbol as IMethodSymbol);
+
+                if (s.ArgumentList.Arguments.Count() == 1 &&
+                    s.ArgumentList.Arguments.FirstOrDefault()
+                    .DescendantNodes().OfType<ExpressionStatementSyntax>().Count() == 1 &&
+                    s.ArgumentList.Arguments.FirstOrDefault()
+                    .DescendantNodes().OfType<GenericNameSyntax>().Any(x => x.Identifier.ToString() == "Go"))
+                {
+                    GenericNameSyntax goIdentifier = s.ArgumentList.Arguments.FirstOrDefault()
+                        .DescendantNodes().OfType<GenericNameSyntax>().FirstOrDefault(x => x.Identifier.ToString() == "Go");
+                    var newNode = node.ReplaceNodes(s.ArgumentList.Arguments.FirstOrDefault()
+                        .DescendantNodes().OfType<InvocationExpressionSyntax>(),
+                        (nde1, nde2) =>
+                        {
+                            if (((MemberAccessExpressionSyntax)nde1.Expression).Name is GenericNameSyntax &&
+                            ((MemberAccessExpressionSyntax)nde1.Expression).Name.Identifier.ToString() == "Go" &&
+                                nde1.ArgumentList.Arguments.Count == 0)
+                            {
+                                if (!(((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax))
+                                    return nde2.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+                                else return nde2.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+                            }
+                            return nde2;
+                        });
+
+                    newNode = newNode.ReplaceNode(newNode.DescendantNodes().OfType<IdentifierNameSyntax>()
+                            .FirstOrDefault(x => x.Identifier.ToString() == "OnClick"),
+                                SyntaxFactory.GenericName(goIdentifier.Identifier, goIdentifier.TypeArgumentList));
+                    return newNode;
+                }
+                return base.VisitExpressionStatement(node);
+            }
+        }
+        class ListModuleWorkFlowRewriter : CSharpSyntaxRewriter
+        {
+            SemanticModel semanticModel;
+            public ListModuleWorkFlowRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
+            public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
+            {
+                var s = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                        .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnClick").FirstOrDefault();
+                if (s == null)
+                    return base.VisitExpressionStatement(node);
+                var methodSymbol = (semanticModel.GetSymbolInfo(s).Symbol as IMethodSymbol);
+                return base.VisitExpressionStatement(node);
+            }
+
+            public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
+            {
+                if (node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
+                     ((GenericNameSyntax)x.Type).Identifier.Text == "ListModule"))
+                    return base.VisitClassDeclaration(node);
+                return node;
             }
         }
     }
