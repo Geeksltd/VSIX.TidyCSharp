@@ -386,6 +386,36 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 if (s == null)
                     return base.VisitExpressionStatement(node);
                 var methodSymbol = (semanticModel.GetSymbolInfo(s).Symbol as IMethodSymbol);
+
+                if (s.ArgumentList.Arguments.Count() == 1 &&
+                    s.ArgumentList.Arguments.FirstOrDefault()
+                    .DescendantNodes().OfType<ExpressionStatementSyntax>().Count() == 1 &&
+                    s.ArgumentList.Arguments.FirstOrDefault()
+                    .DescendantNodes().OfType<GenericNameSyntax>().Any(x => x.Identifier.ToString() == "Go"))
+                {
+                    GenericNameSyntax goIdentifier = s.ArgumentList.Arguments.FirstOrDefault()
+                        .DescendantNodes().OfType<GenericNameSyntax>().FirstOrDefault(x => x.Identifier.ToString() == "Go");
+                    var newNode = node.ReplaceNodes(s.ArgumentList.Arguments.FirstOrDefault()
+                        .DescendantNodes().OfType<InvocationExpressionSyntax>(),
+                        (nde1, nde2) =>
+                        {
+                            if (((MemberAccessExpressionSyntax)nde1.Expression).Name is GenericNameSyntax &&
+                            ((MemberAccessExpressionSyntax)nde1.Expression).Name.Identifier.ToString() == "Go" &&
+                                nde1.ArgumentList.Arguments.Count == 0)
+                            {
+                                if (!(((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax))
+                                    return nde2.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+                                else return nde2.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+                            }
+                            return nde2;
+                        });
+
+                    newNode = newNode.ReplaceNode(newNode.DescendantNodes().OfType<IdentifierNameSyntax>()
+                            .FirstOrDefault(x => x.Identifier.ToString() == "OnClick"),
+                                SyntaxFactory.GenericName(goIdentifier.Identifier, goIdentifier.TypeArgumentList));
+                    return newNode;
+                }
+
                 if (s.DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().Count() == 1 &&
                     methodSymbol?.ReturnType.OriginalDefinition?.ToString() == "MSharp.ModuleButton")
                 {
