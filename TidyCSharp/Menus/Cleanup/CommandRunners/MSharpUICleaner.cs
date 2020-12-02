@@ -13,22 +13,38 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
         {
             if (App.DTE.ActiveDocument.ProjectItem.ProjectItems.ContainingProject.Name == "#UI")
-                return ChangeMethodHelper(initialSourceNode, ProjectItemDetails.SemanticModel);
+                return ChangeMethodHelper(initialSourceNode);
             return initialSourceNode;
         }
 
-        SyntaxNode ChangeMethodHelper(SyntaxNode initialSourceNode, SemanticModel semanticModel)
+        SyntaxNode ChangeMethodHelper(SyntaxNode initialSourceNode)
         {
-            initialSourceNode = new Rewriter(semanticModel).Visit(initialSourceNode);
-            this.RefreshResult(initialSourceNode);
+            initialSourceNode = new SendItemIdRewriter(ProjectItemDetails.SemanticModel)
+                .Visit(initialSourceNode);
+            initialSourceNode = this.RefreshResult(initialSourceNode);
+            initialSourceNode = new IfWorkFlowRewriter(ProjectItemDetails.SemanticModel)
+                .Visit(initialSourceNode);
+            initialSourceNode = this.RefreshResult(initialSourceNode);
+            initialSourceNode = new CustomColumnRewriter(ProjectItemDetails.SemanticModel)
+                .Visit(initialSourceNode);
+            initialSourceNode = this.RefreshResult(initialSourceNode);
+            initialSourceNode = new ElementsNewSyntaxRewriter(ProjectItemDetails.SemanticModel)
+                .Visit(initialSourceNode);
+            initialSourceNode = this.RefreshResult(initialSourceNode);
+            initialSourceNode = new TypicalWorkFlowRewriter(ProjectItemDetails.SemanticModel)
+                .Visit(initialSourceNode);
+            initialSourceNode = this.RefreshResult(initialSourceNode);
+            initialSourceNode = new TypicalModuleFormRewriter(ProjectItemDetails.SemanticModel)
+                .Visit(initialSourceNode);
+            initialSourceNode = this.RefreshResult(initialSourceNode);
             return initialSourceNode;
         }
 
-        class Rewriter : CSharpSyntaxRewriter
+        //cancelsave,deletecancelsave
+        class TypicalModuleFormRewriter : CSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
-            public Rewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
-
+            public TypicalModuleFormRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
             class StatementType
             {
                 public int Index { get; set; }
@@ -36,27 +52,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 public string MethodName { get; set; }
                 public List<int> RemovedIndexPositions { get; set; }
             }
-
-            public override SyntaxNode Visit(SyntaxNode node)
-            {
-                if (node == null) return base.Visit(node);
-
-                if (node is ConstructorDeclarationSyntax)
-                {
-                    return VisitConstructorDeclaration(node as ConstructorDeclarationSyntax);
-                }
-                else if (node is InvocationExpressionSyntax)
-                {
-                    return VisitInvocationExpression(node as InvocationExpressionSyntax);
-                }
-                else if (node is ExpressionStatementSyntax)
-                {
-                    return VisitExpressionStatement(node as ExpressionStatementSyntax);
-                }
-                return base.Visit(node);
-            }
-
-            //cancelsave,deletecancelsave
             public override SyntaxNode VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
             {
                 var t = node.DescendantNodes().OfType<ExpressionStatementSyntax>()
@@ -196,79 +191,59 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         });
                 return node;
             }
-
-            //senditemid, column.search.field.
-            public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
+        }
+        class IfWorkFlowRewriter : CSharpSyntaxRewriter
+        {
+            SemanticModel semanticModel;
+            public IfWorkFlowRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
+            public override SyntaxNode VisitSimpleLambdaExpression(SimpleLambdaExpressionSyntax node)
             {
-                var methodSymbol = semanticModel.GetSymbolInfo(node).Symbol as IMethodSymbol;
-                var methodName = methodSymbol?.Name;
-                var methodType = methodSymbol?.ReturnType.OriginalDefinition?.ToString();
-
-                var methodDefTypes = new string[] {
-                    "MSharp.PropertyFilterElement<TEntity>",
-                    "MSharp.ViewElement<TEntity>",
-                    "MSharp.ViewElement<TEntity, TProperty>",
-                    "MSharp.NumberFormElement",
-                    "MSharp.BooleanFormElement",
-                    "MSharp.DateTimeFormElement",
-                    "MSharp.StringFormElement",
-                    "MSharp.AssociationFormElement",
-                    "MSharp.BinaryFormElement",
-                    "MSharp.CommonFilterElement<TEntity>"
-                };
-                var methodDefNames = new string[] { "Field", "Column", "Search" };
-
-                if (methodDefTypes.Contains(methodType) && methodDefNames.Contains(methodName))
+                var ifNode = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                    .Where(x => ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == "If" &&
+                    !(((MemberAccessExpressionSyntax)x.Expression).Expression is IdentifierNameSyntax))
+                    .FirstOrDefault();
+                if (ifNode != null)
                 {
-                    if (node.ArgumentList.Arguments.Count == 1 && node.ArgumentList.Arguments[0].Expression is SimpleLambdaExpressionSyntax)
-                    {
-                        var arg = ((MemberAccessExpressionSyntax)((SimpleLambdaExpressionSyntax)node.ArgumentList.Arguments[0].Expression).Body).Name;
-                        return SyntaxFactory.ParseExpression($"{methodName.ToLower()}.{arg}()")
-                            .WithLeadingTrivia(node.GetLeadingTrivia());
-                    }
+                    node = node.ReplaceNodes(ifNode.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>(),
+                        (nde1, nde2) =>
+                        {
+                            if (((MemberAccessExpressionSyntax)nde1.Expression).Name.ToString() == "If" &&
+                                !(((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax))
+                            {
+                                return nde2.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+                            }
+                            else if (((MemberAccessExpressionSyntax)nde1.Expression).Name.ToString() == "If" &&
+                               (((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax))
+                            {
+                                return nde2;
+                            }
+                            if (((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax)
+                            {
+                                return SyntaxFactory.InvocationExpression(
+                                       SyntaxFactory.MemberAccessExpression(
+                                           SyntaxKind.SimpleMemberAccessExpression,
+                                           SyntaxFactory.InvocationExpression(
+                                                SyntaxFactory.MemberAccessExpression(
+                                                    SyntaxKind.SimpleMemberAccessExpression,
+                                                    SyntaxFactory.ParseExpression(((MemberAccessExpressionSyntax)nde1.Expression).Expression.ToString()),
+                                                    SyntaxFactory.IdentifierName("If"))
+                                                , SyntaxFactory.ArgumentList(ifNode.ArgumentList.Arguments)), ((MemberAccessExpressionSyntax)nde1.Expression).Name),
+                                    SyntaxFactory.ArgumentList(nde1.ArgumentList.Arguments)).WithLeadingTrivia(nde1.GetLeadingTrivia());
+                            }
+                            return nde2;
+                        });
+                    return VisitSimpleLambdaExpression(node);
                 }
-
-                if (methodType == "MSharp.ListButton<TEntity>" || methodType == "MSharp.ModuleButton")
-                {
-                    switch (methodName)
-                    {
-                        case "ButtonColumn":
-                            return node.WithExpression(SyntaxFactory.ParseExpression("column.Button"))
-                                .WithLeadingTrivia(node.GetLeadingTrivia()); ;
-                        case "LinkColumn":
-                            return node.WithExpression(SyntaxFactory.ParseExpression("column.Link"))
-                                .WithLeadingTrivia(node.GetLeadingTrivia());
-                        case "SearchButton":
-                            return node.WithExpression(SyntaxFactory.ParseExpression("search.Button"))
-                                .WithLeadingTrivia(node.GetLeadingTrivia());
-                    }
-                }
-
-                if (methodName == "Send")
-                {
-                    if (node.ArgumentList.Arguments.Count == 2 &&
-                        node.ArgumentList.Arguments.FirstOrDefault().ToString() == "\"item\"" &&
-                        node.ArgumentList.Arguments.LastOrDefault().ToString() == "\"item.ID\"")
-                    {
-                        var member = node.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
-                        member = member
-                            .WithTrailingTrivia(member.GetTrailingTrivia().Union(node.GetLeadingTrivia()));
-                        return SyntaxFactory.InvocationExpression(
-                            SyntaxFactory.MemberAccessExpression(
-                                SyntaxKind.SimpleMemberAccessExpression, member, SyntaxFactory.IdentifierName("SendItemId")),
-                            SyntaxFactory.ArgumentList());
-                    }
-                }
-
-
-                return base.VisitInvocationExpression(node);
+                return node;
             }
+        }
+        class CustomColumnRewriter : CSharpSyntaxRewriter
+        {
+            SemanticModel semanticModel;
+            public CustomColumnRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
 
-            //customColumn and cancel/save/delete
             public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
             {
-                var s = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
-                        .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnClick").FirstOrDefault();
                 var customColumnNode = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
                     .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "CustomColumn").FirstOrDefault();
 
@@ -317,7 +292,97 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         });
                     return newNode;
                 }
+                return base.VisitExpressionStatement(node);
+            }
+        }
+        class SendItemIdRewriter : CSharpSyntaxRewriter
+        {
+            SemanticModel semanticModel;
+            public SendItemIdRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
+            public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
+            {
+                var methodSymbol = semanticModel.GetSymbolInfo(node).Symbol as IMethodSymbol;
+                var methodName = methodSymbol?.Name;
+                if (methodName == "Send")
+                {
+                    if (node.ArgumentList.Arguments.Count == 2 &&
+                        node.ArgumentList.Arguments.FirstOrDefault().ToString() == "\"item\"" &&
+                        node.ArgumentList.Arguments.LastOrDefault().ToString() == "\"item.ID\"")
+                    {
+                        var member = node.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+                        member = member
+                            .WithTrailingTrivia(member.GetTrailingTrivia().Union(node.GetLeadingTrivia()));
+                        return SyntaxFactory.InvocationExpression(
+                            SyntaxFactory.MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression, member, SyntaxFactory.IdentifierName("SendItemId")),
+                            SyntaxFactory.ArgumentList());
+                    }
+                }
+                return base.VisitInvocationExpression(node);
+            }
+        }
+        //column.search.field.
+        class ElementsNewSyntaxRewriter : CSharpSyntaxRewriter
+        {
+            SemanticModel semanticModel;
+            public ElementsNewSyntaxRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
+            public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
+            {
+                var methodSymbol = semanticModel.GetSymbolInfo(node).Symbol as IMethodSymbol;
+                var methodName = methodSymbol?.Name;
+                var methodType = methodSymbol?.ReturnType.OriginalDefinition?.ToString();
 
+                var methodDefTypes = new string[] {
+                    "MSharp.PropertyFilterElement<TEntity>",
+                    "MSharp.ViewElement<TEntity>",
+                    "MSharp.ViewElement<TEntity, TProperty>",
+                    "MSharp.NumberFormElement",
+                    "MSharp.BooleanFormElement",
+                    "MSharp.DateTimeFormElement",
+                    "MSharp.StringFormElement",
+                    "MSharp.AssociationFormElement",
+                    "MSharp.BinaryFormElement",
+                    "MSharp.CommonFilterElement<TEntity>"
+                };
+                var methodDefNames = new string[] { "Field", "Column", "Search" };
+
+                if (methodDefTypes.Contains(methodType) && methodDefNames.Contains(methodName))
+                {
+                    if (node.ArgumentList.Arguments.Count == 1 && node.ArgumentList.Arguments[0].Expression is SimpleLambdaExpressionSyntax)
+                    {
+                        var arg = ((MemberAccessExpressionSyntax)((SimpleLambdaExpressionSyntax)node.ArgumentList.Arguments[0].Expression).Body).Name;
+                        return SyntaxFactory.ParseExpression($"{methodName.ToLower()}.{arg}()")
+                            .WithLeadingTrivia(node.GetLeadingTrivia());
+                    }
+                }
+
+                if (methodType == "MSharp.ListButton<TEntity>" || methodType == "MSharp.ModuleButton")
+                {
+                    switch (methodName)
+                    {
+                        case "ButtonColumn":
+                            return node.WithExpression(SyntaxFactory.ParseExpression("column.Button"))
+                                .WithLeadingTrivia(node.GetLeadingTrivia()); ;
+                        case "LinkColumn":
+                            return node.WithExpression(SyntaxFactory.ParseExpression("column.Link"))
+                                .WithLeadingTrivia(node.GetLeadingTrivia());
+                        case "SearchButton":
+                            return node.WithExpression(SyntaxFactory.ParseExpression("search.Button"))
+                                .WithLeadingTrivia(node.GetLeadingTrivia());
+                    }
+                }
+                return base.VisitInvocationExpression(node);
+            }
+        }
+        //cancel/save/delete
+        class TypicalWorkFlowRewriter : CSharpSyntaxRewriter
+        {
+            SemanticModel semanticModel;
+            public TypicalWorkFlowRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
+            public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
+            {
+                var s = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                        .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnClick").FirstOrDefault();
                 if (s == null)
                     return base.VisitExpressionStatement(node);
                 var methodSymbol = (semanticModel.GetSymbolInfo(s).Symbol as IMethodSymbol);
@@ -558,48 +623,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 }
                 return base.VisitExpressionStatement(node);
-            }
-
-            //if problem
-            public override SyntaxNode VisitSimpleLambdaExpression(SimpleLambdaExpressionSyntax node)
-            {
-                var ifNode = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
-                    .Where(x => ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == "If" &&
-                    !(((MemberAccessExpressionSyntax)x.Expression).Expression is IdentifierNameSyntax))
-                    .FirstOrDefault();
-                if (ifNode != null)
-                {
-                    node = node.ReplaceNodes(ifNode.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>(),
-                        (nde1, nde2) =>
-                        {
-                            if (((MemberAccessExpressionSyntax)nde1.Expression).Name.ToString() == "If" &&
-                                !(((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax))
-                            {
-                                return nde2.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
-                            }
-                            else if (((MemberAccessExpressionSyntax)nde1.Expression).Name.ToString() == "If" &&
-                               (((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax))
-                            {
-                                return nde2;
-                            }
-                            if (((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax)
-                            {
-                                return SyntaxFactory.InvocationExpression(
-                                       SyntaxFactory.MemberAccessExpression(
-                                           SyntaxKind.SimpleMemberAccessExpression,
-                                           SyntaxFactory.InvocationExpression(
-                                                SyntaxFactory.MemberAccessExpression(
-                                                    SyntaxKind.SimpleMemberAccessExpression,
-                                                    SyntaxFactory.ParseExpression(((MemberAccessExpressionSyntax)nde1.Expression).Expression.ToString()),
-                                                    SyntaxFactory.IdentifierName("If"))
-                                                , SyntaxFactory.ArgumentList(ifNode.ArgumentList.Arguments)), ((MemberAccessExpressionSyntax)nde1.Expression).Name),
-                                    SyntaxFactory.ArgumentList(nde1.ArgumentList.Arguments)).WithLeadingTrivia(nde1.GetLeadingTrivia());
-                            }
-                            return nde2;
-                        });
-                    return VisitSimpleLambdaExpression(node);
-                }
-                return node;
             }
         }
     }

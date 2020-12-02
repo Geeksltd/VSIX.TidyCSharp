@@ -21,15 +21,15 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         }
         SyntaxNode ChangeMethodHelper(SyntaxNode initialSourceNode, SemanticModel semanticModel)
         {
-            initialSourceNode = new Rewriter(semanticModel).Visit(initialSourceNode);
+            initialSourceNode = new LocalTimeRewriter(semanticModel).Visit(initialSourceNode);
 
             return initialSourceNode;
         }
 
-        class Rewriter : CSharpSyntaxRewriter
+        class LocalTimeRewriter : CSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
-            public Rewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
+            public LocalTimeRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
 
             public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
             {

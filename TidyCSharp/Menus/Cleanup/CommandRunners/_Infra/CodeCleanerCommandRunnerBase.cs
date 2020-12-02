@@ -21,11 +21,12 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             SaveResult(initialSourceNode);
         }
 
-        protected virtual void RefreshResult(SyntaxNode initialSourceNode)
+        protected virtual SyntaxNode RefreshResult(SyntaxNode initialSourceNode)
         {
-            var newDocument = ProjectItemDetails.ProjectItemDocument.WithText(initialSourceNode.GetText());
+            var newDocument = ProjectItemDetails.ProjectItemDocument.WithSyntaxRoot(initialSourceNode);
             TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
             ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
+            return ProjectItemDetails.InitialSourceNode;
         }
 
 
