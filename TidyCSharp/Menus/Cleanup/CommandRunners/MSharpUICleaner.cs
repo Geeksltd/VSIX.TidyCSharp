@@ -897,6 +897,71 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                     return newNode;
                 }
+                else if (s.ArgumentList.Arguments.Count() == 1 &&
+                    (s.ArgumentList.Arguments.FirstOrDefault()
+                    .DescendantNodes().OfType<ExpressionStatementSyntax>().Count() == 1 ||
+                    s.ArgumentList.Arguments.FirstOrDefault()
+                    .DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().Count() == 1) &&
+                    s.ArgumentList.Arguments.FirstOrDefault()
+                    .DescendantNodes().OfType<IdentifierNameSyntax>().Any(x => x.Identifier.ToString() == "Reload") &&
+                    s.DescendantNodes().OfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
+                        ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == "Button" &&
+                        x.ArgumentList.Arguments.Count() == 1 &&
+                        x.ArgumentList.Arguments.FirstOrDefault().ToString() == "\"Search\"").Count() == 1)
+                {
+                    InvocationExpressionSyntax iconInvocation = s.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                            .FirstOrDefault(x => x.Expression is MemberAccessExpressionSyntax &&
+                            ((MemberAccessExpressionSyntax)(x.Expression)).Name.ToString() == "Icon");
+                    var neededArguments = iconInvocation.ArgumentList;
+                    var newNode = node.ReplaceNodes(s.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>(),
+                        (nde1, nde2) =>
+                        {
+                            if (nde1.Expression is MemberAccessExpressionSyntax &&
+                            ((MemberAccessExpressionSyntax)nde1.Expression).Name is IdentifierNameSyntax &&
+                            ((MemberAccessExpressionSyntax)nde1.Expression).Name.Identifier.ToString() == "OnClick" &&
+                                nde1.ArgumentList.Arguments.Count == 1)
+                            {
+                                if (!(((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax))
+                                    return nde2.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+                                else return nde2.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+                            }
+                            else if (nde1.Expression is MemberAccessExpressionSyntax &&
+                            ((MemberAccessExpressionSyntax)nde1.Expression).Name is IdentifierNameSyntax &&
+                            ((MemberAccessExpressionSyntax)nde1.Expression).Name.Identifier.ToString() == "Icon" &&
+                                nde1.ArgumentList.Arguments.Count == 1)
+                            {
+                                if (!(((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax))
+                                    return nde2.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+                                else return nde2.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+                            }
+                            else if (nde1.Expression is MemberAccessExpressionSyntax &&
+                            ((MemberAccessExpressionSyntax)nde1.Expression).Name is IdentifierNameSyntax &&
+                            ((MemberAccessExpressionSyntax)nde1.Expression).Name.Identifier.ToString() == "NoText" &&
+                                nde1.ArgumentList.Arguments.Count == 0)
+                            {
+                                if (!(((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax))
+                                    return nde2.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+                                else return nde2.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+                            }
+                            else if (nde1.Expression is MemberAccessExpressionSyntax &&
+                               ((MemberAccessExpressionSyntax)nde1.Expression).Name.ToString() == "Button" &&
+                               nde1.ArgumentList.Arguments.Count() == 1 &&
+                               nde1.ArgumentList.Arguments.FirstOrDefault().ToString() == "\"Search\"")
+                            {
+                                SeparatedSyntaxList<ArgumentSyntax> args = new SeparatedSyntaxList<ArgumentSyntax>();
+                                args = args.AddRange(neededArguments.Arguments.Where(x => x.Expression.ToString() != "FA.Search"));
+                                return SyntaxFactory.InvocationExpression(SyntaxFactory.MemberAccessExpression(
+                                    SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.ParseExpression("search"),
+                                    SyntaxFactory.IdentifierName("Icon")), SyntaxFactory.ArgumentList(args))
+                                            .WithLeadingTrivia(nde1.GetLeadingTrivia())
+                                            .WithTrailingTrivia(nde1.GetTrailingTrivia());
+                            }
+
+                            return nde2;
+                        });
+
+                    return newNode;
+                }
                 return base.VisitExpressionStatement(node);
             }
 
