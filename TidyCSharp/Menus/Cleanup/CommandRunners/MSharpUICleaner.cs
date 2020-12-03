@@ -661,8 +661,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 var methodSymbol = (semanticModel.GetSymbolInfo(s).Symbol as IMethodSymbol);
 
                 if (s.ArgumentList.Arguments.Count() == 1 &&
+                    (s.ArgumentList.Arguments.FirstOrDefault()
+                    .DescendantNodes().OfType<ExpressionStatementSyntax>().Count() == 1 ||
                     s.ArgumentList.Arguments.FirstOrDefault()
-                    .DescendantNodes().OfType<ExpressionStatementSyntax>().Count() == 1 &&
+                    .DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().Count() == 1) &&
                     s.ArgumentList.Arguments.FirstOrDefault()
                     .DescendantNodes().OfType<GenericNameSyntax>().Any(x => x.Identifier.ToString() == "Go"))
                 {
@@ -698,10 +700,203 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
             {
                 var s = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
-                        .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnClick").FirstOrDefault();
+                        .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "Go" ||
+                        (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnClick").FirstOrDefault();
                 if (s == null)
                     return base.VisitExpressionStatement(node);
+                var editRequiredArguments = new string[] { "SendItemId", "SendReturnUrl" };
+                var newRequiredArguments = new string[] { "SendReturnUrl" };
                 var methodSymbol = (semanticModel.GetSymbolInfo(s).Symbol as IMethodSymbol);
+
+                if (s.DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().Count() == 1 &&
+                    s.ArgumentList.Arguments.Count() == 1 &&
+                    editRequiredArguments.All(x => (s.ArgumentList.Arguments.FirstOrDefault().DescendantNodes()
+                        .OfType<InvocationExpressionSyntax>()
+                        .Select(y => ((MemberAccessExpressionSyntax)y.Expression).Name.ToString())).Any(y => y == x)))
+                {
+                    var m = node.ChildNodes().FirstOrDefault();
+                    var newExpression = SyntaxFactory.InvocationExpression(
+                            SyntaxFactory.MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                SyntaxFactory.ParseExpression("column"),
+                                SyntaxFactory.GenericName(SyntaxFactory.Identifier("Edit"),
+                                ((GenericNameSyntax)(((MemberAccessExpressionSyntax)s.Expression).Name)).TypeArgumentList)),
+                            SyntaxFactory.ArgumentList());
+                    while (m.ChildNodes().Any())
+                    {
+                        var m2 = m.ChildNodes();
+                        if (m2.FirstOrDefault() is MemberAccessExpressionSyntax &&
+                            m2.LastOrDefault() is ArgumentListSyntax)
+                        {
+                            var methodName = m2.FirstOrDefault() as MemberAccessExpressionSyntax;
+                            var arguments = m2.LastOrDefault() as ArgumentListSyntax;
+                            if (methodName.Name.Identifier.ToString() == "Go" && ((arguments.Arguments.Count != 1) ||
+                                   !(editRequiredArguments.All(x => arguments.Arguments.FirstOrDefault()
+                                   .Expression.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                                   .FirstOrDefault().ToString().Contains(x)))))
+                            {
+                                return base.VisitExpressionStatement(node);
+                            }
+                            else if (methodName.Name.ToString() == "Icon" && (arguments.Arguments.Count != 1
+                                        || arguments.Arguments.FirstOrDefault().Expression.ToString() != "FA.Edit"))
+                            {
+                                newExpression = SyntaxFactory.InvocationExpression(
+                                    SyntaxFactory.MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
+                            }
+                            else if (methodName.Name.ToString() == "NoText" && (arguments.Arguments.Count != 0))
+                            {
+                                newExpression = SyntaxFactory.InvocationExpression(
+                                    SyntaxFactory.MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
+                            }
+                            else if (methodName.Name.ToString() == "HeaderText" && (arguments.Arguments.Count != 1
+                                        || arguments.Arguments.FirstOrDefault().Expression.ToString() != "\"Actions\""))
+                            {
+                                newExpression = SyntaxFactory.InvocationExpression(
+                                    SyntaxFactory.MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
+                            }
+                            else if (methodName.Name.ToString() == "GridColumnCssClass" && (arguments.Arguments.Count != 1
+                                        || arguments.Arguments.FirstOrDefault().Expression.ToString() != "\"actions\""))
+                            {
+                                newExpression = SyntaxFactory.InvocationExpression(
+                                    SyntaxFactory.MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
+                            }
+                            else if (methodName.Name.ToString() == "Button" && (arguments.Arguments.Count != 1
+                                        || arguments.Arguments.FirstOrDefault().Expression.ToString() != "\"Edit\""))
+                            {
+                                newExpression = SyntaxFactory.InvocationExpression(
+                                    SyntaxFactory.MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
+                            }
+                            else if (methodName.Name.Identifier.ToString() != "Go" &&
+                               methodName.Name.ToString() != "GridColumnCssClass" &&
+                               methodName.Name.ToString() != "HeaderText" &&
+                               methodName.Name.ToString() != "NoText" &&
+                               methodName.Name.ToString() != "Icon" &&
+                               methodName.Name.ToString() != "Button")
+                            {
+                                newExpression = SyntaxFactory.InvocationExpression(
+                                        SyntaxFactory.MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
+                            }
+                            m = (m2.FirstOrDefault() as MemberAccessExpressionSyntax).Expression;
+                        }
+                    }
+                    if (m.ToString() == "column")
+                        return SyntaxFactory.ExpressionStatement(newExpression)
+                                .WithLeadingTrivia(node.GetLeadingTrivia())
+                                .WithTrailingTrivia(node.GetTrailingTrivia());
+                }
+                else if (s.DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().Count() == 1 &&
+                            s.ArgumentList.Arguments.Count() == 1 &&
+                            newRequiredArguments.All(x => (s.ArgumentList.Arguments.FirstOrDefault().DescendantNodes()
+                            .OfType<InvocationExpressionSyntax>()
+                            .Select(y => ((MemberAccessExpressionSyntax)y.Expression).Name.ToString())).Any(y => y == x)))
+                {
+                    var m = node.ChildNodes().FirstOrDefault();
+                    var newExpression = SyntaxFactory.InvocationExpression(
+                            SyntaxFactory.MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                SyntaxFactory.ParseExpression("button"),
+                                SyntaxFactory.GenericName(SyntaxFactory.Identifier("New"),
+                                ((GenericNameSyntax)(((MemberAccessExpressionSyntax)s.Expression).Name)).TypeArgumentList)),
+                            SyntaxFactory.ArgumentList());
+                    while (m.ChildNodes().Any())
+                    {
+                        var m2 = m.ChildNodes();
+                        if (m2.FirstOrDefault() is MemberAccessExpressionSyntax &&
+                            m2.LastOrDefault() is ArgumentListSyntax)
+                        {
+                            var methodName = m2.FirstOrDefault() as MemberAccessExpressionSyntax;
+                            var arguments = m2.LastOrDefault() as ArgumentListSyntax;
+                            if (methodName.Name.Identifier.ToString() == "Go" && ((arguments.Arguments.Count != 1) ||
+                                   !(newRequiredArguments.All(x => arguments.Arguments.FirstOrDefault()
+                                   .Expression.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                                   .FirstOrDefault().ToString().Contains(x)))))
+                            {
+                                return base.VisitExpressionStatement(node);
+                            }
+                            else if (methodName.Name.ToString() == "Icon" && (arguments.Arguments.Count != 1
+                                        || arguments.Arguments.FirstOrDefault().Expression.ToString() != "FA.Plus"))
+                            {
+                                newExpression = SyntaxFactory.InvocationExpression(
+                                    SyntaxFactory.MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
+                            }
+                            else if (methodName.Name.Identifier.ToString() != "Go" &&
+                               methodName.Name.ToString() != "Icon")
+                            {
+                                newExpression = SyntaxFactory.InvocationExpression(
+                                        SyntaxFactory.MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
+                            }
+                            m = (m2.FirstOrDefault() as MemberAccessExpressionSyntax).Expression;
+                        }
+                        else if (m2.FirstOrDefault() is IdentifierNameSyntax &&
+                             m2.LastOrDefault() is ArgumentListSyntax)
+                        {
+                            var methodName = m2.FirstOrDefault() as IdentifierNameSyntax;
+                            var arguments = m2.LastOrDefault() as ArgumentListSyntax;
+                            if (methodName.ToString() == "Button" && (arguments.Arguments.Count != 1
+                                    || arguments.Arguments.FirstOrDefault().Expression.ToString() != "\"New\""))
+                            {
+                                return base.VisitExpressionStatement(node);
+                            }
+                            m = m2.FirstOrDefault();
+                        }
+                    }
+                    return SyntaxFactory.ExpressionStatement(newExpression)
+                                .WithLeadingTrivia(node.GetLeadingTrivia())
+                                .WithTrailingTrivia(node.GetTrailingTrivia());
+                }
+                else if (s.ArgumentList.Arguments.Count() == 1 &&
+                    (s.ArgumentList.Arguments.FirstOrDefault()
+                    .DescendantNodes().OfType<ExpressionStatementSyntax>().Count() == 1 ||
+                    s.ArgumentList.Arguments.FirstOrDefault()
+                    .DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().Count() == 1) &&
+                    s.ArgumentList.Arguments.FirstOrDefault()
+                    .DescendantNodes().OfType<IdentifierNameSyntax>().Any(x => x.Identifier.ToString() == "Export") &&
+                    s.DescendantNodes().OfType<InvocationExpressionSyntax>().Where(x => x.Expression is IdentifierNameSyntax &&
+                        ((IdentifierNameSyntax)x.Expression).Identifier.ToString() == "Button" &&
+                        x.ArgumentList.Arguments.Count() == 1 &&
+                        x.ArgumentList.Arguments.FirstOrDefault().ToString() == "\"Export\"").Count() == 1)
+                {
+                    InvocationExpressionSyntax exportInvocation = s.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                        .FirstOrDefault(x => x.Expression is MemberAccessExpressionSyntax &&
+                        ((MemberAccessExpressionSyntax)(x.Expression)).Name.ToString() == "Export");
+                    var neededArguments = exportInvocation.ArgumentList;
+                    var newNode = node.ReplaceNodes(s.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>(),
+                        (nde1, nde2) =>
+                        {
+                            if (nde1.Expression is MemberAccessExpressionSyntax &&
+                            ((MemberAccessExpressionSyntax)nde1.Expression).Name is IdentifierNameSyntax &&
+                            ((MemberAccessExpressionSyntax)nde1.Expression).Name.Identifier.ToString() == "OnClick" &&
+                                nde1.ArgumentList.Arguments.Count == 1)
+                            {
+                                if (!(((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax))
+                                    return nde2.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+                                else return nde2.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+                            }
+                            else if (nde1.Expression is IdentifierNameSyntax &&
+                               ((IdentifierNameSyntax)nde1.Expression).Identifier.ToString() == "Button" &&
+                               nde1.ArgumentList.Arguments.Count() == 1 &&
+                               nde1.ArgumentList.Arguments.FirstOrDefault().ToString() == "\"Export\"")
+                            {
+                                return SyntaxFactory.InvocationExpression(SyntaxFactory.MemberAccessExpression(
+                                    SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.ParseExpression("button"),
+                                    SyntaxFactory.IdentifierName("Export")), neededArguments)
+                                        .WithLeadingTrivia(nde1.GetLeadingTrivia())
+                                        .WithTrailingTrivia(nde1.GetTrailingTrivia());
+                            }
+
+                            return nde2;
+                        });
+
+                    return newNode;
+                }
                 return base.VisitExpressionStatement(node);
             }
 
