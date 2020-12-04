@@ -254,23 +254,23 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             SemanticModel semanticModel;
             public CustomColumnRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
 
-            public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
+            public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
             {
-                var customColumnNode = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                var customColumnNode = node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>()
                     .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "CustomColumn").FirstOrDefault();
 
                 if (customColumnNode != null)
                 {
-                    var newNode = node.ReplaceNodes(node.DescendantNodes().OfType<InvocationExpressionSyntax>(),
+                    var newNode = node.ReplaceNodes(node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>(),
                         (nde1, nde2) =>
                         {
                             if (nde1.ToString() == "CustomColumn()")
                             {
                                 SeparatedSyntaxList<ArgumentSyntax> args = new SeparatedSyntaxList<ArgumentSyntax>();
-                                var argsHeaderText = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                                var argsHeaderText = node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>()
                                     .Where(x => ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() ==
                                     "HeaderText").FirstOrDefault().ArgumentList;
-                                var argsDisplayExpr = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                                var argsDisplayExpr = node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>()
                                     .Where(x => ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == "DisplayExpression").FirstOrDefault().ArgumentList;
 
                                 if (argsHeaderText.Arguments.Count == 1)
@@ -304,7 +304,14 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         });
                     return newNode;
                 }
-                return base.VisitExpressionStatement(node);
+                return base.VisitInvocationExpression(node);
+            }
+            public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
+            {
+                if (node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
+                     ((GenericNameSyntax)x.Type).Identifier.Text == "ListModule"))
+                    return base.VisitClassDeclaration(node);
+                return node;
             }
         }
         class SendItemIdRewriter : CSharpSyntaxRewriter
@@ -391,12 +398,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         {
             SemanticModel semanticModel;
             public FormModuleWorkFlowRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
-            public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
+            public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
             {
-                var s = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                var s = node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>()
                         .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnClick").FirstOrDefault();
                 if (s == null)
-                    return base.VisitExpressionStatement(node);
+                    return base.VisitInvocationExpression(node);
                 var methodSymbol = (semanticModel.GetSymbolInfo(s).Symbol as IMethodSymbol);
 
                 if (s.DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().Count() == 1 &&
@@ -416,7 +423,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         (invocations.All(x => cancelMethods.Any(y => x.ToString().Contains(y))) ||
                      (invocations.All(x => cancelModalMethods.Any(y => x.ToString().Contains(y))))))
                     {
-                        var m = node.ChildNodes().FirstOrDefault();
+                        var m = node;
                         var methodSelector = invocations.Any(x => x.ToString().Contains("ReturnToPreviousPage"));
                         var newExpression = SyntaxFactory.InvocationExpression(
                             SyntaxFactory.MemberAccessExpression(
@@ -425,7 +432,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 SyntaxFactory.IdentifierName(methodSelector ? "Cancel" : "ModalCancel")),
                             SyntaxFactory.ArgumentList());
 
-                        while (m.ChildNodes().Any())
+                        while (m != null && m.ChildNodes().Any())
                         {
                             var m2 = m.ChildNodes();
                             if (m2.FirstOrDefault() is MemberAccessExpressionSyntax &&
@@ -451,7 +458,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                     ((!arguments.Arguments.FirstOrDefault().Expression.ToString().Contains("ReturnToPreviousPage")) &&
                                     (!arguments.Arguments.FirstOrDefault().Expression.ToString().Contains("CloseModal")))))
                                 {
-                                    return base.VisitExpressionStatement(node);
+                                    return base.VisitInvocationExpression(node);
                                 }
                                 else if (methodName.Name.ToString() != "OnClick" &&
                                    methodName.Name.ToString() != "CausesValidation" &&
@@ -461,7 +468,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                             SyntaxFactory.MemberAccessExpression(
                                                 SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
                                 }
-                                m = (m2.FirstOrDefault() as MemberAccessExpressionSyntax).Expression;
+                                m = (m2.FirstOrDefault() as MemberAccessExpressionSyntax).Expression
+                                    as InvocationExpressionSyntax;
                             }
                             else if (m2.FirstOrDefault() is IdentifierNameSyntax &&
                                m2.LastOrDefault() is ArgumentListSyntax)
@@ -471,12 +479,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 if (methodName.ToString() == "Button" && (arguments.Arguments.Count != 1
                                         || arguments.Arguments.FirstOrDefault().Expression.ToString() != "\"Cancel\""))
                                 {
-                                    return base.VisitExpressionStatement(node);
+                                    return base.VisitInvocationExpression(node);
                                 }
-                                m = m2.FirstOrDefault();
+                                m = m2.FirstOrDefault() as InvocationExpressionSyntax;
                             }
                         }
-                        return SyntaxFactory.ExpressionStatement(newExpression)
+                        return newExpression
                             .WithLeadingTrivia(node.GetLeadingTrivia())
                             .WithTrailingTrivia(node.GetTrailingTrivia());
                     }
@@ -486,7 +494,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         (invocations.All(x => saveMethods.Any(y => x.ToString().Contains(y))) ||
                         invocations.All(x => saveModalMethods.Any(y => x.ToString().Contains(y)))))
                     {
-                        var m = node.ChildNodes().FirstOrDefault();
+                        var m = node;
                         var methodSelector = invocations.Any(x => x.ToString().Contains("ReturnToPreviousPage"));
                         var newExpression = SyntaxFactory.InvocationExpression(
                             SyntaxFactory.MemberAccessExpression(
@@ -495,7 +503,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 SyntaxFactory.IdentifierName(methodSelector ? "Save" : "ModalSave")),
                             SyntaxFactory.ArgumentList());
 
-                        while (m.ChildNodes().Any())
+                        while (m != null && m.ChildNodes().Any())
                         {
                             var m2 = m.ChildNodes();
                             if (m2.FirstOrDefault() is MemberAccessExpressionSyntax &&
@@ -523,7 +531,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                     !((arguments.Arguments.FirstOrDefault().Expression as SimpleLambdaExpressionSyntax).Body as BlockSyntax)
                                         .Statements.Any(x => saveModalMethods.Any(y => x.ToString().Contains(y)))))
                                 {
-                                    return base.VisitExpressionStatement(node);
+                                    return base.VisitInvocationExpression(node);
                                 }
                                 else if (methodName.Name.ToString() != "OnClick" &&
                                    methodName.Name.ToString() != "CausesValidation" &&
@@ -533,7 +541,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                             SyntaxFactory.MemberAccessExpression(
                                                 SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
                                 }
-                                m = (m2.FirstOrDefault() as MemberAccessExpressionSyntax).Expression;
+                                m = (m2.FirstOrDefault() as MemberAccessExpressionSyntax).Expression
+                                     as InvocationExpressionSyntax;
                             }
                             else if (m2.FirstOrDefault() is IdentifierNameSyntax &&
                                m2.LastOrDefault() is ArgumentListSyntax)
@@ -543,12 +552,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 if (methodName.ToString() == "Button" && (arguments.Arguments.Count != 1
                                         || arguments.Arguments.FirstOrDefault().Expression.ToString() != "\"Save\""))
                                 {
-                                    return base.VisitExpressionStatement(node);
+                                    return base.VisitInvocationExpression(node);
                                 }
-                                m = m2.FirstOrDefault();
+                                m = m2.FirstOrDefault() as InvocationExpressionSyntax;
                             }
                         }
-                        return SyntaxFactory.ExpressionStatement(newExpression)
+                        return newExpression
                             .WithLeadingTrivia(node.GetLeadingTrivia())
                             .WithTrailingTrivia(node.GetTrailingTrivia());
                     }
@@ -558,7 +567,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         (invocations.All(x => deleteMethods.Union(optionalMethods).Any(y => x.ToString().Contains(y))) ||
                         invocations.All(x => deleteModalMethods.Union(optionalMethods).Any(y => x.ToString().Contains(y)))))
                     {
-                        var m = node.ChildNodes().FirstOrDefault();
+                        var m = node;
                         var methodSelector = invocations.Any(x => x.ToString().Contains("ReturnToPreviousPage"));
                         var newExpression = SyntaxFactory.InvocationExpression(
                             SyntaxFactory.MemberAccessExpression(
@@ -567,7 +576,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 SyntaxFactory.IdentifierName(methodSelector ? "Delete" : "ModalDelete")),
                             SyntaxFactory.ArgumentList());
 
-                        while (m.ChildNodes().Any())
+                        while (m != null && m.ChildNodes().Any())
                         {
                             var m2 = m.ChildNodes();
                             if (m2.FirstOrDefault() is MemberAccessExpressionSyntax &&
@@ -602,7 +611,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                     !((arguments.Arguments.FirstOrDefault().Expression as SimpleLambdaExpressionSyntax).Body as BlockSyntax)
                                         .Statements.Any(x => deleteModalMethods.Any(y => x.ToString().Contains(y)))))
                                 {
-                                    return base.VisitExpressionStatement(node);
+                                    return base.VisitInvocationExpression(node);
                                 }
                                 else if (methodName.Name.ToString() != "OnClick" &&
                                    methodName.Name.ToString() != "VisibleIf" &&
@@ -613,7 +622,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                             SyntaxFactory.MemberAccessExpression(
                                                 SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
                                 }
-                                m = (m2.FirstOrDefault() as MemberAccessExpressionSyntax).Expression;
+                                m = (m2.FirstOrDefault() as MemberAccessExpressionSyntax).Expression
+                                     as InvocationExpressionSyntax;
                             }
                             else if (m2.FirstOrDefault() is IdentifierNameSyntax &&
                                m2.LastOrDefault() is ArgumentListSyntax)
@@ -623,19 +633,19 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 if (methodName.ToString() == "Button" && (arguments.Arguments.Count != 1
                                         || arguments.Arguments.FirstOrDefault().Expression.ToString() != "\"Delete\""))
                                 {
-                                    return base.VisitExpressionStatement(node);
+                                    return base.VisitInvocationExpression(node);
                                 }
-                                m = m2.FirstOrDefault();
+                                m = m2.FirstOrDefault() as InvocationExpressionSyntax;
                             }
                         }
-                        return SyntaxFactory.ExpressionStatement(newExpression)
+                        return newExpression
                             .WithLeadingTrivia(node.GetLeadingTrivia())
                             .WithTrailingTrivia(node.GetTrailingTrivia());
                     }
 
 
                 }
-                return base.VisitExpressionStatement(node);
+                return base.VisitInvocationExpression(node);
             }
 
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
@@ -652,12 +662,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             SemanticModel semanticModel;
             public GeneralWorkFlowRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
 
-            public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
+            public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
             {
-                var s = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                var s = node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>()
                         .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnClick").FirstOrDefault();
                 if (s == null)
-                    return base.VisitExpressionStatement(node);
+                    return base.VisitInvocationExpression(node);
                 var methodSymbol = (semanticModel.GetSymbolInfo(s).Symbol as IMethodSymbol);
 
                 if (s.ArgumentList.Arguments.Count() == 1 &&
@@ -685,25 +695,25 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             return nde2;
                         });
 
-                    newNode = newNode.ReplaceNode(newNode.DescendantNodes().OfType<IdentifierNameSyntax>()
+                    newNode = newNode.ReplaceNode(newNode.DescendantNodesAndSelf().OfType<IdentifierNameSyntax>()
                             .FirstOrDefault(x => x.Identifier.ToString() == "OnClick"),
                                 SyntaxFactory.GenericName(goIdentifier.Identifier, goIdentifier.TypeArgumentList));
                     return newNode;
                 }
-                return base.VisitExpressionStatement(node);
+                return base.VisitInvocationExpression(node);
             }
         }
         class ListModuleWorkFlowRewriter : CSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
             public ListModuleWorkFlowRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
-            public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
+            public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
             {
-                var s = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                var s = node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>()
                         .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "Go" ||
                         (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnClick").FirstOrDefault();
                 if (s == null)
-                    return base.VisitExpressionStatement(node);
+                    return base.VisitInvocationExpression(node);
                 var editRequiredArguments = new string[] { "SendItemId", "SendReturnUrl" };
                 var newRequiredArguments = new string[] { "SendReturnUrl" };
                 var methodSymbol = (semanticModel.GetSymbolInfo(s).Symbol as IMethodSymbol);
@@ -712,9 +722,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     s.ArgumentList.Arguments.Count() == 1 &&
                     editRequiredArguments.All(x => (s.ArgumentList.Arguments.FirstOrDefault().DescendantNodes()
                         .OfType<InvocationExpressionSyntax>()
-                        .Select(y => ((MemberAccessExpressionSyntax)y.Expression).Name.ToString())).Any(y => y == x)))
+                        .Select(y => ((MemberAccessExpressionSyntax)y.Expression).Name.ToString())).Any(y => y == x)) &&
+                    s.DescendantNodes().OfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
+                        ((MemberAccessExpressionSyntax)x.Expression).Expression is IdentifierNameSyntax &&
+                        ((IdentifierNameSyntax)(((MemberAccessExpressionSyntax)x.Expression).Expression)).Identifier.ToString() == "column").Count() == 1)
                 {
-                    var m = node.ChildNodes().FirstOrDefault();
+                    var m = node;
                     var newExpression = SyntaxFactory.InvocationExpression(
                             SyntaxFactory.MemberAccessExpression(
                                 SyntaxKind.SimpleMemberAccessExpression,
@@ -722,7 +735,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 SyntaxFactory.GenericName(SyntaxFactory.Identifier("Edit"),
                                 ((GenericNameSyntax)(((MemberAccessExpressionSyntax)s.Expression).Name)).TypeArgumentList)),
                             SyntaxFactory.ArgumentList());
-                    while (m.ChildNodes().Any())
+                    while (m != null && m.ChildNodes().Any())
                     {
                         var m2 = m.ChildNodes();
                         if (m2.FirstOrDefault() is MemberAccessExpressionSyntax &&
@@ -735,7 +748,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                    .Expression.DescendantNodes().OfType<InvocationExpressionSyntax>()
                                    .FirstOrDefault().ToString().Contains(x)))))
                             {
-                                return base.VisitExpressionStatement(node);
+                                return base.VisitInvocationExpression(node);
                             }
                             else if (methodName.Name.ToString() == "Icon" && (arguments.Arguments.Count != 1
                                         || arguments.Arguments.FirstOrDefault().Expression.ToString() != "FA.Edit"))
@@ -782,11 +795,11 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                         SyntaxFactory.MemberAccessExpression(
                                             SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
                             }
-                            m = (m2.FirstOrDefault() as MemberAccessExpressionSyntax).Expression;
+                            m = (m2.FirstOrDefault() as MemberAccessExpressionSyntax).Expression
+                                as InvocationExpressionSyntax;
                         }
                     }
-                    if (m.ToString() == "column")
-                        return SyntaxFactory.ExpressionStatement(newExpression)
+                    return newExpression
                                 .WithLeadingTrivia(node.GetLeadingTrivia())
                                 .WithTrailingTrivia(node.GetTrailingTrivia());
                 }
@@ -796,7 +809,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             .OfType<InvocationExpressionSyntax>()
                             .Select(y => ((MemberAccessExpressionSyntax)y.Expression).Name.ToString())).Any(y => y == x)))
                 {
-                    var m = node.ChildNodes().FirstOrDefault();
+                    var m = node;
                     var newExpression = SyntaxFactory.InvocationExpression(
                             SyntaxFactory.MemberAccessExpression(
                                 SyntaxKind.SimpleMemberAccessExpression,
@@ -804,7 +817,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 SyntaxFactory.GenericName(SyntaxFactory.Identifier("New"),
                                 ((GenericNameSyntax)(((MemberAccessExpressionSyntax)s.Expression).Name)).TypeArgumentList)),
                             SyntaxFactory.ArgumentList());
-                    while (m.ChildNodes().Any())
+                    while (m != null && m.ChildNodes().Any())
                     {
                         var m2 = m.ChildNodes();
                         if (m2.FirstOrDefault() is MemberAccessExpressionSyntax &&
@@ -817,7 +830,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                    .Expression.DescendantNodes().OfType<InvocationExpressionSyntax>()
                                    .FirstOrDefault().ToString().Contains(x)))))
                             {
-                                return base.VisitExpressionStatement(node);
+                                return base.VisitInvocationExpression(node);
                             }
                             else if (methodName.Name.ToString() == "Icon" && (arguments.Arguments.Count != 1
                                         || arguments.Arguments.FirstOrDefault().Expression.ToString() != "FA.Plus"))
@@ -833,7 +846,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                         SyntaxFactory.MemberAccessExpression(
                                             SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
                             }
-                            m = (m2.FirstOrDefault() as MemberAccessExpressionSyntax).Expression;
+                            m = (m2.FirstOrDefault() as MemberAccessExpressionSyntax).Expression as InvocationExpressionSyntax;
                         }
                         else if (m2.FirstOrDefault() is IdentifierNameSyntax &&
                              m2.LastOrDefault() is ArgumentListSyntax)
@@ -843,12 +856,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             if (methodName.ToString() == "Button" && (arguments.Arguments.Count != 1
                                     || arguments.Arguments.FirstOrDefault().Expression.ToString() != "\"New\""))
                             {
-                                return base.VisitExpressionStatement(node);
+                                return base.VisitInvocationExpression(node);
                             }
-                            m = m2.FirstOrDefault();
+                            m = m2.FirstOrDefault() as InvocationExpressionSyntax;
                         }
                     }
-                    return SyntaxFactory.ExpressionStatement(newExpression)
+                    return newExpression
                                 .WithLeadingTrivia(node.GetLeadingTrivia())
                                 .WithTrailingTrivia(node.GetTrailingTrivia());
                 }
@@ -962,9 +975,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                     return newNode;
                 }
-                return base.VisitExpressionStatement(node);
+                return base.VisitInvocationExpression(node);
             }
-
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
                 if (node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
