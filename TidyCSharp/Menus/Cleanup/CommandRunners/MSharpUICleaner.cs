@@ -3,6 +3,7 @@ using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.FindSymbols;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -41,6 +42,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 .Visit(initialSourceNode);
             initialSourceNode = this.RefreshResult(initialSourceNode);
             initialSourceNode = new ListModuleWorkFlowRewriter(ProjectItemDetails.SemanticModel)
+                .Visit(initialSourceNode);
+            initialSourceNode = this.RefreshResult(initialSourceNode);
+            initialSourceNode = new FullSearchRewriter(ProjectItemDetails.SemanticModel)
                 .Visit(initialSourceNode);
             return initialSourceNode;
         }
@@ -711,7 +715,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 var s = node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>()
                         .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "Go" ||
-                        (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnClick").FirstOrDefault();
+                        (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnClick" ||
+                        (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "Link").FirstOrDefault();
                 if (s == null)
                     return base.VisitInvocationExpression(node);
                 var editRequiredArguments = new string[] { "SendItemId", "SendReturnUrl" };
@@ -975,7 +980,97 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                     return newNode;
                 }
+                else if (node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
+                         ((MemberAccessExpressionSyntax)x.Expression).Expression is IdentifierNameSyntax &&
+                         ((IdentifierNameSyntax)(((MemberAccessExpressionSyntax)x.Expression).Expression)).Identifier.ToString() == "column").Count() == 1 &&
+                         node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
+                        ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == "HeaderText" &&
+                        x.ArgumentList.Arguments.Count() == 1).Count() == 1 &&
+                        node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
+                        ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == "Link" &&
+                        x.ArgumentList.Arguments.Count() == 1).Count() == 1)
+                {
+                    var linkMethod = node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
+                        ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == "Link" &&
+                        x.ArgumentList.Arguments.Count() == 1).FirstOrDefault();
+                    var headerTextMethod = node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
+                        ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == "HeaderText" &&
+                        x.ArgumentList.Arguments.Count() == 1).FirstOrDefault();
+
+                    if (linkMethod.ArgumentList.Arguments.FirstOrDefault().ToString()
+                        .Contains("item." + headerTextMethod.ArgumentList.Arguments.FirstOrDefault()
+                        .ToString().Trim('"')))
+                    {
+                        SeparatedSyntaxList<ArgumentSyntax> args = new SeparatedSyntaxList<ArgumentSyntax>();
+                        args = args.Add(SyntaxFactory.Argument(
+                                SyntaxFactory.SimpleLambdaExpression(SyntaxFactory.Parameter(
+                                    SyntaxFactory.ParseToken("x")), null,
+                                    SyntaxFactory.MemberAccessExpression
+                                    (SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.ParseExpression("x"),
+                                    SyntaxFactory.IdentifierName(headerTextMethod.ArgumentList.Arguments.FirstOrDefault()
+                        .ToString().Trim('"'))))));
+                        var newNode = node.ReplaceNodes(node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>(),
+                       (nde1, nde2) =>
+                       {
+                           if (nde1.Expression is MemberAccessExpressionSyntax &&
+                            ((MemberAccessExpressionSyntax)nde1.Expression).Name is IdentifierNameSyntax &&
+                            ((MemberAccessExpressionSyntax)nde1.Expression).Name.Identifier.ToString() == "HeaderText" &&
+                                nde1.ArgumentList.Arguments.Count == 1)
+                           {
+                               if (!(((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax))
+                                   return nde2.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+                               else return nde2.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+                           }
+                           else if (nde1.Expression is MemberAccessExpressionSyntax &&
+                             ((MemberAccessExpressionSyntax)nde1.Expression).Name.ToString() == "Link" &&
+                             nde1.ArgumentList.Arguments.Count() == 1)
+                           {
+                               return SyntaxFactory.InvocationExpression(
+                                     SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression
+                                     , SyntaxFactory.ParseExpression("column"),
+                                     SyntaxFactory.IdentifierName("Link")),
+                                     SyntaxFactory.ArgumentList(args))
+                                            .WithLeadingTrivia(nde1.GetLeadingTrivia())
+                                            .WithTrailingTrivia(nde1.GetTrailingTrivia());
+                           }
+
+                           return nde2;
+                       });
+                        return newNode;
+                    }
+                }
                 return base.VisitInvocationExpression(node);
+            }
+            public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
+            {
+                if (node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
+                     ((GenericNameSyntax)x.Type).Identifier.Text == "ListModule"))
+                    return base.VisitClassDeclaration(node);
+                return node;
+            }
+        }
+        class FullSearchRewriter : CSharpSyntaxRewriter
+        {
+            SemanticModel semanticModel;
+            public FullSearchRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
+
+            public override SyntaxNode VisitVariableDeclarator(VariableDeclaratorSyntax node)
+            {
+                return base.VisitVariableDeclarator(node);
+            }
+            public override SyntaxNode VisitVariableDeclaration(VariableDeclarationSyntax node)
+            {
+                var declarationSymbol = semanticModel.GetSymbolInfo(node.Type).Symbol;
+                if (declarationSymbol.Name == "ModuleButton" &&
+                    node.Variables.Count() == 1)
+                {
+                    //SymbolFinder.FindReferencesAsync(declarationSymbol,this.solu);
+                }
+                return base.VisitVariableDeclaration(node);
+            }
+            public override SyntaxNode VisitLocalDeclarationStatement(LocalDeclarationStatementSyntax node)
+            {
+                return base.VisitLocalDeclarationStatement(node);
             }
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
