@@ -1,7 +1,11 @@
 using EnvDTE;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.FindSymbols;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 using RoslynDocument = Microsoft.CodeAnalysis.Document;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup

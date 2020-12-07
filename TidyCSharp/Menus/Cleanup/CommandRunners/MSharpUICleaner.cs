@@ -5,7 +5,10 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.FindSymbols;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
+using RoslynDocument = Microsoft.CodeAnalysis.Document;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -44,7 +47,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             initialSourceNode = new ListModuleWorkFlowRewriter(ProjectItemDetails.SemanticModel)
                 .Visit(initialSourceNode);
             initialSourceNode = this.RefreshResult(initialSourceNode);
-            initialSourceNode = new FullSearchRewriter(ProjectItemDetails.SemanticModel)
+            initialSourceNode = new FullSearchRewriter(ProjectItemDetails.SemanticModel
+                , ProjectItemDetails.ProjectItemDocument.Project.Solution
+                , ProjectItemDetails.ProjectItemDocument)
                 .Visit(initialSourceNode);
             return initialSourceNode;
         }
@@ -1052,25 +1057,110 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         class FullSearchRewriter : CSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
-            public FullSearchRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
+            Solution solution;
+            RoslynDocument roslynDocument;
 
-            public override SyntaxNode VisitVariableDeclarator(VariableDeclaratorSyntax node)
+            bool shouldConvertToFullSearch = false;
+            public FullSearchRewriter(SemanticModel semanticModel,
+                Solution solution,
+                RoslynDocument roslynDocument)
             {
-                return base.VisitVariableDeclarator(node);
+                this.semanticModel = semanticModel;
+                this.solution = solution;
+                this.roslynDocument = roslynDocument;
             }
+
             public override SyntaxNode VisitVariableDeclaration(VariableDeclarationSyntax node)
             {
                 var declarationSymbol = semanticModel.GetSymbolInfo(node.Type).Symbol;
+                var identifierName = semanticModel.GetDeclaredSymbol(node.Variables.FirstOrDefault());
                 if (declarationSymbol.Name == "ModuleButton" &&
                     node.Variables.Count() == 1)
                 {
-                    //SymbolFinder.FindReferencesAsync(declarationSymbol,this.solu);
+                    if (node.Variables.FirstOrDefault().Initializer.Value is InvocationExpressionSyntax &&
+                        ((MemberAccessExpressionSyntax)((InvocationExpressionSyntax)node.Variables.FirstOrDefault()
+                        .Initializer.Value).Expression).Name.ToString() == "Icon")
+                    {
+                        var invocation = node.Variables.FirstOrDefault().Initializer.Value
+                            as InvocationExpressionSyntax;
+                        var result = Task.Run(() => GetReferencedSymbolsAsync(identifierName)).Result;
+                        if (result.Count() == 1 && invocation.ArgumentList.Arguments.Count() == 0)
+                        {
+                            SyntaxNode nextNode = node.SyntaxTree.GetRoot().FindNode(result.FirstOrDefault().Locations
+                                .FirstOrDefault().Location.SourceSpan);
+                            if (nextNode.Ancestors().OfType<InvocationExpressionSyntax>().Any())
+                            {
+                                var isNextInvocOk = CheckNextInvocationExpression(nextNode.Ancestors()
+                                    .OfType<InvocationExpressionSyntax>().FirstOrDefault(),
+                                    identifierName.ToString());
+                                if (isNextInvocOk)
+                                {
+                                    shouldConvertToFullSearch = true;
+                                    return SyntaxFactory.InvocationExpression(
+                                        SyntaxFactory.MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            SyntaxFactory.ParseExpression("search"),
+                                            SyntaxFactory.IdentifierName("FullWithIcon")),
+                                        SyntaxFactory.ArgumentList())
+                                        .WithLeadingTrivia(node.GetLeadingTrivia())
+                                        .WithTrailingTrivia(node.GetTrailingTrivia());
+                                }
+                            }
+                        }
+                    }
                 }
                 return base.VisitVariableDeclaration(node);
             }
             public override SyntaxNode VisitLocalDeclarationStatement(LocalDeclarationStatementSyntax node)
             {
+                if (node.Declaration is VariableDeclarationSyntax)
+                {
+                    var t = VisitVariableDeclaration(node.Declaration);
+                    if (t.IsKind(SyntaxKind.InvocationExpression))
+                        return SyntaxFactory.ExpressionStatement(t as InvocationExpressionSyntax)
+                            .WithTrailingTrivia(node.GetTrailingTrivia())
+                            .WithLeadingTrivia(node.GetLeadingTrivia());
+                }
                 return base.VisitLocalDeclarationStatement(node);
+            }
+
+            public override SyntaxNode VisitVariableDeclarator(VariableDeclaratorSyntax node)
+            {
+                return base.VisitVariableDeclarator(node);
+            }
+            public bool CheckNextInvocationExpression(InvocationExpressionSyntax node
+                , string identifierString)
+            {
+                var s = node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>()
+                        .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "AfterControlAddon").FirstOrDefault();
+                while (s.Expression != null)
+                {
+                    if (s.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression))
+                    {
+                        var memberExpression = s.Expression as MemberAccessExpressionSyntax;
+                        if (memberExpression.Name.ToString() == "AfterControlAddon" &&
+                            s.ArgumentList.Arguments.Count() == 1 &&
+                            s.ArgumentList.Arguments.FirstOrDefault().Expression.ToString() ==
+                            $"{identifierString}.Ref")
+                        {
+                            s = memberExpression.Expression as InvocationExpressionSyntax;
+                            continue;
+                        }
+                    }
+                    else if (s.Expression.IsKind(SyntaxKind.IdentifierName))
+                    {
+                        var identifierExpression = s.Expression as IdentifierNameSyntax;
+                        if (identifierExpression.Identifier.ToString() == "Search" &&
+                            s.ArgumentList.Arguments.Count() == 1 &&
+                            s.ArgumentList.Arguments.FirstOrDefault().Expression.ToString() ==
+                            "GeneralSearch.AllFields")
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                return false;
             }
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
@@ -1078,6 +1168,32 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                      ((GenericNameSyntax)x.Type).Identifier.Text == "ListModule"))
                     return base.VisitClassDeclaration(node);
                 return node;
+            }
+
+            public async Task<IEnumerable<ReferencedSymbol>> GetReferencedSymbolsAsync(ISymbol symbol)
+            {
+                return await SymbolFinder.FindReferencesAsync(symbol,
+                    solution, documents:
+                    ImmutableHashSet.Create(this.roslynDocument));
+            }
+            public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
+            {
+                var s = node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>()
+                        .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "AfterControlAddon").FirstOrDefault();
+                if (s != null && shouldConvertToFullSearch)
+                {
+                    shouldConvertToFullSearch = false;
+                    return SyntaxFactory.ParseExpression("");
+                }
+                return base.VisitInvocationExpression(node);
+            }
+
+            public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
+            {
+                var result = base.VisitExpressionStatement(node);
+                if (result.ToString() == ";")
+                    return null;
+                return result;
             }
         }
     }
