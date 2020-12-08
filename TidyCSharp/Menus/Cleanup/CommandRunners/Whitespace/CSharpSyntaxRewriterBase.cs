@@ -1,6 +1,7 @@
 ﻿using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -89,6 +90,46 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             syntaxTrivias = ProcessSpecialTrivias(syntaxTrivias, itsForCloseBrace);
 
             return syntaxTrivias;
+        }
+
+        protected StatementSyntax CleanUpListWithDefaultEndOfLines(StatementSyntax statementNode
+            , ref bool _needLeadingdoubleLine
+            , ref bool _hasPreviousStatement)
+        {
+            if (statementNode.WithoutLeadingTrivia()
+                .WithoutTrailingTrivia().DescendantTrivia()
+                .Where(x => x.IsKind(SyntaxKind.EndOfLineTrivia)).Count() > 0)
+            {
+                var leading = statementNode.GetLeadingTrivia();
+
+                SyntaxTriviaList leadingTrivias = new SyntaxTriviaList();
+                if ((_needLeadingdoubleLine || _hasPreviousStatement) &&
+                    !leading.FirstOrDefault().IsKind(SyntaxKind.EndOfLineTrivia))
+                    leadingTrivias = new SyntaxTriviaList(SyntaxFactory.EndOfLine("\n"));
+
+                _hasPreviousStatement = true;
+                _needLeadingdoubleLine = true;
+                leadingTrivias = leadingTrivias.AddRange(leading);
+
+                return statementNode.WithLeadingTrivia(leadingTrivias);
+            }
+            else if (_needLeadingdoubleLine)
+            {
+                var leading = statementNode.GetLeadingTrivia();
+
+                SyntaxTriviaList leadingTrivias = new SyntaxTriviaList();
+                if ((_needLeadingdoubleLine || _hasPreviousStatement) &&
+                    !leading.FirstOrDefault().IsKind(SyntaxKind.EndOfLineTrivia))
+                    leadingTrivias = new SyntaxTriviaList(SyntaxFactory.EndOfLine("\n"));
+
+                _hasPreviousStatement = true;
+                leadingTrivias = leadingTrivias.AddRange(leading);
+                _needLeadingdoubleLine = false;
+                return statementNode.WithLeadingTrivia(leadingTrivias);
+            }
+            _needLeadingdoubleLine = false;
+            _hasPreviousStatement = true;
+            return statementNode;
         }
 
         protected SyntaxTriviaList CleanUpListWithExactNumberOfWhitespaces(SyntaxTriviaList syntaxTrivias, int exactNumberOfBlanks, CleanupTypes? options, bool itsForCloseBrace = false)

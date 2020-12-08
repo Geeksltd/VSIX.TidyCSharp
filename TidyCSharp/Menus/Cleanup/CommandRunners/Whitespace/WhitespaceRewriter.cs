@@ -12,6 +12,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
         MemberDeclarationSyntax _LastMember;
         bool _lastTokenIsAOpenBrace;
         bool _lastTokenIsACloseBrace;
+        bool _needLeadingDoubleEndOfLine = false;
+        bool _isPreviousStatementMultiLine = false;
         public WhitespaceRewriter(SyntaxNode initialSource, Options options) : base(initialSource, options) { }
 
         public SyntaxNode Apply()
@@ -214,6 +216,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
             statementNode = statementNode.WithLeadingTrivia(leadingTriviaList);
 
+            if (CheckOption((int)CleanupTypes.Add_blank_line_between_statements_more_than_one_line))
+            {
+                statementNode = CleanUpListWithDefaultEndOfLines(statementNode, ref _needLeadingDoubleEndOfLine , ref _isPreviousStatementMultiLine);
+            }
             // _LastMember = null;
 
             return statementNode;
