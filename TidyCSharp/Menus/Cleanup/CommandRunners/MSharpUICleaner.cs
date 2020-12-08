@@ -51,6 +51,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 , ProjectItemDetails.ProjectItemDocument.Project.Solution
                 , ProjectItemDetails.ProjectItemDocument)
                 .Visit(initialSourceNode);
+            initialSourceNode = this.RefreshResult(initialSourceNode);
+            initialSourceNode = new CustomFieldRewriter(ProjectItemDetails.SemanticModel)
+                .Visit(initialSourceNode);
             return initialSourceNode;
         }
 
@@ -1194,6 +1197,117 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 if (result.ToString() == ";")
                     return null;
                 return result;
+            }
+        }
+        class CustomFieldRewriter : CSharpSyntaxRewriter
+        {
+            SemanticModel semanticModel;
+            public CustomFieldRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
+
+            public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
+            {
+                var customColumnNode = node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>()
+                    .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "CustomField").FirstOrDefault();
+
+                if (customColumnNode != null)
+                {
+                    var newNode = node.ReplaceNodes(node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>(),
+                        (nde1, nde2) =>
+                        {
+                            if (nde1.ToString() == "CustomField()")
+                            {
+                                SeparatedSyntaxList<ArgumentSyntax> args = new SeparatedSyntaxList<ArgumentSyntax>();
+                                var argsLabel =
+                                node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>()
+                                    .Any(x =>
+                                    x.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
+                                    ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == "Label")
+                                    ?
+                                node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>()
+                                    .Where(x => x.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
+                                    x.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
+                                    ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() ==
+                                    "Label").FirstOrDefault().ArgumentList : null;
+                                var argsControlType =
+                                node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>()
+                                    .Any(x =>
+                                    x.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
+                                    ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == "Control")
+                                    ?
+                                node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>()
+                                    .Where(x =>
+                                    x.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
+                                    ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == "Control").FirstOrDefault().ArgumentList
+                                    : SyntaxFactory.ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>().Add(
+                                        SyntaxFactory.Argument(
+                                        SyntaxFactory.ParseExpression("ControlType.Textbox"))));
+                                var argsPropertyType =
+                                     node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>()
+                                     .Any(x =>
+                                     x.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
+                                     ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == "PropertyType")
+                                    ? node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>()
+                                        .Where(x => ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == "PropertyType").FirstOrDefault().ArgumentList
+                                        : null;
+
+                                if (argsPropertyType != null && argsLabel == null)
+                                {
+                                    argsLabel = SyntaxFactory.ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>().Add(
+                                        SyntaxFactory.Argument(
+                                        SyntaxFactory.ParseExpression("\"\""))));
+                                }
+
+                                if (argsLabel != null && argsLabel.Arguments.Count == 1)
+                                    args = args.Add(argsLabel.Arguments.FirstOrDefault());
+
+                                if (argsControlType.Arguments.Count == 1)
+                                    args = args.Add(argsControlType.Arguments.FirstOrDefault());
+
+                                return SyntaxFactory.InvocationExpression(
+                                    SyntaxFactory.MemberAccessExpression(
+                                         SyntaxKind.SimpleMemberAccessExpression,
+                                        SyntaxFactory.ParseExpression("field"),
+                                    (argsPropertyType != null ?
+                                    SyntaxFactory.GenericName("Custom")
+                                        .WithTypeArgumentList(
+                                        SyntaxFactory.TypeArgumentList(new SeparatedSyntaxList<TypeSyntax>()
+                                        .Add(SyntaxFactory.ParseTypeName(argsPropertyType.Arguments.FirstOrDefault()
+                                        .ToString().Trim('"'))))) as SimpleNameSyntax
+                                    : SyntaxFactory.IdentifierName("Custom") as SimpleNameSyntax)),
+                                    SyntaxFactory.ArgumentList(args))
+                                .WithLeadingTrivia(nde1.GetLeadingTrivia());
+                            }
+                            else if (((MemberAccessExpressionSyntax)nde1.Expression).Name.ToString() ==
+                               "Label" &&
+                               nde1.ArgumentList.Arguments.Count == 1)
+                            {
+                                return nde2.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+                            }
+                            else if (((MemberAccessExpressionSyntax)nde1.Expression).Name.ToString() ==
+                              "Control" &&
+                              nde1.ArgumentList.Arguments.Count == 1)
+                            {
+                                return nde2.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+                            }
+                            else if (((MemberAccessExpressionSyntax)nde1.Expression).Name.ToString() ==
+                               "PropertyType" &&
+                               nde1.ArgumentList.Arguments.Count == 1)
+                            {
+                                return nde2.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+                            }
+
+                            return nde2;
+                        });
+                    return newNode;
+                }
+                return base.VisitInvocationExpression(node);
+            }
+            public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
+            {
+                if (node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
+                     ((GenericNameSyntax)x.Type).Identifier.Text == "FormModule"))
+                    return base.VisitClassDeclaration(node);
+                return node;
             }
         }
     }
