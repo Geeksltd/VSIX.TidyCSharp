@@ -56,5 +56,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
         [CleanupItem(Title = "Renew M# Model methods", FirstOrder = 13)]
         ConvertMsharpModelMethods = 0x26,
+
+        [CleanupItem(Title = "Renew M# General Statements", FirstOrder = 14)]
+        ConvertMsharpGeneralMethods = 0x27,
     }
 }

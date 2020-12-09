@@ -43,6 +43,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                     return new MSharpUICleaner();
                 case CodeCleanerType.ConvertMsharpModelMethods:
                     return new MSharpModelCleaner();
+                case CodeCleanerType.ConvertMsharpGeneralMethods:
+                    return new MSharpGeneralCleaner();
 
                 default: return null; // TODO
             }

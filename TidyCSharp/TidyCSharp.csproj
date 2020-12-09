@@ -450,6 +450,7 @@
     <Compile Include="Menus\ActionsOnCSharp\ActionsCSharpOnFile.cs" />
     <Compile Include="Menus\ActionsOnCSharp\CSharpActionDelegate.cs" />
     <Compile Include="Menus\ActionsOnCSharp\DteServiceProvider.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\MSharpGeneralCleaner.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\MSharpModelCleaner.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\MSharpUICleaner.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\CamelCasedClassFields\CamelCasedFields.cs" />
