@@ -62,7 +62,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         class CsMethodStringRewriter : CSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
-            int lastNewLinePosition;
             public CsMethodStringRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
             public override SyntaxNode VisitLiteralExpression(LiteralExpressionSyntax node)
             {
