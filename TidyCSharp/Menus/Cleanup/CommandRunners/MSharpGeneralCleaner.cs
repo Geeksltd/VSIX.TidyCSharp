@@ -14,11 +14,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
     {
         public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
         {
-            return ChangeMethodHelper(initialSourceNode, ProjectItemDetails.SemanticModel);
+            return ChangeMethodHelper(initialSourceNode);
         }
-        SyntaxNode ChangeMethodHelper(SyntaxNode initialSourceNode, SemanticModel semanticModel)
+        SyntaxNode ChangeMethodHelper(SyntaxNode initialSourceNode)
         {
-            initialSourceNode = new MultiLineExpressionRewriter(semanticModel).Visit(initialSourceNode);
+            initialSourceNode = new MultiLineExpressionRewriter(ProjectItemDetails.SemanticModel).Visit(initialSourceNode);
+            initialSourceNode = this.RefreshResult(initialSourceNode);
+            initialSourceNode = new CsMethodStringRewriter(ProjectItemDetails.SemanticModel).Visit(initialSourceNode);
             return initialSourceNode;
         }
         class MultiLineExpressionRewriter : CSharpSyntaxRewriter
@@ -57,5 +59,24 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return node;
             }
         }
+        class CsMethodStringRewriter : CSharpSyntaxRewriter
+        {
+            SemanticModel semanticModel;
+            int lastNewLinePosition;
+            public CsMethodStringRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
+            public override SyntaxNode VisitLiteralExpression(LiteralExpressionSyntax node)
+            {
+                if (node.Token.ValueText.StartsWith("c#:"))
+                {
+                    var args = new SeparatedSyntaxList<ArgumentSyntax>();
+                    args = args.Add(SyntaxFactory.Argument(
+                        SyntaxFactory.ParseExpression($"\"{node.Token.ValueText.Substring(3)}\"")));
+                    return SyntaxFactory.InvocationExpression(SyntaxFactory.IdentifierName("cs")
+                        , SyntaxFactory.ArgumentList(args));
+                }
+                return base.VisitLiteralExpression(node);
+            }
+        }
+
     }
 }
