@@ -386,6 +386,16 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     if (node.ArgumentList.Arguments.Count == 1 && node.ArgumentList.Arguments[0].Expression is SimpleLambdaExpressionSyntax)
                     {
                         var arg = ((MemberAccessExpressionSyntax)((SimpleLambdaExpressionSyntax)node.ArgumentList.Arguments[0].Expression).Body).Name;
+                        return SyntaxFactory.InvocationExpression(SyntaxFactory.MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            node.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) ?
+                            SyntaxFactory.MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                ((MemberAccessExpressionSyntax)(node.Expression)).Expression,
+                                SyntaxFactory.IdentifierName(((MemberAccessExpressionSyntax)(node.Expression)).Name.ToString().ToLower()))
+                            : SyntaxFactory.ParseExpression(methodName.ToLower()),
+                            SyntaxFactory.IdentifierName(arg.ToString())))
+                            .WithLeadingTrivia(node.GetLeadingTrivia());
                         return SyntaxFactory.ParseExpression($"{methodName.ToLower()}.{arg}()")
                             .WithLeadingTrivia(node.GetLeadingTrivia());
                     }
