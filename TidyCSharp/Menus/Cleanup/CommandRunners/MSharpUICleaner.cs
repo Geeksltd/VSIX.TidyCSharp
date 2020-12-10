@@ -210,7 +210,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             }
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                if (node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
+                if (node.BaseList != null &&
+                    node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
                      ((GenericNameSyntax)x.Type).Identifier.Text == "FormModule"))
                     return base.VisitClassDeclaration(node);
                 return node;
@@ -223,7 +224,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             public override SyntaxNode VisitSimpleLambdaExpression(SimpleLambdaExpressionSyntax node)
             {
                 var ifNode = node.DescendantNodes().OfType<InvocationExpressionSyntax>()
-                    .Where(x => ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == "If" &&
+                    .Where(x =>
+                    x.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
+                    ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == "If" &&
                     !(((MemberAccessExpressionSyntax)x.Expression).Expression is IdentifierNameSyntax))
                     .FirstOrDefault();
                 if (ifNode != null)
@@ -320,7 +323,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             }
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                if (node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
+                if (node.BaseList != null &&
+                    node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
                      ((GenericNameSyntax)x.Type).Identifier.Text == "ListModule"))
                     return base.VisitClassDeclaration(node);
                 return node;
@@ -662,7 +666,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                if (node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
+                if (node.BaseList != null &&
+                    node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
                      ((GenericNameSyntax)x.Type).Identifier.Text == "FormModule"))
                     return base.VisitClassDeclaration(node);
                 return node;
@@ -1051,7 +1056,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             }
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                if (node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
+                if (node.BaseList != null &&
+                    node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
                      ((GenericNameSyntax)x.Type).Identifier.Text == "ListModule"))
                     return base.VisitClassDeclaration(node);
                 return node;
@@ -1167,7 +1173,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             }
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                if (node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
+                if (node.BaseList != null &&
+                    node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
                      ((GenericNameSyntax)x.Type).Identifier.Text == "ListModule"))
                     return base.VisitClassDeclaration(node);
                 return node;
@@ -1304,7 +1311,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             }
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                if (node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
+                if (node.BaseList != null &&
+                    node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
                      ((GenericNameSyntax)x.Type).Identifier.Text == "FormModule"))
                     return base.VisitClassDeclaration(node);
                 return node;
