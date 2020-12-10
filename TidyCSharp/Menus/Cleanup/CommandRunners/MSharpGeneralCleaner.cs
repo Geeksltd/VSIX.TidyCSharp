@@ -26,35 +26,23 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         class MultiLineExpressionRewriter : CSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
-            int lastNewLinePosition;
             public MultiLineExpressionRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
-            public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
+
+            public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
             {
+                if (node.ToString().Split('\n').Any(x => x.Length > 110))
+                    return base.VisitExpressionStatement(node);
+
                 var tokens = node.DescendantTokens().Where(x => x.IsKind(SyntaxKind.DotToken))
                     .Where(x => x.Parent.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
                         x.Parent.Parent.IsKind(SyntaxKind.InvocationExpression));
                 node = node.ReplaceTokens(tokens, (nde1, nde2) =>
                 {
-                    if (lastNewLinePosition == 0)
-                    {
-                        lastNewLinePosition = ((MemberAccessExpressionSyntax)nde2.Parent).Expression.SpanStart;
-                    }
-                    var lastEndOfLineTrivia = ((MemberAccessExpressionSyntax)nde2.Parent).DescendantTrivia()
-                    .Where(x => x.IsKind(SyntaxKind.EndOfLineTrivia)).Select(x => x.SpanStart);
-                    if (lastEndOfLineTrivia.Any())
-                    {
-                        if (lastEndOfLineTrivia.LastOrDefault() > lastNewLinePosition)
-                            lastNewLinePosition = lastEndOfLineTrivia.LastOrDefault();
-                    }
-                    if (((MemberAccessExpressionSyntax)nde2.Parent).Expression.Span.End - lastNewLinePosition > 50)
-                    {
-                        var trivia = new SyntaxTriviaList(SyntaxFactory.EndOfLine("\n"));
-                        trivia = trivia.AddRange(nde2.Parent.GetLeadingTrivia()
+                    var trivia = new SyntaxTriviaList(SyntaxFactory.EndOfLine("\n"));
+                    trivia = trivia.AddRange(node.GetLeadingTrivia()
                             .Where(x => !x.IsKind(SyntaxKind.EndOfLineTrivia)));
-                        lastNewLinePosition = nde1.SpanStart;
-                        return nde2.WithLeadingTrivia(trivia);
-                    }
-                    return nde2;
+                    trivia = trivia.Add(SyntaxFactory.Tab);
+                    return nde2.WithLeadingTrivia(trivia);
                 });
                 return node;
             }
@@ -69,7 +57,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 {
                     var args = new SeparatedSyntaxList<ArgumentSyntax>();
                     args = args.Add(SyntaxFactory.Argument(
-                        SyntaxFactory.ParseExpression($"\"{node.Token.ValueText.Substring(3)}\"")));
+                        SyntaxFactory.ParseExpression("\"" + node.Token.Text.TrimStart("\"c#:"))));
                     return SyntaxFactory.InvocationExpression(SyntaxFactory.IdentifierName("cs")
                         , SyntaxFactory.ArgumentList(args));
                 }
