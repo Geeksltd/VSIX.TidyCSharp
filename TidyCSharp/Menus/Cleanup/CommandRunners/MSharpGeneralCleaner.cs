@@ -30,7 +30,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
             {
-                if (node.ToString().Split('\n').Any(x => x.Length > 110))
+                if (node.ToString().Split('\n').All(x => x.Length < 110))
                     return base.VisitExpressionStatement(node);
 
                 var tokens = node.DescendantTokens().Where(x => x.IsKind(SyntaxKind.DotToken))
