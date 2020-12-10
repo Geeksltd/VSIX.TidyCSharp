@@ -15,7 +15,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
         public Options Options { get; set; }
 
-        public static SyntaxNode NormalizeWhiteSpaceHelper(SyntaxNode initialSourceNode, Options options)
+        public SyntaxNode NormalizeWhiteSpaceHelper(SyntaxNode initialSourceNode, Options options)
         {
             if (TidyCSharpPackage.Instance != null)
             {
@@ -23,7 +23,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             }
 
             initialSourceNode = new BlockRewriter(initialSourceNode, options).Visit(initialSourceNode);
+            initialSourceNode = RefreshResult(initialSourceNode);
             initialSourceNode = new WhitespaceRewriter(initialSourceNode, options).Apply();
+            if (CheckOption((int)CleanupTypes.Add_blank_line_between_statements_more_than_one_line))
+            {
+                initialSourceNode = RefreshResult(initialSourceNode);
+                initialSourceNode = new BlankLineRewriter(this.ProjectItemDetails.SemanticModel).Visit(initialSourceNode);
+            }
             return initialSourceNode;
         }
     }
