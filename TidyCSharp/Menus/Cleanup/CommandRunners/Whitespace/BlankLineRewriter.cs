@@ -13,8 +13,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
     {
         SemanticModel semanticModel;
         public BlankLineRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
-
-
         public override SyntaxNode VisitBlock(BlockSyntax node)
         {
             bool writeTrailing = false;
