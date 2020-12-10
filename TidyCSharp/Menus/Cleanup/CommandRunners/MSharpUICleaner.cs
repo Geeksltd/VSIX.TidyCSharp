@@ -707,6 +707,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 {
                     GenericNameSyntax goIdentifier = s.ArgumentList.Arguments.FirstOrDefault()
                         .DescendantNodes().OfType<GenericNameSyntax>().FirstOrDefault(x => x.Identifier.ToString() == "Go");
+
                     var newNode = node.ReplaceNodes(s.ArgumentList.Arguments.FirstOrDefault()
                         .DescendantNodes().OfType<InvocationExpressionSyntax>(),
                         (nde1, nde2) =>
@@ -717,7 +718,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             {
                                 if (!(((MemberAccessExpressionSyntax)nde1.Expression).Expression is IdentifierNameSyntax))
                                     return nde2.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault();
-                                else return nde2.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+                                else
+                                    return nde2.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
                             }
                             return nde2;
                         });
@@ -725,6 +727,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     newNode = newNode.ReplaceNode(newNode.DescendantNodesAndSelf().OfType<IdentifierNameSyntax>()
                             .FirstOrDefault(x => x.Identifier.ToString() == "OnClick"),
                                 SyntaxFactory.GenericName(goIdentifier.Identifier, goIdentifier.TypeArgumentList));
+
+                    var argument = newNode.ArgumentList.Arguments.FirstOrDefault().Expression as SimpleLambdaExpressionSyntax;
+                    if (argument.Body.IsKind(SyntaxKind.IdentifierName))
+                        return newNode.WithArgumentList(SyntaxFactory.ArgumentList());
                     return newNode;
                 }
                 return base.VisitInvocationExpression(node);
