@@ -90,6 +90,16 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 SyntaxFactory.InvocationExpression(identifierName.WithoutTrailingTrivia(), arguments.WithoutTrailingTrivia()),
                                     SyntaxFactory.Token(SyntaxKind.DotToken).WithLeadingTrivia(trivia), SyntaxFactory.IdentifierName(newExpression.ToString()));
                     }
+                    else
+                    {
+                        if (newExpression.ToString() == "")
+                            newExpression = SyntaxFactory.InvocationExpression(m).WithoutTrailingTrivia();
+                        else
+                            newExpression = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                SyntaxFactory.InvocationExpression(m),
+                                    SyntaxFactory.Token(SyntaxKind.DotToken).WithLeadingTrivia(trivia), SyntaxFactory.IdentifierName(newExpression.ToString()));
+                        m = null;// (m2.FirstOrDefault() as ExpressionSyntax)?.Expression;
+                    }
                 }
 
                 return SyntaxFactory.ExpressionStatement(newExpression)

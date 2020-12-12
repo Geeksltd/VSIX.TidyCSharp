@@ -509,6 +509,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 }
                                 m = m2.FirstOrDefault() as InvocationExpressionSyntax;
                             }
+                            else return node;
                         }
                         return newExpression
                             .WithLeadingTrivia(node.GetLeadingTrivia())
@@ -582,6 +583,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 }
                                 m = m2.FirstOrDefault() as InvocationExpressionSyntax;
                             }
+                            else return node;
                         }
                         return newExpression
                             .WithLeadingTrivia(node.GetLeadingTrivia())
@@ -663,6 +665,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 }
                                 m = m2.FirstOrDefault() as InvocationExpressionSyntax;
                             }
+                            else return node;
                         }
                         return newExpression
                             .WithLeadingTrivia(node.GetLeadingTrivia())
@@ -832,6 +835,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             m = (m2.FirstOrDefault() as MemberAccessExpressionSyntax).Expression
                                 as InvocationExpressionSyntax;
                         }
+                        else return node;
                     }
                     return newExpression
                                 .WithLeadingTrivia(node.GetLeadingTrivia())
@@ -894,6 +898,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             }
                             m = m2.FirstOrDefault() as InvocationExpressionSyntax;
                         }
+                        else return node;
                     }
                     return newExpression
                                 .WithLeadingTrivia(node.GetLeadingTrivia())
