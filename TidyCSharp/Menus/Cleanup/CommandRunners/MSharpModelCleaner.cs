@@ -1,5 +1,6 @@
 ﻿using Geeks.GeeksProductivityTools;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeValidators;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -43,8 +44,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 };
                 if (methodName == "Default" && methodType == "MSharp.DateTimeProperty")
                 {
-                    if (node.ArgumentList.Arguments.Count == 1 &&
-                        acceptedArguments.Any(x => x.Equals(node.ArgumentList.Arguments.FirstOrDefault().ToString())))
+                    if (node.ArgumentsCountShouldBe(1) &&
+                        node.FirstArgumentShouldBeIn(acceptedArguments))
                     {
                         return SyntaxFactory.InvocationExpression(
                             SyntaxFactory.MemberAccessExpression(
@@ -52,7 +53,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             SyntaxFactory.ArgumentList());
                     }
                 }
-
                 return base.VisitInvocationExpression(node);
             }
         }

@@ -1,4 +1,5 @@
 ﻿using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeTypeConverter;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -29,27 +30,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
             {
-                // if (node.ToString().Split('\n').All(x => x.Length < 110))
-                //    return base.VisitExpressionStatement(node);
-
-                // var tokens = node.DescendantTokens().Where(x => x.IsKind(SyntaxKind.DotToken))
-                //    .Where(x => x.Parent.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
-                //        x.Parent.Parent.IsKind(SyntaxKind.InvocationExpression) &&
-                //        x.Parent.Ancestors().All(x => !x.IsKind(SyntaxKind.ArgumentList)));
-                // node = node.ReplaceTokens(tokens, (nde1, nde2) =>
-                // {
-                //    if (nde1.Parent.GetLeadingTrivia()
-                //        .Any(x => x.IsKind(SyntaxKind.EndOfLineTrivia)))
-                //        return nde1;
-
-                //    var trivia = new SyntaxTriviaList(SyntaxFactory.EndOfLine("\n"));
-                //    trivia = trivia.AddRange(node.GetLeadingTrivia().Reverse()
-                //        .TakeWhile(x => !x.IsKind(SyntaxKind.EndOfLineTrivia)));
-                //    trivia = trivia.Add(SyntaxFactory.Tab);
-                //    return nde2.WithLeadingTrivia(trivia);
-                // });
-                // return node;
-
                 if (node.ToString().Length < 110)
                     return base.VisitExpressionStatement(node);
 
@@ -68,7 +48,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     {
                         var methodName = m2.FirstOrDefault() as MemberAccessExpressionSyntax;
                         var arguments = m2.LastOrDefault() as ArgumentListSyntax;
-                        m = (m2.FirstOrDefault() as MemberAccessExpressionSyntax).Expression;
+                        m = m2.FirstOrDefault().As<MemberAccessExpressionSyntax>()?.Expression;
                         if (newExpression.ToString() == "")
                             newExpression = SyntaxFactory.InvocationExpression(methodName.Name, arguments)
                                 .WithoutTrailingTrivia();
@@ -93,12 +73,11 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     else
                     {
                         if (newExpression.ToString() == "")
-                            newExpression = SyntaxFactory.InvocationExpression(m).WithoutTrailingTrivia();
+                            newExpression = m.WithoutTrailingTrivia();
                         else
                             newExpression = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                                SyntaxFactory.InvocationExpression(m),
-                                    SyntaxFactory.Token(SyntaxKind.DotToken).WithLeadingTrivia(trivia), SyntaxFactory.IdentifierName(newExpression.ToString()));
-                        m = null;// (m2.FirstOrDefault() as ExpressionSyntax)?.Expression;
+                               m, SyntaxFactory.Token(SyntaxKind.DotToken).WithLeadingTrivia(trivia), SyntaxFactory.IdentifierName(newExpression.ToString()));
+                        m = null;
                     }
                 }
 

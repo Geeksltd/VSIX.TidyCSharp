@@ -1,5 +1,6 @@
 using Geeks.GeeksProductivityTools;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeValidators;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -210,9 +211,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             }
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                if (node.BaseList != null &&
-                    node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
-                     ((GenericNameSyntax)x.Type).Identifier.Text == "FormModule"))
+                if (node.ClassShouldHaveBase() &&
+                    node.ClassShouldHaveGenericBase() &&
+                    node.GenericClassShouldInheritFrom("FormModule"))
                     return base.VisitClassDeclaration(node);
                 return node;
             }
@@ -323,9 +324,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             }
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                if (node.BaseList != null &&
-                    node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
-                     ((GenericNameSyntax)x.Type).Identifier.Text == "ListModule"))
+                if (node.ClassShouldHaveBase() &&
+                   node.ClassShouldHaveGenericBase() &&
+                   node.GenericClassShouldInheritFrom("ListModule"))
                     return base.VisitClassDeclaration(node);
                 return node;
             }
@@ -679,9 +680,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                if (node.BaseList != null &&
-                    node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
-                     ((GenericNameSyntax)x.Type).Identifier.Text == "FormModule"))
+                if (node.ClassShouldHaveBase() &&
+                   node.ClassShouldHaveGenericBase() &&
+                   node.GenericClassShouldInheritFrom("FormModule"))
                     return base.VisitClassDeclaration(node);
                 return node;
             }
@@ -1077,9 +1078,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             }
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                if (node.BaseList != null &&
-                    node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
-                     ((GenericNameSyntax)x.Type).Identifier.Text == "ListModule"))
+                if (node.ClassShouldHaveBase() &&
+                   node.ClassShouldHaveGenericBase() &&
+                   node.GenericClassShouldInheritFrom("ListModule"))
                     return base.VisitClassDeclaration(node);
                 return node;
             }
@@ -1194,9 +1195,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             }
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                if (node.BaseList != null &&
-                    node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
-                     ((GenericNameSyntax)x.Type).Identifier.Text == "ListModule"))
+                if (node.ClassShouldHaveBase() &&
+                   node.ClassShouldHaveGenericBase() &&
+                   node.GenericClassShouldInheritFrom("ListModule"))
                     return base.VisitClassDeclaration(node);
                 return node;
             }
@@ -1332,9 +1333,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             }
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                if (node.BaseList != null &&
-                    node.BaseList.Types.Any(x => x.Type.IsKind(SyntaxKind.GenericName) &&
-                     ((GenericNameSyntax)x.Type).Identifier.Text == "FormModule"))
+                if (node.ClassShouldHaveBase() &&
+                   node.ClassShouldHaveGenericBase() &&
+                   node.GenericClassShouldInheritFrom("FormModule"))
                     return base.VisitClassDeclaration(node);
                 return node;
             }
