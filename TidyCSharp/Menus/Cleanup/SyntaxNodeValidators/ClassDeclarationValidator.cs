@@ -24,8 +24,9 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeValidators
 
         public static bool GenericClassShouldInheritFrom(this ClassDeclarationSyntax node, string baseClass)
         {
-            return node.BaseList.Types.Any(x => x.As<GenericNameSyntax>()
-                .Identifier.Text == "FormModule");
+            return node.BaseList.Types.Any(x => x.As<SimpleBaseTypeSyntax>()?
+            .Type.As<GenericNameSyntax>()?
+                .Identifier.Text == baseClass);
         }
     }
 }

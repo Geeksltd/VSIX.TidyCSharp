@@ -46,8 +46,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     if (m2.FirstOrDefault() is MemberAccessExpressionSyntax &&
                         m2.LastOrDefault() is ArgumentListSyntax)
                     {
-                        var methodName = m2.FirstOrDefault() as MemberAccessExpressionSyntax;
-                        var arguments = m2.LastOrDefault() as ArgumentListSyntax;
+                        var methodName = m2.FirstOrDefault().As<MemberAccessExpressionSyntax>();
+                        var arguments = m2.LastOrDefault().As<ArgumentListSyntax>();
                         m = m2.FirstOrDefault().As<MemberAccessExpressionSyntax>()?.Expression;
                         if (newExpression.ToString() == "")
                             newExpression = SyntaxFactory.InvocationExpression(methodName.Name, arguments)
@@ -80,7 +80,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         m = null;
                     }
                 }
-
+                if (m != null)
+                    newExpression = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                        m, SyntaxFactory.IdentifierName(newExpression.ToString()));
                 return SyntaxFactory.ExpressionStatement(newExpression)
                     .WithLeadingTrivia(node.GetLeadingTrivia())
                     .WithTrailingTrivia(node.GetTrailingTrivia());

@@ -515,6 +515,15 @@
       <DependentUpon>CleanupOptionForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Menus\Cleanup\CommandsHandlers\CleanupOptions.cs" />
+    <Compile Include="Menus\Cleanup\SyntaxNodeExtractors\ArgumentListSyntaxExtractor.cs" />
+    <Compile Include="Menus\Cleanup\SyntaxNodeExtractors\InvocationExpressionExtractor.cs" />
+    <Compile Include="Menus\Cleanup\SyntaxNodeExtractors\SyntaxNodeExtractor.cs" />
+    <Compile Include="Menus\Cleanup\SyntaxNodeTypeConverter\SyntaxNodeConverter.cs" />
+    <Compile Include="Menus\Cleanup\SyntaxNodeValidators\ArgumentListSyntaxValidator.cs" />
+    <Compile Include="Menus\Cleanup\SyntaxNodeValidators\ClassDeclarationValidator.cs" />
+    <Compile Include="Menus\Cleanup\SyntaxNodeValidators\ExpressionStatementValidator.cs" />
+    <Compile Include="Menus\Cleanup\SyntaxNodeValidators\InvocationExpressionValidator.cs" />
+    <Compile Include="Menus\Cleanup\SyntaxNodeValidators\MemberAccessExpressionValidator.cs" />
     <Compile Include="Menus\Cleanup\Utils\CleanupCSharpSyntaxRewriter.cs" />
     <Compile Include="Menus\Cleanup\Utils\RenameHelper\VariableRenamingBase.cs" />
     <Compile Include="Menus\Cleanup\CommandsHandlers\Infra\ExtendedBaseCodeCleanupCommand.cs" />
@@ -670,6 +679,7 @@
     <Analyzer Include="..\packages\Microsoft.VisualStudio.Threading.Analyzers.16.6.13\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\Microsoft.VisualStudio.Threading.Analyzers.16.6.13\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.dll" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>
