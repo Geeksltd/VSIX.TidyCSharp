@@ -76,7 +76,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             newExpression = m.WithoutTrailingTrivia();
                         else
                             newExpression = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                               m, SyntaxFactory.Token(SyntaxKind.DotToken).WithLeadingTrivia(trivia), SyntaxFactory.IdentifierName(newExpression.ToString()));
+                               m.WithoutTrailingTrivia(), SyntaxFactory.Token(SyntaxKind.DotToken).WithLeadingTrivia(trivia), SyntaxFactory.IdentifierName(newExpression.ToString()));
                         m = null;
                     }
                 }

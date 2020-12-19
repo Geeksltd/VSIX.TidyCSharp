@@ -367,7 +367,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             SyntaxFactory.MemberAccessExpression(
                                 SyntaxKind.SimpleMemberAccessExpression,
                                 node.GetLeftSideExpression(),
-                                SyntaxFactory.IdentifierName(node.GetRightSideNameSyntax().ToString().ToLower()))
+                                SyntaxFactory.IdentifierName(node.GetRightSideNameSyntax()?.ToString().ToLower()))
                             : SyntaxFactory.ParseExpression(methodName.ToLower()),
                             SyntaxFactory.IdentifierName(arg.ToString())))
                             .WithLeadingTrivia(node.GetLeadingTrivia());
@@ -726,7 +726,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 if (s.DescendantNodesOfType<SimpleLambdaExpressionSyntax>().Count() == 1 &&
                     s.ArgumentsCountShouldBe(1) &&
                     editRequiredArguments.All(x => (s.FirstArgument().DescendantNodesOfType<InvocationExpressionSyntax>()
-                        .Select(y => y.GetRightSideNameSyntax().ToString())).Any(y => y == x)) &&
+                        .Select(y => y.GetRightSideNameSyntax()?.ToString())).Any(y => y == x)) &&
                     s.DescendantNodesOfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
                        x.LeftSideShouldBeIdentifier() &&
                        x.GetLeftSideExpression().As<IdentifierNameSyntax>()?.Identifier.ToString() == "column").Count() == 1)
@@ -809,7 +809,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 else if (s.DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().Count() == 1 &&
                             s.ArgumentsCountShouldBe(1) &&
                             newRequiredArguments.All(x => (s.FirstArgument().DescendantNodesOfType<InvocationExpressionSyntax>()
-                            .Select(y => y.GetRightSideNameSyntax().ToString())).Any(y => y == x)))
+                            .Select(y => y.GetRightSideNameSyntax()?.ToString())).Any(y => y == x)))
                 {
                     var m = node;
                     var newExpression = SyntaxFactory.InvocationExpression(
