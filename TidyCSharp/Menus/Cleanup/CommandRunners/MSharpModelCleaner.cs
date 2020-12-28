@@ -23,11 +23,17 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         }
         SyntaxNode ChangeMethodHelper(SyntaxNode initialSourceNode)
         {
-            initialSourceNode = new LocalTimeRewriter(ProjectItemDetails.SemanticModel).Visit(initialSourceNode);
+            initialSourceNode = new LocalTimeRewriter(ProjectItemDetails.SemanticModel)
+                .Visit(initialSourceNode);
             initialSourceNode = this.RefreshResult(initialSourceNode);
-            initialSourceNode = new CascadeDeleteRewriter(ProjectItemDetails.SemanticModel).Visit(initialSourceNode);
+            initialSourceNode = new CascadeDeleteRewriter(ProjectItemDetails.SemanticModel)
+                .Visit(initialSourceNode);
             initialSourceNode = this.RefreshResult(initialSourceNode);
-            initialSourceNode = new CalculatedGetterRewriter(ProjectItemDetails.SemanticModel).Visit(initialSourceNode);
+            initialSourceNode = new CalculatedGetterRewriter(ProjectItemDetails.SemanticModel)
+                .Visit(initialSourceNode);
+            initialSourceNode = this.RefreshResult(initialSourceNode);
+            initialSourceNode = new TransientDatabaseModeRewriter(ProjectItemDetails.SemanticModel)
+                .Visit(initialSourceNode);
             return initialSourceNode;
         }
 
@@ -53,7 +59,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     {
                         return SyntaxFactory.InvocationExpression(
                             SyntaxFactory.MemberAccessExpression(
-                                SyntaxKind.SimpleMemberAccessExpression, node.DescendantNodes().OfType<InvocationExpressionSyntax>().FirstOrDefault(), SyntaxFactory.IdentifierName("DefaultToNow")),
+                                SyntaxKind.SimpleMemberAccessExpression, node.GetLeftSideExpression(), SyntaxFactory.IdentifierName("DefaultToNow")),
                             SyntaxFactory.ArgumentList());
                     }
                 }
@@ -66,21 +72,19 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             public CascadeDeleteRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
             public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
             {
-                var s = node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
-                        .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnDelete").FirstOrDefault();
-                if (s == null)
-                    return base.VisitInvocationExpression(node);
-                var methodSymbol = (semanticModel.GetSymbolInfo(s).Symbol as IMethodSymbol);
+                var methodSymbol = (semanticModel.GetSymbolInfo(node).Symbol as IMethodSymbol);
+                var methodName = methodSymbol?.Name;
 
-                if (s.ArgumentsCountShouldBe(1) &&
-                    s.FirstArgumentShouldBe("CascadeAction.CascadeDelete"))
+                if (node.ArgumentsCountShouldBe(1) &&
+                    node.FirstArgumentShouldBe("CascadeAction.CascadeDelete") &&
+                    methodName == "OnDelete")
                 {
-                    var newNode = node.ReplaceNode(s.ArgumentList, SyntaxFactory.ArgumentList());
-
-                    newNode = newNode.ReplaceNode(newNode.DescendantNodesAndSelfOfType<IdentifierNameSyntax>()
-                            .FirstOrDefault(x => x.Identifier.ToString() == "OnDelete"),
-                                SyntaxFactory.IdentifierName("CascadeDelete"));
-                    return newNode;
+                    return SyntaxFactory.InvocationExpression(
+                            SyntaxFactory.MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                node.GetLeftSideExpression(),
+                                SyntaxFactory.IdentifierName("CascadeDelete")),
+                            SyntaxFactory.ArgumentList());
                 }
                 return base.VisitInvocationExpression(node);
             }
@@ -118,6 +122,29 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                     nde1.ArgumentList);
                             else return nde2;
                         });
+                    return newNode;
+                }
+                return base.VisitInvocationExpression(node);
+            }
+        }
+        class TransientDatabaseModeRewriter : CSharpSyntaxRewriter
+        {
+            SemanticModel semanticModel;
+            public TransientDatabaseModeRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
+            public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
+            {
+                var methodSymbol = semanticModel.GetSymbolInfo(node).Symbol as IMethodSymbol;
+                var methodName = methodSymbol?.Name;
+
+                if (node.ArgumentsCountShouldBe(1) &&
+                    node.FirstArgumentShouldBe("DatabaseOption.Transient") &&
+                    methodName == "DatabaseMode")
+                {
+                    var newNode = node.ReplaceNode(node.ArgumentList, SyntaxFactory.ArgumentList());
+
+                    newNode = newNode.ReplaceNode(newNode.DescendantNodesAndSelfOfType<IdentifierNameSyntax>()
+                            .FirstOrDefault(x => x.Identifier.ToString() == "DatabaseMode"),
+                                SyntaxFactory.IdentifierName("Transient"));
                     return newNode;
                 }
                 return base.VisitInvocationExpression(node);
