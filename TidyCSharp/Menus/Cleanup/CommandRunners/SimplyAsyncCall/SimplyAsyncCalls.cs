@@ -65,6 +65,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             var singleStatement = method.Body.Statements.First();
 
+            if (singleStatement.DescendantNodesAndSelf()
+                .Count(x => x.IsKind(SyntaxKind.AwaitExpression)) > 1)
+                return method;
+
             AwaitExpressionSyntax awaitStatementExpression = null;
 
             if (singleStatement is ReturnStatementSyntax retSS)
