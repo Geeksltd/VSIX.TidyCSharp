@@ -26,6 +26,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             initialSourceNode = new LocalTimeRewriter(ProjectItemDetails.SemanticModel).Visit(initialSourceNode);
             initialSourceNode = this.RefreshResult(initialSourceNode);
             initialSourceNode = new CascadeDeleteRewriter(ProjectItemDetails.SemanticModel).Visit(initialSourceNode);
+            initialSourceNode = this.RefreshResult(initialSourceNode);
+            initialSourceNode = new CalculatedGetterRewriter(ProjectItemDetails.SemanticModel).Visit(initialSourceNode);
             return initialSourceNode;
         }
 
@@ -78,6 +80,44 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     newNode = newNode.ReplaceNode(newNode.DescendantNodesAndSelfOfType<IdentifierNameSyntax>()
                             .FirstOrDefault(x => x.Identifier.ToString() == "OnDelete"),
                                 SyntaxFactory.IdentifierName("CascadeDelete"));
+                    return newNode;
+                }
+                return base.VisitInvocationExpression(node);
+            }
+        }
+        class CalculatedGetterRewriter : CSharpSyntaxRewriter
+        {
+            SemanticModel semanticModel;
+            public CalculatedGetterRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
+
+            public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
+            {
+                var calculatedInvocation = node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
+                        .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "Calculated").FirstOrDefault();
+                var getterInvocation = node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
+                        .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "Getter").FirstOrDefault();
+                if (calculatedInvocation == null || getterInvocation == null)
+                    return base.VisitInvocationExpression(node);
+
+                if ((calculatedInvocation.ArgumentsCountShouldBe(0) ||
+                    (calculatedInvocation.ArgumentsCountShouldBe(1) &&
+                    calculatedInvocation.FirstArgumentShouldBe("true"))) &&
+                    getterInvocation.ArgumentsCountShouldBe(1))
+                {
+                    var newNode = node.ReplaceNodes(
+                        node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
+                        .Where(x => x.MethodNameShouldBeIn(new string[] { "Getter", "Calculated" })),
+                        (nde1, nde2) =>
+                        {
+                            if (nde1.MethodNameShouldBe("Calculated"))
+                                return nde1.GetLeftSideExpression();
+                            else if (nde1.MethodNameShouldBe("Getter"))
+                                return SyntaxFactory.InvocationExpression(
+                                    SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                    nde2.GetLeftSideExpression(), SyntaxFactory.IdentifierName("CalculatedFrom")),
+                                    nde1.ArgumentList);
+                            else return nde2;
+                        });
                     return newNode;
                 }
                 return base.VisitInvocationExpression(node);
