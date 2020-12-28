@@ -17,12 +17,33 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                     var newNode = ApplyNodeChange(node as BlockSyntax);
                     return base.Visit(newNode);
                 }
+                else if (node is SimpleLambdaExpressionSyntax)
+                {
+                    var newNode = ApplyNodeChange(node as SimpleLambdaExpressionSyntax);
+                    return base.Visit(newNode);
+                }
             }
 
             return base.Visit(node);
         }
 
         SyntaxToken lastBlockToken = default(SyntaxToken);
+        SyntaxNode ApplyNodeChange(SimpleLambdaExpressionSyntax lambdaNode)
+        {
+            if (lambdaNode.Block == null) return lambdaNode;
+            var blockSyntax = lambdaNode.Block as BlockSyntax;
+            if (blockSyntax.Statements.Count == 1)
+            {
+                var newNode = blockSyntax.Statements.First() as ExpressionStatementSyntax;
+
+                return lambdaNode.WithBlock(null)
+                    .WithExpressionBody(newNode.Expression
+                        .WithoutTrivia()
+                        .WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia(" ")))
+                    .WithArrowToken(lambdaNode.ArrowToken.WithoutTrivia());
+            }
+            return lambdaNode;
+        }
         SyntaxNode ApplyNodeChange(BlockSyntax blockNode)
         {
             if (blockNode.Parent is ConversionOperatorDeclarationSyntax) return blockNode;
