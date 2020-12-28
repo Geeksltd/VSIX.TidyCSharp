@@ -12,13 +12,20 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
     {
         public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
         {
+
             try
             {
-                var window = ProjectItemDetails.ProjectItem.Open(Constants.vsViewKindCode);
+                Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
 
-                window.Activate();
+                var window = ProjectItemDetails.ProjectItem.Open(Constants.vsViewKindCode);
+                //window = ProjectItemDetails.ProjectItem.Document.DTE
+                //    .ItemOperations.OpenFile(ProjectItemDetails.ProjectItem.Document.Path
+                //    , Constants.vsViewKindCode);
+                //window.Activate();
+                ProjectItemDetails.ProjectItem.Document.Activate();
                 ProjectItemDetails.ProjectItem.Document.DTE.ExecuteCommand(UsingsCommands.REMOVE_AND_SORT_COMMAND_NAME);
-                window.Document.Save();
+                ProjectItemDetails.ProjectItem.Document.Save();
+                //window.Document.Save();
             }
             catch (Exception e)
             {
