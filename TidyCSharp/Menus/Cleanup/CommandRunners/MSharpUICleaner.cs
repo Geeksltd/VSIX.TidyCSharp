@@ -258,7 +258,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 var customColumnNode = node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
                     .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "CustomColumn").FirstOrDefault();
 
-                if (customColumnNode != null)
+                if (customColumnNode != null &&
+                    (node.GetArgumentsOfMethod("LabelText") != null || node.GetArgumentsOfMethod("HeaderTemplate") != null) &&
+                    node.GetArgumentsOfMethod("DisplayExpression") != null)
                 {
                     var newNode = node.ReplaceNodes(node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>(),
                         (nde1, nde2) =>
@@ -266,13 +268,14 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             if (nde1.ToString() == "CustomColumn()")
                             {
                                 SeparatedSyntaxList<ArgumentSyntax> args = new SeparatedSyntaxList<ArgumentSyntax>();
-                                var argsHeaderText = node.GetArgumentsOfMethod("HeaderText");
+                                var argsLabelText = node.GetArgumentsOfMethod("LabelText")
+                                    ?? node.GetArgumentsOfMethod("HeaderTemplate");
                                 var argsDisplayExpr = node.GetArgumentsOfMethod("DisplayExpression");
 
-                                if (argsHeaderText.Arguments.Count == 1)
-                                    args = args.Add(argsHeaderText.Arguments.FirstOrDefault());
+                                if (argsLabelText?.Arguments.Count == 1)
+                                    args = args.Add(argsLabelText.Arguments.FirstOrDefault());
 
-                                if (argsDisplayExpr.Arguments.Count == 1)
+                                if (argsDisplayExpr?.Arguments.Count == 1)
                                     args = args.Add(argsDisplayExpr.Arguments.FirstOrDefault());
 
                                 return SyntaxFactory.InvocationExpression(
@@ -283,7 +286,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                     SyntaxFactory.ArgumentList(args))
                                 .WithLeadingTrivia(nde1.GetLeadingTrivia());
                             }
-                            else if (nde1.MethodNameShouldBeIn(new string[] { "HeaderText", "DisplayExpression" })
+                            else if (nde1.MethodNameShouldBeIn(new string[] { "LabelText", "HeaderTemplate", "DisplayExpression" })
                                 && nde1.ArgumentsCountShouldBe(1))
                             {
                                 return nde2.FirstDescendantNode<InvocationExpressionSyntax>();
@@ -700,7 +703,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 SyntaxFactory.GenericName(goIdentifier.Identifier, goIdentifier.TypeArgumentList));
 
                     var argument = newNode.FirstArgument().Expression.As<SimpleLambdaExpressionSyntax>();
-                    if (argument.Body.IsKind(SyntaxKind.IdentifierName))
+                    if (argument != null && argument.Body.IsKind(SyntaxKind.IdentifierName))
                         return newNode.WithArgumentList(SyntaxFactory.ArgumentList());
                     return newNode;
                 }
@@ -1069,7 +1072,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 var declarationSymbol = semanticModel.GetSymbolInfo(node.Type).Symbol;
                 var identifierName = semanticModel.GetDeclaredSymbol(node.Variables.FirstOrDefault());
-                if (declarationSymbol.Name == "ModuleButton" &&
+                if (declarationSymbol?.Name == "ModuleButton" &&
                     node.Variables.Count() == 1)
                 {
                     if (node.Variables.FirstOrDefault().Initializer.Value is InvocationExpressionSyntax &&
@@ -1199,7 +1202,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 var customColumnNode = node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
                     .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "CustomField").FirstOrDefault();
-
+                node.GetArgumentsOfMethod("PropertyType");
                 if (customColumnNode != null)
                 {
                     var newNode = node.ReplaceNodes(node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>(),
@@ -1256,7 +1259,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                     SyntaxFactory.MemberAccessExpression(
                                          SyntaxKind.SimpleMemberAccessExpression,
                                         SyntaxFactory.ParseExpression("field"),
-                                    (argsPropertyType != null ?
+                                    (argsPropertyType != null &&
+                                        argsPropertyType.Arguments.FirstOrDefault()
+                                        .Expression.IsKind(SyntaxKind.StringLiteralExpression) ?
                                     SyntaxFactory.GenericName("Custom")
                                         .WithTypeArgumentList(
                                         SyntaxFactory.TypeArgumentList(new SeparatedSyntaxList<TypeSyntax>()
@@ -1269,17 +1274,26 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             else if (nde1.MethodNameShouldBe("Label") &&
                                nde1.ArgumentsCountShouldBe(1))
                             {
-                                return nde2.FirstDescendantNode<InvocationExpressionSyntax>();
+                                return node.MethodNameShouldBe("Label") ?
+                                    nde2.FirstDescendantNode<InvocationExpressionSyntax>().WithoutTrailingTrivia() :
+                                    nde2.FirstDescendantNode<InvocationExpressionSyntax>();
                             }
                             else if (nde1.MethodNameShouldBe("Control") &&
                               nde1.ArgumentsCountShouldBe(1))
                             {
-                                return nde2.FirstDescendantNode<InvocationExpressionSyntax>();
+                                return node.MethodNameShouldBe("Control") ?
+                                    nde2.FirstDescendantNode<InvocationExpressionSyntax>().WithoutTrailingTrivia() :
+                                    nde2.FirstDescendantNode<InvocationExpressionSyntax>();
                             }
                             else if (nde1.MethodNameShouldBe("PropertyType") &&
-                               nde1.ArgumentsCountShouldBe(1))
+                               nde1.ArgumentsCountShouldBe(1) &&
+                                   nde1.GetArgumentsOfMethod("PropertyType").FirstArgument()
+                                    .Expression.IsKind(SyntaxKind.StringLiteralExpression))
                             {
-                                return nde2.FirstDescendantNode<InvocationExpressionSyntax>();
+                                return
+                                    node.MethodNameShouldBe("PropertyType") ?
+                                    nde2.FirstDescendantNode<InvocationExpressionSyntax>().WithoutTrailingTrivia() :
+                                    nde2.FirstDescendantNode<InvocationExpressionSyntax>();
                             }
 
                             return nde2;

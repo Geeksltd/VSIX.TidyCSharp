@@ -27,8 +27,11 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors
 
         public static ArgumentListSyntax GetArgumentsOfMethod(this InvocationExpressionSyntax node, string methodName)
         {
+            //var d1 = node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>();
+            //var d2 = d1.Where(x => x.MethodNameShouldBe(methodName));
+            //var d3 = d2.FirstOrDefault().ArgumentList;
             return node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
-                 .Where(x => x.MethodNameShouldBe(methodName)).FirstOrDefault().ArgumentList;
+                 .Where(x => x.MethodNameShouldBe(methodName))?.FirstOrDefault()?.ArgumentList;
         }
 
         public static ArgumentSyntax FirstArgument(this InvocationExpressionSyntax node)
