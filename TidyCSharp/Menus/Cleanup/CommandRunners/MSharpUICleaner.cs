@@ -57,6 +57,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             initialSourceNode = this.RefreshResult(initialSourceNode);
             initialSourceNode = new CustomFieldRewriter(ProjectItemDetails.SemanticModel)
                 .Visit(initialSourceNode);
+            initialSourceNode = this.RefreshResult(initialSourceNode);
+            initialSourceNode = new OnClickGoWorkFlowRewriter(ProjectItemDetails.SemanticModel)
+                .Visit(initialSourceNode);
             return initialSourceNode;
         }
 
@@ -1309,6 +1312,41 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                    node.GenericClassShouldInheritFrom("FormModule"))
                     return base.VisitClassDeclaration(node);
                 return node;
+            }
+        }
+        //onclick,go method should be last invocation
+        class OnClickGoWorkFlowRewriter : CSharpSyntaxRewriter
+        {
+            SemanticModel semanticModel;
+            public OnClickGoWorkFlowRewriter(SemanticModel semanticModel) => this.semanticModel = semanticModel;
+
+            public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
+            {
+                var listInvocations = new string[] { "OnClick" };
+                var invocation = node.DescendantNodesOfType<InvocationExpressionSyntax>()
+                    .Where(x =>
+                        x.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
+                        x.MethodNameShouldBeIn(listInvocations))
+                    .FirstOrDefault();
+                if (invocation != null)
+                {
+                    node = node.ReplaceNodes(node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>(),
+                        (nde1, nde2) =>
+                        {
+                            if (nde1.MethodNameShouldBeIn(listInvocations))
+                            {
+                                return nde2.GetLeftSideExpression();
+                            }
+                            return nde2;
+                        });
+
+                    return SyntaxFactory.InvocationExpression(
+                        SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                        node,
+                        invocation.GetRightSideNameSyntax().WithoutTrailingTrivia()),
+                        invocation.ArgumentList.WithoutTrailingTrivia());
+                }
+                return base.VisitInvocationExpression(node);
             }
         }
     }
