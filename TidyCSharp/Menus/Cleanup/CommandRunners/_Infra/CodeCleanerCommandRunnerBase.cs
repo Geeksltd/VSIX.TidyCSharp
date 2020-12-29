@@ -97,11 +97,22 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             }
             static RoslynDocument GetRoslynDomuentByProjectItem(ProjectItem projectItem)
             {
-                return
+                var document =
                     TidyCSharpPackage.Instance
                         .CleanupWorkingSolution
                         .Projects.FirstOrDefault(p => p.Name == projectItem.ContainingProject.Name)
                         ?.Documents.FirstOrDefault(d => d.FilePath == projectItem.ToFullPathPropertyValue());
+                if (document == null)
+                {
+                    var path = projectItem.ToFullPathPropertyValue();
+                    return
+                        TidyCSharpPackage.Instance
+                       .CleanupWorkingSolution.GetDocument(
+                            TidyCSharpPackage.Instance
+                           .CleanupWorkingSolution.GetDocumentIdsWithFilePath(path)
+                           .FirstOrDefault());
+                }
+                return document;
             }
         }
     }

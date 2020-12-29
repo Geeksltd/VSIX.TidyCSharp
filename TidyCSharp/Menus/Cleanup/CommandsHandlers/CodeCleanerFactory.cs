@@ -45,7 +45,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                     return new MSharpModelCleaner();
                 case CodeCleanerType.ConvertMsharpGeneralMethods:
                     return new MSharpGeneralCleaner();
-
+                case CodeCleanerType.ConvertZebbleGeneralMethods:
+                    return new ZebbleCleaner();
                 default: return null; // TODO
             }
         }
