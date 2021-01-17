@@ -363,7 +363,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 if (methodDefTypes.Contains(methodType) && methodDefNames.Contains(methodName))
                 {
-                    if (node.ArgumentsCountShouldBe(1) && node.ArgumentList.Arguments[0].Expression is SimpleLambdaExpressionSyntax)
+                    if (node.ArgumentsCountShouldBe(1) &&
+                        node.ArgumentList.Arguments[0].Expression is SimpleLambdaExpressionSyntax &&
+                        node.ArgumentList.Arguments[0].Expression.As<SimpleLambdaExpressionSyntax>()
+                        ?.Body is MemberAccessExpressionSyntax &&
+                        node.ArgumentList.Arguments[0].Expression.As<SimpleLambdaExpressionSyntax>()
+                        .Body.As<MemberAccessExpressionSyntax>().LeftSideShouldBeIdentifier())
                     {
                         var arg = node.ArgumentList.Arguments[0].Expression.As<SimpleLambdaExpressionSyntax>()?
                             .Body.As<MemberAccessExpressionSyntax>()?.Name;
@@ -875,10 +880,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 .WithTrailingTrivia(node.GetTrailingTrivia());
                 }
                 else if (s.ArgumentsCountShouldBe(1) &&
-                    (s.FirstArgument()
-                    .DescendantNodesOfType<ExpressionStatementSyntax>().Count() == 1 ||
-                    s.FirstArgument()
-                    .DescendantNodesOfType<SimpleLambdaExpressionSyntax>().Count() == 1) &&
+                    (s.FirstArgument().Expression.As<SimpleLambdaExpressionSyntax>()?.ExpressionBody != null ||
+                    (s.FirstArgument().Expression.As<SimpleLambdaExpressionSyntax>()?.Block != null &&
+                    s.FirstArgument().Expression.As<SimpleLambdaExpressionSyntax>()?.Block.Statements.Count() == 1)) &&
                     s.FirstArgument()
                     .DescendantNodesOfType<IdentifierNameSyntax>().Any(x => x.Identifier.ToString() == "Export") &&
                     s.DescendantNodesOfType<InvocationExpressionSyntax>().Where(x => x.Expression is IdentifierNameSyntax &&
@@ -917,7 +921,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             return nde2;
                         });
 
-                    return newNode;
+                    return newNode.WithoutTrailingTrivia();
                 }
                 else if (s.ArgumentsCountShouldBe(1) &&
                     (s.FirstArgument()
