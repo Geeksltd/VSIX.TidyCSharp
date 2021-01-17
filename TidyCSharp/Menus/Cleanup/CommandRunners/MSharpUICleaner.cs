@@ -700,8 +700,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             {
                                 if (nde1.LeftSideShouldBeIdentifier(false))
                                     return nde2.FirstDescendantNode<InvocationExpressionSyntax>();
-                                else
+                                else if (!nde1.Parent.IsKind(SyntaxKind.ExpressionStatement))
                                     return nde2.FirstDescendantNode<IdentifierNameSyntax>();
+                                else return SyntaxFactory.ParseExpression("");
                             }
                             return nde2;
                         });
@@ -1334,21 +1335,28 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     .FirstOrDefault();
                 if (invocation != null)
                 {
-                    node = node.ReplaceNodes(node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>(),
+                    node = node.ReplaceNodes(invocation.Ancestors().FirstOrDefault(x => x.IsKind(SyntaxKind.ExpressionStatement))
+                        .DescendantNodesAndSelfOfType<InvocationExpressionSyntax>(),
                         (nde1, nde2) =>
                         {
-                            if (nde1.MethodNameShouldBeIn(listInvocations))
+                            if (nde1.MethodNameShouldBeIn(listInvocations) &&
+                                !nde1.Parent.IsKind(SyntaxKind.ExpressionStatement))
                             {
                                 return nde2.GetLeftSideExpression();
+                            }
+                            else if (nde1.Parent.IsKind(SyntaxKind.ExpressionStatement) &&
+                                !nde1.MethodNameShouldBeIn(listInvocations))
+                            {
+                                return SyntaxFactory.InvocationExpression(
+                                SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                nde2,
+                                invocation.GetRightSideNameSyntax().WithoutTrailingTrivia()),
+                                invocation.ArgumentList.WithoutTrailingTrivia());
                             }
                             return nde2;
                         });
 
-                    return SyntaxFactory.InvocationExpression(
-                        SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                        node,
-                        invocation.GetRightSideNameSyntax().WithoutTrailingTrivia()),
-                        invocation.ArgumentList.WithoutTrailingTrivia());
+                    return node;
                 }
                 return base.VisitInvocationExpression(node);
             }
