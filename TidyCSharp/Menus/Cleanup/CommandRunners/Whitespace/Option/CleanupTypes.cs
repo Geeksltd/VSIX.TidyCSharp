@@ -39,8 +39,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
         [CleanupItem(FirstOrder = 1, Title = "Blank line between } and the next statement.")]
         Adding_Blank_after_Block_Close_Bracket = 0x200,
 
-        [CleanupItem(FirstOrder = 1, Title = "No { and } for short blocks (single statement and < 70 chars)")]
-        Remove_Brackets_of_block_that_has_only_one_statement_with_length_shorter_than_70_chars = 0x400,
+        [CleanupItem(FirstOrder = 1, Title = "No { and } for short blocks (single statement and < 80 chars)")]
+        Remove_Brackets_of_block_that_has_only_one_statement_with_length_shorter_than_80_chars = 0x400,
 
         [CleanupItem(FirstOrder = 1, Title = "Add Blank line between Statements more that one line")]
         Add_blank_line_between_statements_more_than_one_line = 0x500,

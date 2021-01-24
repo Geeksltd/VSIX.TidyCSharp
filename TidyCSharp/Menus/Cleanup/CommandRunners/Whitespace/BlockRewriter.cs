@@ -10,7 +10,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
         public override SyntaxNode Visit(SyntaxNode node)
         {
-            if (CheckOption((int)CleanupTypes.Remove_Brackets_of_block_that_has_only_one_statement_with_length_shorter_than_70_chars))
+            if (CheckOption((int)CleanupTypes.Remove_Brackets_of_block_that_has_only_one_statement_with_length_shorter_than_80_chars))
             {
                 if (node is BlockSyntax)
                 {
@@ -32,7 +32,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
         {
             if (lambdaNode.Block == null) return lambdaNode;
             var blockSyntax = lambdaNode.Block as BlockSyntax;
-            if (blockSyntax.Statements.Count == 1)
+            if (blockSyntax.Statements.Count == 1 &&
+                blockSyntax.Statements.FirstOrDefault().ToString().Length <= 80)
             {
                 var newNode = blockSyntax.Statements.First() as ExpressionStatementSyntax;
 
