@@ -35,7 +35,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 if (node.Modifiers.Any(SyntaxKind.ReadOnlyKeyword)) return node;
                 if (semanticModel.GetTypeInfo(node.Declaration.Type).Type.Name != "Bindable") return node;
                 if (!node.Declaration.Type.IsKind(SyntaxKind.GenericName)) return node;
-                if (semanticModel.GetTypeInfo(node.Declaration.Type).Type.ContainingNamespace.Name != "Zebble")
+                if (semanticModel.GetTypeInfo(node.Declaration.Type).Type.ContainingNamespace.Name != "Zebble" ||
+                    semanticModel.GetTypeInfo(node.Declaration.Type).Type.ContainingNamespace.Name != "Olive")
                     return node;
 
                 return node.AddModifiers(
