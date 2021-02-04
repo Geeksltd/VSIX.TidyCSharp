@@ -39,7 +39,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                     if (annotations.Any() == false) break;
 
-                    var firstAnnotatedItem = annotations.FirstOrDefault());
+                    var firstAnnotatedItem = annotations.FirstOrDefault();
                     var annotationOfFirstAnnotatedItem = firstAnnotatedItem.GetAnnotations(SELECTED_METHOD_ANNOTATION_RENAME).FirstOrDefault();
 
                     var renameResult = Renamer.RenameSymbol(WorkingDocument, initialSourceNode, null, firstAnnotatedItem, annotationOfFirstAnnotatedItem.Data);

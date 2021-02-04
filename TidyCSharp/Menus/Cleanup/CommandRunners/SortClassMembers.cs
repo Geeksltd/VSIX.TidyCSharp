@@ -70,7 +70,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             if (constructorsToMoveList.Any())
             {
                 annotatedClassNode = annotatedClassNode.RemoveNodes(constructorsToMoveList, SyntaxRemoveOptions.KeepNoTrivia);
-                var annotatedMethod = annotatedClassNode.GetAnnotatedNodes(methodAnnotation).First();
+                var annotatedMethod = annotatedClassNode.GetAnnotatedNodes(methodAnnotation).FirstOrDefault();
                 annotatedClassNode = annotatedClassNode.InsertNodesBefore(annotatedMethod, constructorsToMoveList);
 
                 return annotatedClassNode;
