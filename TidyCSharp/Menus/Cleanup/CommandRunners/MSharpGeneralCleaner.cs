@@ -37,7 +37,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 List<SyntaxToken> rewritableToken = new List<SyntaxToken>();
                 var trivia = new SyntaxTriviaList(SyntaxFactory.EndOfLine("\n"));
                 trivia = trivia.AddRange(node.GetLeadingTrivia().Reverse()
-                    .TakeWhile(x => !x.IsKind(SyntaxKind.EndOfLineTrivia)));
+                    .TakeWhile(x => x.IsDirective ^ !x.IsKind(SyntaxKind.EndOfLineTrivia)));
                 trivia = trivia.Add(SyntaxFactory.Tab);
                 var newExpression = SyntaxFactory.ParseExpression("");
                 while (m != null && m.ChildNodes().Any())

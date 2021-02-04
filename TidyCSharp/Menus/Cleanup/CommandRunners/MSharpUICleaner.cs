@@ -711,9 +711,14 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             .FirstOrDefault(x => x.Identifier.ToString() == "OnClick"),
                                 SyntaxFactory.GenericName(goIdentifier.Identifier, goIdentifier.TypeArgumentList));
 
-                    var argument = newNode.FirstArgument().Expression.As<SimpleLambdaExpressionSyntax>();
+                    var argument = newNode.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
+                        .FirstOrDefault(x => x.MethodNameShouldBe("Go"))
+                        .FirstArgument().Expression.As<SimpleLambdaExpressionSyntax>();
                     if (argument != null && argument.Body.IsKind(SyntaxKind.IdentifierName))
-                        return newNode.WithArgumentList(SyntaxFactory.ArgumentList());
+                    {
+                        newNode = newNode.ReplaceNode(newNode.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
+                        .FirstOrDefault(x => x.MethodNameShouldBe("Go")).ArgumentList, SyntaxFactory.ArgumentList());
+                    }
                     return newNode;
                 }
                 return base.VisitInvocationExpression(node);
@@ -1209,8 +1214,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
             {
                 var customColumnNode = node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
-                    .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "CustomField").FirstOrDefault();
-                node.GetArgumentsOfMethod("PropertyType");
+                    .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "CustomField"
+                    && !x.Ancestors().Contains(node.ArgumentList)).FirstOrDefault();
+
                 if (customColumnNode != null)
                 {
                     var newNode = node.ReplaceNodes(node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>(),
@@ -1327,26 +1333,31 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
             {
-                var listInvocations = new string[] { "OnClick", "Go" };
+                var listInvocations = new string[] { "OnClick" };
+                var listInvocationsWithGo = new string[] { "OnClick", "Go" };
                 var invocation = node.DescendantNodesOfType<InvocationExpressionSyntax>()
                     .Where(x =>
                         //x.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
-                        x.MethodNameShouldBeIn(listInvocations))
+                        (
+                        (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol) != null &&
+                        (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol).ReturnsVoid &&
+                        (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol).Name == "Go")
+                        || x.MethodNameShouldBeIn(listInvocations))
                     .FirstOrDefault();
-                var s = node.DescendantNodesOfType<InvocationExpressionSyntax>().Select(x => x.Expression.As<MemberAccessExpressionSyntax>()?.Name.ToString());
+
                 if (invocation != null)
                 {
                     node = node.ReplaceNodes(invocation.Ancestors().FirstOrDefault(x => x.IsKind(SyntaxKind.ExpressionStatement))
                         .DescendantNodesAndSelfOfType<InvocationExpressionSyntax>(),
                         (nde1, nde2) =>
                         {
-                            if (nde1.MethodNameShouldBeIn(listInvocations) &&
+                            if (nde1.MethodNameShouldBeIn(listInvocationsWithGo) &&
                                 !nde1.Parent.IsKind(SyntaxKind.ExpressionStatement))
                             {
                                 return nde2.GetLeftSideExpression();
                             }
                             else if (nde1.Parent.IsKind(SyntaxKind.ExpressionStatement) &&
-                                !nde1.MethodNameShouldBeIn(listInvocations))
+                                !nde1.MethodNameShouldBeIn(listInvocationsWithGo))
                             {
                                 return SyntaxFactory.InvocationExpression(
                                 SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
