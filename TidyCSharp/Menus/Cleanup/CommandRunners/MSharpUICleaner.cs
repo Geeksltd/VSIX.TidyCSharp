@@ -268,7 +268,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     var newNode = node.ReplaceNodes(node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>(),
                         (nde1, nde2) =>
                         {
-                            if (nde1.ToString() == "CustomColumn()")
+                            if (nde1.Expression.As<IdentifierNameSyntax>()?.Identifier.ValueText == "CustomColumn")
                             {
                                 SeparatedSyntaxList<ArgumentSyntax> args = new SeparatedSyntaxList<ArgumentSyntax>();
                                 var argsLabelText = node.GetArgumentsOfMethod("LabelText")
