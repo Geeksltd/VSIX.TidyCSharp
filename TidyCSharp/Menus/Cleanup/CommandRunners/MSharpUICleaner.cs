@@ -680,7 +680,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 if (s.ArgumentsCountShouldBe(1) &&
                     (s.FirstArgument()
-                    .DescendantNodesOfType<ExpressionStatementSyntax>().Count() == 1 ||
+                    .DescendantNodesOfType<ExpressionStatementSyntax>().Count() == 1 &&
                     s.FirstArgument()
                     .DescendantNodesOfType<SimpleLambdaExpressionSyntax>().Count() == 1) &&
                     s.FirstArgument()
