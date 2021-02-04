@@ -46,7 +46,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 if (node.Variables.Count > 1) return null;
 
-                var variable = node.Variables.First();
+                var variable = node.Variables.FirstOrDefault();
 
                 if (variable.Initializer == null) return null;
 

@@ -210,7 +210,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
                 => syntaxList.Contains(SyntaxWrapper.Unwrap(node));
 
             public override TNode First()
-                => SyntaxWrapper.Wrap(syntaxList.First());
+                => SyntaxWrapper.Wrap(syntaxList.FirstOrDefault());
 
             public override TNode FirstOrDefault()
                 => SyntaxWrapper.Wrap(syntaxList.FirstOrDefault());
@@ -306,7 +306,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
                 => false;
 
             public override TNode First()
-                => SyntaxWrapper.Wrap(SyntaxList.First());
+                => SyntaxWrapper.Wrap(SyntaxList.FirstOrDefault());
 
             public override TNode FirstOrDefault()
                 => SyntaxWrapper.Wrap(default(SyntaxNode));

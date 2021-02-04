@@ -24,6 +24,7 @@ namespace Geeks.GeeksProductivityTools
 
         static void GlobalExceptionHandlerEvent(object sender, UnhandledExceptionEventArgs args)
         {
+            ErrorNotification.WriteErrorToFile((Exception)args.ExceptionObject);
             ErrorNotification.EmailError((Exception)args.ExceptionObject);
         }
     }

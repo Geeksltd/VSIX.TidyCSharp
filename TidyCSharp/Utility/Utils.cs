@@ -61,6 +61,7 @@ namespace GeeksAddin
             }
             catch (Exception err)
             {
+                ErrorNotification.WriteErrorToFile(err);
                 ErrorNotification.EmailError(err);
             }
         }

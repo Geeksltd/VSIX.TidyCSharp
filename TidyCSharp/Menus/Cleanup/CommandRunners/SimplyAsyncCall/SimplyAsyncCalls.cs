@@ -63,7 +63,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             if (method.ReturnType.WithoutTrivia().ToFullString() == "void") return method;
             if (method.Body.Statements.Count != 1) return method;
 
-            var singleStatement = method.Body.Statements.First();
+            var singleStatement = method.Body.Statements.FirstOrDefault();
 
             if (singleStatement.DescendantNodesAndSelf()
                 .Count(x => x.IsKind(SyntaxKind.AwaitExpression)) > 1)
@@ -114,7 +114,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 method
                     .ReplaceNode(singleStatement, newStatement)
                     .WithModifiers(
-                        method.Modifiers.Remove(method.Modifiers.First(x => x.IsKind(SyntaxKind.AsyncKeyword))))
+                        method.Modifiers.Remove(method.Modifiers.FirstOrDefault(x => x.IsKind(SyntaxKind.AsyncKeyword))))
                     .WithLeadingTrivia(method.GetLeadingTrivia())
                     .WithTrailingTrivia(method.GetTrailingTrivia());
         }

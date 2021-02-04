@@ -35,7 +35,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             if (blockSyntax.Statements.Count == 1 &&
                 blockSyntax.Statements.FirstOrDefault().ToString().Length <= 80)
             {
-                var newNode = blockSyntax.Statements.First() as ExpressionStatementSyntax;
+                var newNode = blockSyntax.Statements.FirstOrDefault() as ExpressionStatementSyntax;
 
                 return lambdaNode.WithBlock(null)
                     .WithExpressionBody(newNode.Expression
@@ -63,7 +63,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             if (blockNode.Parent is AnonymousMethodExpressionSyntax) return blockNode;
             if (blockNode.Parent is MethodDeclarationSyntax == false && blockNode.Statements.Count == 1)
             {
-                var singleStatement = blockNode.Statements.First();
+                var singleStatement = blockNode.Statements.FirstOrDefault();
 
                 if (singleStatement.Span.Length <= NormalizeWhitespace.Options.BLOCK_SINGLE_STATEMENT_MAX_LENGTH)
                 {

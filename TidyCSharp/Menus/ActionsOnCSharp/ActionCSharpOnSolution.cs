@@ -25,6 +25,7 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
             }
             catch (Exception e)
             {
+                ErrorNotification.WriteErrorToFile(e);
                 ErrorNotification.EmailError(e);
                 ProcessActions.GeeksProductivityToolsProcess();
             }

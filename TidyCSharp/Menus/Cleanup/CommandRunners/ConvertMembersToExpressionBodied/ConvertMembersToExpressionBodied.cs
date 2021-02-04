@@ -89,7 +89,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             if (method.Body.Statements.Count != 1) return null;
             if (method.Body.ContainsDirectives) return null;
 
-            var singleStatement = method.Body.Statements.First();
+            var singleStatement = method.Body.Statements.FirstOrDefault();
             if (singleStatement is IfStatementSyntax) return null;
             if (singleStatement is ThrowStatementSyntax) return null;
             if (singleStatement is YieldStatementSyntax) return null;
@@ -150,7 +150,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             var returnStatements = getNode.Body.Statements.OfType<ReturnStatementSyntax>().ToList();
             if (returnStatements.Count() != 1) return propertyDeclaration;
-            var expression = returnStatements.First().Expression.WithoutTrivia();
+            var expression = returnStatements.FirstOrDefault().Expression.WithoutTrivia();
 
             var length =
                 expression.Span.Length +
@@ -174,7 +174,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
         static SyntaxToken GetSemicolon(BlockSyntax block)
         {
-            var statement = block.Statements.First();
+            var statement = block.Statements.FirstOrDefault();
 
             var semicolon =
                 (statement is ExpressionStatementSyntax)
@@ -209,7 +209,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             if (constructorDeclaration.Body.Statements.Count != 1) return constructorDeclaration;
             if (constructorDeclaration.Body.ContainsDirectives) return constructorDeclaration;
 
-            var singleStatement = constructorDeclaration.Body.Statements.First();
+            var singleStatement = constructorDeclaration.Body.Statements.FirstOrDefault();
             if (singleStatement is IfStatementSyntax) return constructorDeclaration;
             if (singleStatement is ThrowStatementSyntax) return constructorDeclaration;
             if (singleStatement is YieldStatementSyntax) return constructorDeclaration;

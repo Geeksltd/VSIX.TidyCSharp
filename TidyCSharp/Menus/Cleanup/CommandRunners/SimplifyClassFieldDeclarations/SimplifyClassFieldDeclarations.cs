@@ -242,7 +242,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 public List<VariableDeclaratorSyntax> VariablesWithoutInitializer { get; set; }
                 public List<VariableDeclaratorSyntax> VariablesWithInitializer { get; set; }
-                public FieldDeclarationSyntax FirstOldFieldDeclarations => OldFieldDeclarations.First();
+                public FieldDeclarationSyntax FirstOldFieldDeclarations => OldFieldDeclarations.FirstOrDefault();
                 public List<FieldDeclarationSyntax> OldFieldDeclarations { get; set; }
                 public FieldDeclarationSyntax NewFieldDeclaration { get; set; }
             }

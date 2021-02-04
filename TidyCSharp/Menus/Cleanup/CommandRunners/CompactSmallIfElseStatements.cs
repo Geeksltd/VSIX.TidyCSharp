@@ -183,7 +183,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 if (block.Statements.Count != 1) return null;
                 if (block.HasNoneWhitespaceTrivia()) return null;
-                var firstStatement = block.Statements.First();
+                var firstStatement = block.Statements.FirstOrDefault();
                 if (firstStatement is IfStatementSyntax) return firstStatement;
                 if (firstStatement.Span.Length <= NormalizeWhitespace.Options.BLOCK_SINGLE_STATEMENT_MAX_LENGTH) return firstStatement;
                 return null;

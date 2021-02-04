@@ -803,7 +803,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             else if (
                                 !methodName.MethodNameShouldBeIn(new string[] {
                                 "Go","GridColumnCssClass","HeaderText","NoText",
-                                "Icon" , "Button" }))
+                                "Icon" , "Button", "Edit" }))
                             {
                                 newExpression = SyntaxFactory.InvocationExpression(
                                         SyntaxFactory.MemberAccessExpression(
@@ -853,7 +853,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                     SyntaxFactory.MemberAccessExpression(
                                         SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
                             }
-                            else if (!methodName.MethodNameShouldBeIn(new string[] { "Go", "Icon" }))
+                            else if (!methodName.MethodNameShouldBeIn(new string[] { "Go", "Icon", "New" }))
                             {
                                 newExpression = SyntaxFactory.InvocationExpression(
                                         SyntaxFactory.MemberAccessExpression(
@@ -1327,12 +1327,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
             {
-                var listInvocations = new string[] { "OnClick" };
+                var listInvocations = new string[] { "OnClick", "Go" };
                 var invocation = node.DescendantNodesOfType<InvocationExpressionSyntax>()
                     .Where(x =>
-                        x.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
+                        //x.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
                         x.MethodNameShouldBeIn(listInvocations))
                     .FirstOrDefault();
+                var s = node.DescendantNodesOfType<InvocationExpressionSyntax>().Select(x => x.Expression.As<MemberAccessExpressionSyntax>()?.Name.ToString());
                 if (invocation != null)
                 {
                     node = node.ReplaceNodes(invocation.Ancestors().FirstOrDefault(x => x.IsKind(SyntaxKind.ExpressionStatement))

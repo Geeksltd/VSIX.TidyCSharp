@@ -11,13 +11,13 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeValidators
     {
         public static bool MethodNameShouldBe(this MemberAccessExpressionSyntax node, string checkArg)
         {
-            return checkArg.Equals(node.Name.ToString());
+            return checkArg.Equals(node.Name.Identifier.ToString());
         }
 
         public static bool MethodNameShouldBeIn(this MemberAccessExpressionSyntax node, string[] checkArgs)
         {
             return checkArgs.Any(x =>
-                x.Equals(node.Name.ToString()));
+                x.Equals(node.Name.Identifier.ToString()));
         }
 
         public static bool LeftSideShouldBeIdentifier(this MemberAccessExpressionSyntax node, bool shouldBe = true)

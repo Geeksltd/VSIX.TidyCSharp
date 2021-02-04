@@ -114,7 +114,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 var oldValues = output.Values.GroupBy(x => x.BuiltInName).ToList();
                 foreach (var item0 in oldValues)
                 {
-                    var item = item0.First();
+                    var item = item0.FirstOrDefault();
 
                     output.Add(item.BuiltInName, new TypesMapItem { BuiltInName = item.BuiltInName, Name = item.BuiltInName, FullName = item.FullName });
                 }

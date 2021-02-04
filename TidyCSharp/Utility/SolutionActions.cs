@@ -56,6 +56,7 @@ namespace Geeks.GeeksProductivityTools.Utils
             }
             catch (Exception e)
             {
+                ErrorNotification.WriteErrorToFile(e);
                 ErrorNotification.EmailError(e);
                 ProcessActions.GeeksProductivityToolsProcess();
                 return null;

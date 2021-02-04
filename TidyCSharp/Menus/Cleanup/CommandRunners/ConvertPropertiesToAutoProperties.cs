@@ -39,7 +39,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                     if (annotations.Any() == false) break;
 
-                    var firstAnnotatedItem = annotations.First();
+                    var firstAnnotatedItem = annotations.FirstOrDefault());
                     var annotationOfFirstAnnotatedItem = firstAnnotatedItem.GetAnnotations(SELECTED_METHOD_ANNOTATION_RENAME).FirstOrDefault();
 
                     var renameResult = Renamer.RenameSymbol(WorkingDocument, initialSourceNode, null, firstAnnotatedItem, annotationOfFirstAnnotatedItem.Data);
@@ -306,7 +306,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 var propertyDeclaration_GetLeadingTrivia = propertyDeclaration.GetLeadingTrivia();
 
-                if (leadingList.Any() && propertyDeclaration_GetLeadingTrivia.First().IsKind(SyntaxKind.EndOfLineTrivia) == false)
+                if (leadingList.Any() && propertyDeclaration_GetLeadingTrivia.FirstOrDefault().IsKind(SyntaxKind.EndOfLineTrivia) == false)
                 {
                     var endOfLine = relatedField.GetLeadingTrivia().FirstOrDefault(x => x.IsKind(SyntaxKind.EndOfLineTrivia));
 
@@ -357,11 +357,11 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                      .WithLeadingTrivia(leadingList)
                      .WithIdentifier(propertyDeclaration.Identifier.WithTrailingTrivia(SyntaxFactory.Space));
 
-                if (relatedField.Declaration.Variables.First().Initializer != null)
+                if (relatedField.Declaration.Variables.FirstOrDefault().Initializer != null)
                 {
                     propertyDeclaration =
                         propertyDeclaration.WithInitializer(
-                            relatedField.Declaration.Variables.First().Initializer)
+                            relatedField.Declaration.Variables.FirstOrDefault().Initializer)
                     .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken));
                 }
                 return propertyDeclaration;

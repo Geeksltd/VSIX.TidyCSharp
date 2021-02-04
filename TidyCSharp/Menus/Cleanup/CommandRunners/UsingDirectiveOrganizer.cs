@@ -29,6 +29,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             }
             catch (Exception e)
             {
+                ErrorNotification.WriteErrorToFile(e);
                 ErrorNotification.EmailError(e);
                 ProcessActions.GeeksProductivityToolsProcess();
             }

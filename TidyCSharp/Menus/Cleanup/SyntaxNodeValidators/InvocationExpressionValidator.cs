@@ -35,7 +35,7 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeValidators
         public static bool MethodNameShouldBeIn(this InvocationExpressionSyntax node, string[] checkArgs)
         {
             return checkArgs.Any(x =>
-                x.Equals(node.Expression.As<MemberAccessExpressionSyntax>()?.Name.ToString()));
+                x.Equals(node.Expression.As<MemberAccessExpressionSyntax>()?.Name.Identifier.ToString()));
         }
 
         public static bool MethodNameShouldBe(this InvocationExpressionSyntax node, string checkArg)
