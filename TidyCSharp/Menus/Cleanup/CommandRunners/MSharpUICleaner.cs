@@ -1244,9 +1244,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                     .Where(x =>
                                     x.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
                                      x.MethodNameShouldBe("Control")).FirstOrDefault().ArgumentList
-                                    : SyntaxFactory.ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>().Add(
-                                        SyntaxFactory.Argument(
-                                        SyntaxFactory.ParseExpression("ControlType.Textbox"))));
+                                    : null;
                                 var argsPropertyType =
                                      node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
                                      .Any(x =>
@@ -1255,6 +1253,20 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                     ? node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
                                         .Where(x => x.MethodNameShouldBe("PropertyType")).FirstOrDefault().ArgumentList
                                         : null;
+
+                                if (argsLabel == null && argsControlType == null)
+                                {
+                                    argsLabel = SyntaxFactory.ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>().Add(
+                                        SyntaxFactory.Argument(
+                                        SyntaxFactory.ParseExpression("\"\""))));
+                                }
+
+                                if (argsPropertyType != null && argsControlType == null)
+                                {
+                                    argsControlType = SyntaxFactory.ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>().Add(
+                                        SyntaxFactory.Argument(
+                                        SyntaxFactory.ParseExpression("ControlType.Textbox"))));
+                                }
 
                                 if (argsPropertyType != null && argsLabel == null)
                                 {
@@ -1266,7 +1278,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 if (argsLabel != null && argsLabel.ArgumentsCountShouldBe(1))
                                     args = args.Add(argsLabel.FirstArgument());
 
-                                if (argsControlType.ArgumentsCountShouldBe(1))
+                                if (argsControlType != null && argsControlType.ArgumentsCountShouldBe(1))
                                     args = args.Add(argsControlType.FirstArgument());
 
                                 return SyntaxFactory.InvocationExpression(
