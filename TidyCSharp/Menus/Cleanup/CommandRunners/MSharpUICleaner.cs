@@ -937,14 +937,18 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     s.FirstArgument()
                     .DescendantNodesOfType<IdentifierNameSyntax>().Any(x => x.Identifier.ToString() == "Reload") &&
                     s.DescendantNodesOfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
-                        x.MethodNameShouldBe("Button") &&
+                        x.MethodNameShouldBe("SearchButton") &&
                         x.ArgumentsCountShouldBe(1) &&
-                        x.FirstArgumentShouldBe("\"Search\"")).Count() == 1)
+                        x.FirstArgumentShouldBe("\"Search\"")).Count() == 1 &&
+                    s.DescendantNodesOfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
+                        x.MethodNameShouldBe("Icon") &&
+                        x.ArgumentsCountShouldBe(1) &&
+                        x.FirstArgumentShouldBe("FA.Search")).Count() == 1)
                 {
                     InvocationExpressionSyntax iconInvocation = s.DescendantNodesOfType<InvocationExpressionSyntax>()
                             .FirstOrDefault(x => x.Expression is MemberAccessExpressionSyntax &&
                             x.MethodNameShouldBe("Icon"));
-                    var neededArguments = iconInvocation.ArgumentList;
+                    var neededArguments = iconInvocation != null ? iconInvocation.ArgumentList : null;
                     var newNode = node.ReplaceNodes(s.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>(),
                         (nde1, nde2) =>
                         {
@@ -976,7 +980,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 else return nde2.FirstDescendantNode<IdentifierNameSyntax>();
                             }
                             else if (nde1.Expression is MemberAccessExpressionSyntax &&
-                               nde1.MethodNameShouldBe("Button") &&
+                               nde1.MethodNameShouldBe("SearchButton") &&
                                nde1.ArgumentsCountShouldBe(1) &&
                                nde1.FirstArgumentShouldBe("\"Search\""))
                             {

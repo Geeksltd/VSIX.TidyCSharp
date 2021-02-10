@@ -31,6 +31,7 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
                 {
                     if (actionTypeItem == VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces) continue;
                     if (actionTypeItem == VSIX.TidyCSharp.Cleanup.CodeCleanerType.OrganizeUsingDirectives) continue;
+                    if (actionTypeItem == VSIX.TidyCSharp.Cleanup.CodeCleanerType.ConvertMsharpGeneralMethods) continue;
 
                     CodeCleanerHost.Run(item, actionTypeItem, cleanupOptions);
                 }
@@ -56,6 +57,11 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
                 else
                 {
                     window.Document.Save();
+                }
+
+                if (cleanupOptions.ActionTypes.Contains(VSIX.TidyCSharp.Cleanup.CodeCleanerType.ConvertMsharpGeneralMethods))
+                {
+                    CodeCleanerHost.Run(item, VSIX.TidyCSharp.Cleanup.CodeCleanerType.ConvertMsharpGeneralMethods, cleanupOptions);
                 }
 
                 if (fileWindowMustBeOpend == false)
