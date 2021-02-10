@@ -679,10 +679,11 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 var methodSymbol = (semanticModel.GetSymbolInfo(s).Symbol as IMethodSymbol);
 
                 if (s.ArgumentsCountShouldBe(1) &&
-                    (s.FirstArgument()
-                    .DescendantNodesOfType<ExpressionStatementSyntax>().Count() == 1 &&
-                    s.FirstArgument()
-                    .DescendantNodesOfType<SimpleLambdaExpressionSyntax>().Count() == 1) &&
+                    s.FirstArgument().Expression.IsKind(SyntaxKind.SimpleLambdaExpression) &&
+                    (s.FirstArgument().Expression.As<SimpleLambdaExpressionSyntax>().Block != null ?
+                    s.FirstArgument().DescendantNodesOfType<ExpressionStatementSyntax>().Count() == 1 :
+                    s.FirstArgument().Expression.As<SimpleLambdaExpressionSyntax>()
+                    .ExpressionBody.IsKind(SyntaxKind.InvocationExpression)) &&
                     s.FirstArgument()
                     .DescendantNodesOfType<GenericNameSyntax>().Any(x => x.Identifier.ToString() == "Go"))
                 {
