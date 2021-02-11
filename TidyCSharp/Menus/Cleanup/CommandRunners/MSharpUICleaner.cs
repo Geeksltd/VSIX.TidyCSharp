@@ -747,7 +747,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         .Select(y => y.GetRightSideNameSyntax()?.ToString())).Any(y => y == x)) &&
                     s.DescendantNodesOfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
                        x.LeftSideShouldBeIdentifier() &&
-                       x.GetLeftSideExpression().As<IdentifierNameSyntax>()?.Identifier.ToString() == "column").Count() == 1)
+                       x.GetLeftSideExpression().As<IdentifierNameSyntax>()?.Identifier.ToString() == "column").Count() == 1 &&
+                       node.DescendantNodesOfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
+                       x.MethodNameShouldBe("Icon") &&
+                       x.FirstArgumentShouldBe("Fa.Edit")).Count() == 1 &&
+                       node.DescendantNodesOfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
+                       x.MethodNameShouldBe("Button") &&
+                       x.FirstArgumentShouldBe("\"Edit\"")).Count() == 1)
                 {
                     var m = node;
                     var newExpression = SyntaxFactory.InvocationExpression(
@@ -827,7 +833,16 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 else if (s.DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().Count() == 1 &&
                             s.ArgumentsCountShouldBe(1) &&
                             newRequiredArguments.All(x => (s.FirstArgument().DescendantNodesOfType<InvocationExpressionSyntax>()
-                            .Select(y => y.GetRightSideNameSyntax()?.ToString())).Any(y => y == x)))
+                            .Select(y => y.GetRightSideNameSyntax()?.ToString())).Any(y => y == x)) &&
+                        s.DescendantNodesOfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
+                       x.LeftSideShouldBeIdentifier() &&
+                       x.GetLeftSideExpression().As<IdentifierNameSyntax>()?.Identifier.ToString() == "column").Count() == 1 &&
+                       node.DescendantNodesOfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
+                       x.MethodNameShouldBe("Icon") &&
+                       x.FirstArgumentShouldBe("Fa.Plus")).Count() == 1 &&
+                       node.DescendantNodesOfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
+                       x.MethodNameShouldBe("Button") &&
+                       x.FirstArgumentShouldBe("\"New\"")).Count() == 1)
                 {
                     var m = node;
                     var newExpression = SyntaxFactory.InvocationExpression(
