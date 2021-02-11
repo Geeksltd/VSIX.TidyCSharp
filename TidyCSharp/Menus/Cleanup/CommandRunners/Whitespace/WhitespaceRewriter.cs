@@ -185,6 +185,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             bool isCleanupDone = false;
             var leadingTriviaList = statementNode.GetLeadingTrivia();
 
+            if (statementNode.IsKind(SyntaxKind.EmptyStatement)) // remove unused semicolons
+                return null;
+
             if (_lastTokenIsACloseBrace)
             {
                 if (CheckOption((int)CleanupTypes.Adding_Blank_after_Block_Close_Bracket))

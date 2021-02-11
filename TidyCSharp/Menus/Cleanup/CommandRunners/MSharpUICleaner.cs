@@ -732,7 +732,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
             {
                 var s = node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
-                        .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "Go" ||
+                        .Where(x => ((semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "Go" &&
+                            x.FirstAncestorOrSelf<ArgumentSyntax>() == null) ||
                         (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnClick" ||
                         (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "Link").FirstOrDefault();
                 if (s == null)
@@ -750,7 +751,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                        x.GetLeftSideExpression().As<IdentifierNameSyntax>()?.Identifier.ToString() == "column").Count() == 1 &&
                        node.DescendantNodesOfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
                        x.MethodNameShouldBe("Icon") &&
-                       x.FirstArgumentShouldBe("Fa.Edit")).Count() == 1 &&
+                       x.FirstArgumentShouldBe("FA.Edit")).Count() == 1 &&
                        node.DescendantNodesOfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
                        x.MethodNameShouldBe("Button") &&
                        x.FirstArgumentShouldBe("\"Edit\"")).Count() == 1)
@@ -839,7 +840,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                        x.GetLeftSideExpression().As<IdentifierNameSyntax>()?.Identifier.ToString() == "column").Count() == 1 &&
                        node.DescendantNodesOfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
                        x.MethodNameShouldBe("Icon") &&
-                       x.FirstArgumentShouldBe("Fa.Plus")).Count() == 1 &&
+                       x.FirstArgumentShouldBe("FA.Plus")).Count() == 1 &&
                        node.DescendantNodesOfType<InvocationExpressionSyntax>().Where(x => x.Expression is MemberAccessExpressionSyntax &&
                        x.MethodNameShouldBe("Button") &&
                        x.FirstArgumentShouldBe("\"New\"")).Count() == 1)
