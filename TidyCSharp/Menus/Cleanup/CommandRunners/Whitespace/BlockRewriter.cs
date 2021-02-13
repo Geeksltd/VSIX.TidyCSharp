@@ -35,10 +35,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             if (blockSyntax.Statements.Count == 1 &&
                 blockSyntax.Statements.FirstOrDefault().ToString().Length <= 80)
             {
-                var newNode = blockSyntax.Statements.FirstOrDefault() as ExpressionStatementSyntax;
+                var newNode = blockSyntax.Statements.FirstOrDefault() as StatementSyntax;
 
                 return lambdaNode.WithBlock(null)
-                    .WithExpressionBody(newNode.Expression
+                    .WithExpressionBody((newNode.IsKind(SyntaxKind.ReturnStatement)
+                    ? (newNode as ReturnStatementSyntax).Expression :
+                    (newNode as ExpressionStatementSyntax).Expression)
                         .WithoutTrivia()
                         .WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia(" ")))
                     .WithArrowToken(lambdaNode.ArrowToken.WithoutTrivia());
