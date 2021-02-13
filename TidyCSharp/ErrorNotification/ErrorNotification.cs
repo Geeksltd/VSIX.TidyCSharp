@@ -11,7 +11,7 @@ namespace Geeks.GeeksProductivityTools
 
         internal static void WriteErrorToFile(Exception ex)
         {
-            File.AppendAllText(@"D:\Error.txt", Newtonsoft.Json.JsonConvert.SerializeObject(ex));
+            File.AppendAllText(Path.GetDirectoryName(App.DTE.Solution.FileName) + "\\Tidy.Error.log", Newtonsoft.Json.JsonConvert.SerializeObject(ex));
         }
 
         internal static void EmailError(Exception ex)

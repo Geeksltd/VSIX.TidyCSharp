@@ -61,6 +61,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             if (blockNode.Parent is SimpleLambdaExpressionSyntax) return blockNode;
             if (blockNode.Parent is ParenthesizedLambdaExpressionSyntax) return blockNode;
             if (blockNode.Parent is AnonymousMethodExpressionSyntax) return blockNode;
+            if (blockNode.Parent is LocalFunctionStatementSyntax) return blockNode;
             if (blockNode.Parent is MethodDeclarationSyntax == false && blockNode.Statements.Count == 1)
             {
                 var singleStatement = blockNode.Statements.FirstOrDefault();
