@@ -61,6 +61,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         ConvertMsharpGeneralMethods = 0x27,
 
         [CleanupItem(Title = "Renew Zebble General Statements", FirstOrder = 15)]
-        ConvertZebbleGeneralMethods = 0x28
+        ConvertZebbleGeneralMethods = 0x28,
+
+        [CleanupItem(Title = "Upgrade C# Syntax", FirstOrder = 16)]
+        UpgradeCSharpSyntax = 0x29
     }
 }

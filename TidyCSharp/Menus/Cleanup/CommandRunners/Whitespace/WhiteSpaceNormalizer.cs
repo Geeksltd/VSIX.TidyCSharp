@@ -24,6 +24,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             initialSourceNode = new BlockRewriter(initialSourceNode, options).Visit(initialSourceNode);
             initialSourceNode = RefreshResult(initialSourceNode);
+
+            if (CheckOption((int)CleanupTypes.Add_blank_line_between_statements_more_than_one_line))
+            {
+                initialSourceNode = new EndOFLineRewriter().Visit(initialSourceNode);
+                initialSourceNode = RefreshResult(initialSourceNode);
+            }
+
             initialSourceNode = new WhitespaceRewriter(initialSourceNode, options).Apply();
             if (CheckOption((int)CleanupTypes.Add_blank_line_between_statements_more_than_one_line))
             {

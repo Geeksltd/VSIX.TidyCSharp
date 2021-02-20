@@ -44,5 +44,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
         [CleanupItem(FirstOrder = 1, Title = "Add Blank line between Statements more that one line")]
         Add_blank_line_between_statements_more_than_one_line = 0x500,
+
+        [CleanupItem(FirstOrder = 1, Title = "Use \\n instead of \\r\\n")]
+        Use_slash_n_instead_of_slash_sr_slash_n = 0x600,
     }
 }

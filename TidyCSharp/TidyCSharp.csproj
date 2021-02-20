@@ -450,6 +450,7 @@
     <Compile Include="Menus\ActionsOnCSharp\ActionsCSharpOnFile.cs" />
     <Compile Include="Menus\ActionsOnCSharp\CSharpActionDelegate.cs" />
     <Compile Include="Menus\ActionsOnCSharp\DteServiceProvider.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\CSharpSyntaxUpgrade.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\MSharpGeneralCleaner.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\MSharpModelCleaner.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\MSharpUICleaner.cs" />
@@ -467,6 +468,7 @@
     <Compile Include="Menus\Cleanup\CommandRunners\CamelCasedMethodVariable\Option\Options.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\ConvertFullNameTypesToBuiltInTypes.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\BlankLineRewriter.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\EndOFLineRewriter.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\ZebbleCleaner.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\_Infra\CodeCleanerCommandRunnerBase.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\_Infra\OptionsBase.cs" />
