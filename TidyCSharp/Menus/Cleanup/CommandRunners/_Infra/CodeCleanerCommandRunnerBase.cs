@@ -15,10 +15,12 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
         public void Run(ProjectItem item) => AsyncRun(item);
 
         public ProjectItemDetailsType ProjectItemDetails { get; protected set; }
+        public ProjectItemDetailsType UnModifiedProjectItemDetails { get; protected set; }
 
         protected virtual void AsyncRun(ProjectItem item)
         {
             ProjectItemDetails = new ProjectItemDetailsType(item);
+            UnModifiedProjectItemDetails = ProjectItemDetails;
 
             var initialSourceNode = CleanUp(ProjectItemDetails.InitialSourceNode);
 
@@ -27,6 +29,19 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         protected virtual SyntaxNode RefreshResult(SyntaxNode initialSourceNode)
         {
+            var exceptContents = new char[] { ' ', '\t', '\r', '\n' };
+            var actualContent =
+                string.Join("", initialSourceNode.ToFullString()
+                .ToCharArray().Where(x => !exceptContents.Contains(x)));
+
+            if (string.Join("", UnModifiedProjectItemDetails.ProjectItemDocument
+                .GetTextAsync().Result.ToString()
+                .ToCharArray().Where(x => !exceptContents.Contains(x))) == actualContent)
+            {
+                ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
+                return ProjectItemDetails.InitialSourceNode;
+            }
+
             var newDocument = ProjectItemDetails.ProjectItemDocument.WithSyntaxRoot(initialSourceNode);
             TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
             ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
@@ -37,6 +52,15 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
         protected virtual void SaveResult(SyntaxNode initialSourceNode)
         {
             if (initialSourceNode == null || initialSourceNode == ProjectItemDetails.InitialSourceNode) return;
+            var exceptContents = new char[] { ' ', '\t', '\r', '\n' };
+            var actualContent =
+                string.Join("", initialSourceNode.ToFullString()
+                .ToCharArray().Where(x => !exceptContents.Contains(x)));
+
+            if (string.Join("", UnModifiedProjectItemDetails.ProjectItemDocument
+                .GetTextAsync().Result.ToString()
+                .ToCharArray().Where(x => !exceptContents.Contains(x))) == actualContent)
+                return;
 
             if (ProjectItemDetails.ProjectItemDocument == null)
             {
