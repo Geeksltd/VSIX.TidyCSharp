@@ -33,12 +33,27 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 if (node.Declaration.Type.IsVar)
                     return node;
+                //if (node. != null)
+                //{
+                //    var newNode = node.WithType(SyntaxFactory.ParseTypeName(""))
+                //        .WithNewKeyword(node.NewKeyword.WithoutWhitespaceTrivia());
+                //    var nodeTypeinfo = semanticModel.GetTypeInfo(node);
+                //    var parentSymbol = semanticModel.GetSymbolInfo(node.Parent).Symbol;
+                //    if (parentSymbol?.Kind == SymbolKind.Method &&
+                //        (parentSymbol as IMethodSymbol)?.MethodKind == MethodKind.AnonymousFunction)
+                //        return base.VisitObjectCreationExpression(node);
+
+                //    if (nodeTypeinfo.ConvertedType.Name == nodeTypeinfo.Type.Name)
+                //        return newNode;
+                //}
                 return base.VisitLocalDeclarationStatement(node);
             }
 
             public override SyntaxNode VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
             {
-                if (node.NewKeyword != null)
+                if (node.NewKeyword != null && (
+                    node.Parent.IsKind(SyntaxKind.ReturnStatement) ||
+                    node.Parent.IsKind(SyntaxKind.LocalDeclarationStatement)))
                 {
                     var newNode = node.WithType(SyntaxFactory.ParseTypeName(""))
                         .WithNewKeyword(node.NewKeyword.WithoutWhitespaceTrivia());

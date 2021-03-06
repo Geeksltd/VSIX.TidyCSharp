@@ -18,13 +18,5 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             return base.VisitTrivia(trivia);
         }
 
-        public override SyntaxNode VisitOperatorDeclaration(OperatorDeclarationSyntax node)
-        {
-            var n = node.Update(node.AttributeLists, node.Modifiers, node.ReturnType,
-                node.OperatorKeyword, node.OperatorToken, node.ParameterList, node.Body,
-                node.SemicolonToken);
-            return base.VisitOperatorDeclaration(node);
-        }
-
     }
 }
