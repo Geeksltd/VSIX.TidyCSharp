@@ -118,8 +118,6 @@ namespace System
             foreach (var option in listOfEndings)
                 if (input.EndsWith(option))
                     return true;
-
-
             return false;
         }
 
