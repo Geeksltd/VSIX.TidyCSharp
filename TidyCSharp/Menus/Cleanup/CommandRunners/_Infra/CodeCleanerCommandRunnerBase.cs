@@ -12,6 +12,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
     public abstract class CodeCleanerCommandRunnerBase : ICodeCleaner
     {
+        public bool IsReportOnlyMode { get; set; }
         public void Run(ProjectItem item) => AsyncRun(item);
 
         public ProjectItemDetailsType ProjectItemDetails { get; protected set; }
@@ -24,7 +25,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             var initialSourceNode = CleanUp(ProjectItemDetails.InitialSourceNode);
 
-            SaveResult(initialSourceNode);
+            if (!IsReportOnlyMode)
+                SaveResult(initialSourceNode);
         }
 
         protected virtual SyntaxNode RefreshResult(SyntaxNode initialSourceNode)

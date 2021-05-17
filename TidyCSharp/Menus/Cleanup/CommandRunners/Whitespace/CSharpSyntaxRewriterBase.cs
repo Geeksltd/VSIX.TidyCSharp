@@ -74,7 +74,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                         !t.IsKind(SyntaxKind.EndOfLineTrivia) && !t.IsKind(SyntaxKind.WhitespaceTrivia)
                     );
 
-                if (specialTriviasCount > 0) return CleanUpList(syntaxTrivias);
+                if (specialTriviasCount > 0) 
+                    return CleanUpList(syntaxTrivias);
 
                 return CleanUpList(syntaxTrivias, 0);
             }

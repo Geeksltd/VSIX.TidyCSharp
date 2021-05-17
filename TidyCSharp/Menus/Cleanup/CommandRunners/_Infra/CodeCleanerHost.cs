@@ -7,14 +7,14 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
     public class CodeCleanerHost
     {
-        public static void Run(ProjectItem item, CodeCleanerType command, CleanupOptions cleanupOptions)
+        public static void Run(ProjectItem item, CodeCleanerType command, CleanupOptions cleanupOptions, bool IsReportOnly = false)
         {
             if (!ActiveDocument.IsValid(item))
                 ErrorNotification.EmailError(Resources.PrivateModifierCleanUpFailed);
 
             else
             {
-                var instance = CodeCleanerFactory.Create(command, cleanupOptions);
+                var instance = CodeCleanerFactory.Create(command, cleanupOptions, IsReportOnly);
                 new CodeCleaner(instance, item).Run();
             }
         }
