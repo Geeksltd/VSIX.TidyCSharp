@@ -315,6 +315,7 @@
     <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\BlankLineRewriter.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\Whitespace\EndOFLineRewriter.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\ZebbleCleaner.cs" />
+    <Compile Include="Menus\Cleanup\CommandRunners\_Infra\SyntaxRewriterBase.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\_Infra\CodeCleanerCommandRunnerBase.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\_Infra\OptionsBase.cs" />
     <Compile Include="Menus\Cleanup\CommandRunners\ConvertMembersToExpressionBodied\Option\CleanupTypes.cs" />

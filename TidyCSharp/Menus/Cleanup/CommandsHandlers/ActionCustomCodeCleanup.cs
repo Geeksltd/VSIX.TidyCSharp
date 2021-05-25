@@ -29,7 +29,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             if (dialogResult == DialogResult.Cancel) return;
 
-            ActionsOnCSharp.CSharpActionDelegate.TargetAction desiredAction = ActionsOnCSharp.ActionsCSharpOnFile.DoCleanup;
+            ActionsOnCSharp.CSharpActionDelegate.TargetAction desiredAction = ActionsOnCSharp.ActionsCSharpOnFile.ReportOnlyDoNotCleanup;
             if (CleanupOptionForm.Instance.CleanupOptions != null)
             {
                 ActionsOnCSharp.ActionCSharpOnAnyWhere.Invoke(desiredAction, CleanupOptionForm.Instance.CleanupOptions);

@@ -18,5 +18,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 new CodeCleaner(instance, item).Run();
             }
         }
+
+        public static void GenerateMessages()
+        {
+            CodeCleanerCommandRunnerBase.GenerateMessages();
+        }
     }
 }

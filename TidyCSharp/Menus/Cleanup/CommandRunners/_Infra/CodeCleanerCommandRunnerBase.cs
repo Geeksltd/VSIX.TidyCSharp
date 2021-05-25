@@ -7,11 +7,16 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using RoslynDocument = Microsoft.CodeAnalysis.Document;
+using System.IO;
+using Newtonsoft.Json;
+using System.Xml;
+using System.Text;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
     public abstract class CodeCleanerCommandRunnerBase : ICodeCleaner
     {
+        static IList<ChangesReport> ChangesReports;
         public bool IsReportOnlyMode { get; set; }
         public void Run(ProjectItem item) => AsyncRun(item);
 
@@ -76,6 +81,41 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         public abstract SyntaxNode CleanUp(SyntaxNode initialSourceNode);
 
+        public bool IsEquivalentToUnModified(SyntaxNode initialSourceNode)
+        {
+            return initialSourceNode.IsEquivalentTo(UnModifiedProjectItemDetails.InitialSourceNode);
+        }
+
+        public void CollectMessages(IEnumerable<ChangesReport> changesReports)
+        {
+            ChangesReports = ChangesReports ?? new List<ChangesReport>();
+            foreach (var report in changesReports)
+                ChangesReports.Add(report);
+        }
+        public static void GenerateMessages()
+        {
+            XmlWriterSettings xmlWriterSettings = new XmlWriterSettings();
+            xmlWriterSettings.Indent = true;
+            XmlWriter textWriter = XmlWriter.Create(Path.GetDirectoryName(App.DTE.Solution.FullName)
+                + "\\Tidy.log", xmlWriterSettings);
+            textWriter.WriteStartDocument();
+            textWriter.WriteStartElement("Reports");
+            foreach (var change in ChangesReports)
+            {
+
+                textWriter.WriteStartElement("Report");
+                textWriter.WriteAttributeString("Generator", change.Generator);
+                textWriter.WriteElementString("LineNumber", change.LineNumber.ToString());
+                textWriter.WriteElementString("Column", change.Column.ToString());
+                textWriter.WriteElementString("FileName", change.FileName);
+                textWriter.WriteElementString("Message", change.Message);
+                textWriter.WriteEndElement();
+            }
+            textWriter.WriteEndElement();
+            textWriter.WriteEndDocument();
+            textWriter.Close();
+            ChangesReports.Clear();
+        }
         public ICleanupOption Options { get; set; }
 
         public bool CheckOption(int? optionItem) => Options.Should(optionItem);
