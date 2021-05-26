@@ -8,6 +8,7 @@ namespace GeeksAddin
 
     static class DteExtensions
     {
+        
         /// <summary>
         /// Returns the selected text or null if selected text cannot be found
         /// </summary>
@@ -69,5 +70,8 @@ namespace GeeksAddin
                            .FirstOrDefault(p => p.Name.Equals(SolutionItemsFolder, StringComparison.OrdinalIgnoreCase))
                       ?? solution.AddSolutionFolder(SolutionItemsFolder);
         }
+
+
+
     }
 }

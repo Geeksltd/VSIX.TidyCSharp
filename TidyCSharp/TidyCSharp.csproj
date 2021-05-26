@@ -108,6 +108,10 @@
       <HintPath>..\packages\Microsoft.DiaSymReader.1.3.0\lib\net20\Microsoft.DiaSymReader.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.Practices.Modeling.Common, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Practices.Modeling.Common.4.0.30319\lib\net\Microsoft.Practices.Modeling.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.ServiceHub.Framework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ServiceHub.Framework.2.1.20\lib\netstandard2.0\Microsoft.ServiceHub.Framework.dll</HintPath>
       <Private>True</Private>
@@ -273,6 +277,10 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="UIAutomationProvider" />
     <Reference Include="UIAutomationTypes" />
+    <Reference Include="VsWebSite.Interop, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\packages\VsWebSite.Interop.16.9.31023.347\lib\net45\VsWebSite.Interop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
@@ -290,6 +298,7 @@
   <ItemGroup>
     <Compile Include="Extensions\Extentions.cs" />
     <Compile Include="Extensions\FileExtensions.cs" />
+    <Compile Include="Extensions\RunCodeAnalysisRulesCommand.cs" />
     <Compile Include="Menus\ActionsOnCSharp\ActionCSharpOnAnyWhere.cs" />
     <Compile Include="Menus\ActionsOnCSharp\ActionCSharpOnProjectItem.cs" />
     <Compile Include="Menus\ActionsOnCSharp\ActionsCSharpOnFile.cs" />

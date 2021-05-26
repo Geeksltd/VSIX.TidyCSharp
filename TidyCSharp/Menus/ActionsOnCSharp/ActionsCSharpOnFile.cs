@@ -95,19 +95,19 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
                     if (actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces
                         && actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.OrganizeUsingDirectives
                         && actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.ConvertMsharpGeneralMethods)
-                        CodeCleanerHost.Run(item, actionTypeItem, cleanupOptions,true);
+                        CodeCleanerHost.Run(item, actionTypeItem, cleanupOptions, true);
                 }
 
                 if (cleanupOptions.ActionTypes.Contains(VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces))
                 {
-                    CodeCleanerHost.Run(item, VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces, cleanupOptions,true);
+                    CodeCleanerHost.Run(item, VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces, cleanupOptions, true);
                 }
 
                 if (cleanupOptions.ActionTypes.Contains(VSIX.TidyCSharp.Cleanup.CodeCleanerType.OrganizeUsingDirectives))
                 {
                     window.Document.Close(vsSaveChanges.vsSaveChangesYes);
 
-                    CodeCleanerHost.Run(item, VSIX.TidyCSharp.Cleanup.CodeCleanerType.OrganizeUsingDirectives, cleanupOptions,true);
+                    CodeCleanerHost.Run(item, VSIX.TidyCSharp.Cleanup.CodeCleanerType.OrganizeUsingDirectives, cleanupOptions, true);
 
                     if (fileWindowMustBeOpend == false)
                     {
@@ -122,7 +122,7 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
                 }
                 if (cleanupOptions.ActionTypes.Contains(VSIX.TidyCSharp.Cleanup.CodeCleanerType.ConvertMsharpGeneralMethods))
                 {
-                    CodeCleanerHost.Run(item, VSIX.TidyCSharp.Cleanup.CodeCleanerType.ConvertMsharpGeneralMethods, cleanupOptions,true);
+                    CodeCleanerHost.Run(item, VSIX.TidyCSharp.Cleanup.CodeCleanerType.ConvertMsharpGeneralMethods, cleanupOptions, true);
                 }
                 if (fileWindowMustBeOpend == false)
                 {

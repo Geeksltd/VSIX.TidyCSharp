@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.LanguageServices;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel.Design;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -18,6 +19,7 @@ namespace Geeks.GeeksProductivityTools
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideOptionPage(typeof(OptionsPage), "Geeks productivity tools", "General", 0, 0, true)]
     [Guid(GuidList.GuidGeeksProductivityToolsPkgString)]
+    [ProvideAppCommandLine("TidyReportSwitch", typeof(TidyCSharpPackage), Arguments = "0", DemandLoad = 1)]
     public sealed class TidyCSharpPackage : AsyncPackage
     {
         public TidyCSharpPackage() { }
@@ -26,12 +28,16 @@ namespace Geeks.GeeksProductivityTools
         EnvDTE.DocumentEvents docEvents;
         EnvDTE.SolutionEvents solEvents;
         EnvDTE.Events events;
+        EnvDTE.BuildEvents solbuildEvents;
+        EnvDTE.CommandEvents commandEvents;
 
         public static TidyCSharpPackage Instance { get; private set; }
+
         public Workspace VsWorkspace { get; set; }
 
         bool bResetWorkingSolution;
         Solution _CleanupWorkingSolution;
+
         public Solution CleanupWorkingSolution
         {
             get
@@ -45,6 +51,7 @@ namespace Geeks.GeeksProductivityTools
                 return _CleanupWorkingSolution;
             }
         }
+
         public void RefreshSolution(Solution newSolution)
         {
             _CleanupWorkingSolution = ExtactChanges(_CleanupWorkingSolution, newSolution);
@@ -93,6 +100,7 @@ namespace Geeks.GeeksProductivityTools
 
         protected override async System.Threading.Tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
+
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             await base.InitializeAsync(cancellationToken, progress);
 
@@ -113,10 +121,19 @@ namespace Geeks.GeeksProductivityTools
 
             // Hook up event handlers
             events = App.DTE.Events;
+
             docEvents = events.DocumentEvents;
             solEvents = events.SolutionEvents;
+            solbuildEvents = events.BuildEvents;
             docEvents.DocumentSaved += DocumentEvents_DocumentSaved;
             solEvents.Opened += delegate { App.Initialize(GetDialogPage(typeof(OptionsPage)) as OptionsPage); };
+            solbuildEvents.OnBuildBegin += BuildEvents_OnBuildBegin;
+            commandEvents = events.CommandEvents;
+        }
+
+        private void BuildEvents_OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
+        {
+
         }
 
         void DocumentEvents_DocumentSaved(EnvDTE.Document document)

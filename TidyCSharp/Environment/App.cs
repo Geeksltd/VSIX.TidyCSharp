@@ -1,4 +1,5 @@
 using EnvDTE80;
+using EnvDTE;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 
@@ -12,13 +13,13 @@ namespace Geeks.GeeksProductivityTools
 
         public static void Initialize(OptionsPage optionsPage)
         {
+
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(GlobalExceptionHandlerEvent);
 
             DTE = (DTE2)TidyCSharpPackage.GetGlobalService(typeof(SDTE));
 
             Settings = new GlobalSettings();
             Settings.Load();
-
             OptionsPage = optionsPage;
         }
 

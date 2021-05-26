@@ -28,7 +28,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             var dialogResult = CleanupOptionForm.Instance.ShowDialog();
 
             if (dialogResult == DialogResult.Cancel) return;
-
+            
             ActionsOnCSharp.CSharpActionDelegate.TargetAction desiredAction = ActionsOnCSharp.ActionsCSharpOnFile.DoCleanup;
             if (CleanupOptionForm.Instance.CleanupOptions != null)
             {
