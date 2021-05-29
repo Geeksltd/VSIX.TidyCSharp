@@ -52,13 +52,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 if (IsReportOnlyMode)
                 {
                     var lineSpan = node.GetFileLinePosSpan();
-                    ChangesReport = ChangesReport.Append(new ChangesReport
+                    ChangesReport = ChangesReport.Append(new ChangesReport(node)
                     {
                         LineNumber = lineSpan.StartLinePosition.Line,
                         Column = lineSpan.StartLinePosition.Character,
-                        FileName = node.GetFileName(),
                         Message = "Should Add Readonly Modifier",
-                        Generator = GetType().Name
+                        Generator = nameof(ZebbleCleaner)
                     });
                     return node;
                 }

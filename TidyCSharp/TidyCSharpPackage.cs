@@ -135,6 +135,8 @@ namespace Geeks.GeeksProductivityTools
         {
             var cleanUpRunner = new ActionReadOnlyCodeCleanup();
             cleanUpRunner.RunReadOnlyCleanUp();
+            CodeCleanerHost.GenerateMessages();
+
         }
 
         void DocumentEvents_DocumentSaved(EnvDTE.Document document)

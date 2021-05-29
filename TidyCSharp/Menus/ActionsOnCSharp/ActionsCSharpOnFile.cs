@@ -67,7 +67,6 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
                 {
                     window.Close(vsSaveChanges.vsSaveChangesYes);
                 }
-                CodeCleanerHost.GenerateMessages();
             }
             catch (Exception e)
             {
@@ -129,8 +128,6 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
                 {
                     window.Close(vsSaveChanges.vsSaveChangesYes);
                 }
-                CodeCleanerHost.GenerateMessages();
-
             }
             catch (Exception e)
             {

@@ -35,5 +35,10 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors
         {
             return Path.GetFileName(node.SyntaxTree.FilePath);
         }
+
+        public static string GetFilePath(this SyntaxNode node)
+        {
+            return node.SyntaxTree.FilePath;
+        }
     }
 }

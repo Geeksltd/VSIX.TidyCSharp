@@ -17,6 +17,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             CleanupOptions = new CleanupOptions();
             CleanupOptions.Accept(new
                 ReadOnlyMainCleanup(CodeCleanerType.ConvertZebbleGeneralMethods));
+            CleanupOptions.Accept(new
+                ReadOnlyMainCleanup(CodeCleanerType.OrganizeUsingDirectives));
         }
 
         public void RunReadOnlyCleanUp()

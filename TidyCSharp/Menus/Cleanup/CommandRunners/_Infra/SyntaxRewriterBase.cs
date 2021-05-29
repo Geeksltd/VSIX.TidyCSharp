@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
+﻿using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,17 +18,21 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.Infra
             IsReportOnlyMode = isReportOnlyMode;
             ChangesReport = new List<ChangesReport>();
         }
-        public virtual IEnumerable<ChangesReport> GetReport()
+        public virtual ChangesReport[] GetReport()
         {
-            return ChangesReport;
+            return ChangesReport.ToArray();
         }
     }
 
     public class ChangesReport
     {
+        public ChangesReport(SyntaxNode node)
+        {
+            FileName = node.GetFilePath();
+        }
         public string Message { get; set; }
         public long LineNumber { get; set; }
-        public string FileName { get; set; }
+        public string FileName { get; private set; }
         public string Generator { get; set; }
         public long Column { get; set; }
     }

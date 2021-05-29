@@ -86,7 +86,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             return initialSourceNode.IsEquivalentTo(UnModifiedProjectItemDetails.InitialSourceNode);
         }
 
-        public void CollectMessages(IEnumerable<ChangesReport> changesReports)
+        public void CollectMessages(params ChangesReport[] changesReports)
         {
             ChangesReports = ChangesReports ?? new List<ChangesReport>();
             foreach (var report in changesReports)
