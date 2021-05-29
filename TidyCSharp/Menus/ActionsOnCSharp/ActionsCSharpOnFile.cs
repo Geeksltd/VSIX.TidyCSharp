@@ -67,6 +67,7 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
                 {
                     window.Close(vsSaveChanges.vsSaveChangesYes);
                 }
+                CodeCleanerHost.GenerateMessages();
             }
             catch (Exception e)
             {
