@@ -26,8 +26,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 //window.Activate();
                 ProjectItemDetails.ProjectItem.Document.Activate();
                 ProjectItemDetails.ProjectItem.Document.DTE.ExecuteCommand(UsingsCommands.REMOVE_AND_SORT_COMMAND_NAME);
+                var modified = ProjectItemDetails.ProjectItem.ToSyntaxNode();
+                var unm = this.UnModifiedProjectItemDetails;
                 if (IsReportOnlyMode &&
-                    IsEquivalentToUnModified(ProjectItemDetails.ProjectItem.ToSyntaxNode()))
+                    !IsEquivalentToUnModified(modified))
                 {
                     this.CollectMessages(new ChangesReport(initialSourceNode)
                     {

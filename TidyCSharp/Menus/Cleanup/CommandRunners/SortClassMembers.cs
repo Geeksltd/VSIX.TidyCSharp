@@ -10,7 +10,14 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
     {
         public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
         {
-            return SortClassMembersHelper(initialSourceNode);
+            var modifiedSourceNode = SortClassMembersHelper(initialSourceNode);
+            if (IsReportOnlyMode &&
+                   !IsEquivalentToUnModified(modifiedSourceNode))
+            {
+                //this.CollectMessages(syntaxRewriter.GetReport());
+                return initialSourceNode;
+            }
+            return modifiedSourceNode;
         }
 
         public static SyntaxNode SortClassMembersHelper(SyntaxNode initialSource)
