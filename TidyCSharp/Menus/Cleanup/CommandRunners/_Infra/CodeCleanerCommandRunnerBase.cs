@@ -11,6 +11,7 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Xml;
 using System.Text;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
