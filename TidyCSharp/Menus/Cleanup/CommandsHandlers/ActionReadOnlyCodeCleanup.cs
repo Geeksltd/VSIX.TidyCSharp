@@ -9,22 +9,24 @@ using Geeks.VSIX.TidyCSharp.Cleanup;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
-    public class ActionReadOnlyCodeCleanup
-    {
-        public CleanupOptions CleanupOptions { get; private set; }
-        public ActionReadOnlyCodeCleanup()
-        {
-            CleanupOptions = new CleanupOptions();
-            CleanupOptions.Accept(new
-                ReadOnlyMainCleanup(CodeCleanerType.ConvertZebbleGeneralMethods));
-            CleanupOptions.Accept(new
-                ReadOnlyMainCleanup(CodeCleanerType.OrganizeUsingDirectives));
-        }
+	public class ActionReadOnlyCodeCleanup
+	{
+		public CleanupOptions CleanupOptions { get; private set; }
+		public ActionReadOnlyCodeCleanup()
+		{
+			CleanupOptions = new CleanupOptions();
+			CleanupOptions.Accept(new
+				ReadOnlyMainCleanup(CodeCleanerType.ConvertZebbleGeneralMethods));
+			CleanupOptions.Accept(new
+				ReadOnlyMainCleanup(CodeCleanerType.OrganizeUsingDirectives));
+			CleanupOptions.Accept(new
+				ReadOnlyMainCleanup(CodeCleanerType.SortClassMembers));
+		}
 
-        public void RunReadOnlyCleanUp()
-        {
-            ActionsOnCSharp.CSharpActionDelegate.TargetAction desiredAction = ActionsOnCSharp.ActionsCSharpOnFile.ReportOnlyDoNotCleanup;
-            ActionsOnCSharp.ActionCSharpOnAnyWhere.Invoke(desiredAction, CleanupOptions);
-        }
-    }
+		public void RunReadOnlyCleanUp()
+		{
+			ActionsOnCSharp.CSharpActionDelegate.TargetAction desiredAction = ActionsOnCSharp.ActionsCSharpOnFile.ReportOnlyDoNotCleanup;
+			ActionsOnCSharp.ActionCSharpOnAnyWhere.Invoke(desiredAction, CleanupOptions);
+		}
+	}
 }

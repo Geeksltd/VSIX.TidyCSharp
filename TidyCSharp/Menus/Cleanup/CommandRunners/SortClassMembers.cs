@@ -1,4 +1,5 @@
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
+using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
@@ -11,12 +12,18 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
 		{
 			var modifiedSourceNode = SortClassMembersHelper(initialSourceNode);
-			//if (IsReportOnlyMode &&
-			//	   !IsEquivalentToUnModified(modifiedSourceNode))
-			//{
-			//	//this.CollectMessages(syntaxRewriter.GetReport());
-			//	return initialSourceNode;
-			//}
+			if (IsReportOnlyMode &&
+				   !IsEquivalentToUnModified(modifiedSourceNode))
+			{
+				this.CollectMessages(new ChangesReport(initialSourceNode)
+				{
+					LineNumber = 1,
+					Column = 1,
+					Message = "Sort Class Members",
+					Generator = nameof(SortClassMembers)
+				});
+				return initialSourceNode;
+			}
 			return modifiedSourceNode;
 		}
 
