@@ -21,6 +21,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 				ReadOnlyMainCleanup(CodeCleanerType.OrganizeUsingDirectives));
 			CleanupOptions.Accept(new
 				ReadOnlyMainCleanup(CodeCleanerType.SortClassMembers));
+			CleanupOptions.Accept(new
+				ReadOnlyMainCleanup(CodeCleanerType.SimplifyVariableDeclarations));
 		}
 
 		public void RunReadOnlyCleanUp()

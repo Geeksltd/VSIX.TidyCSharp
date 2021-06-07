@@ -25,6 +25,11 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils
 		{
 			return ChangesReport.ToArray();
 		}
+
+		public void AddReport(ChangesReport changesReports)
+		{
+			ChangesReport = ChangesReport.Append(changesReports);
+		}
 	}
 
 	public class ChangesReport

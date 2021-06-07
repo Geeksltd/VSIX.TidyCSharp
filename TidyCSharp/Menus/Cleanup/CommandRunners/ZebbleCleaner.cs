@@ -53,7 +53,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 				if (IsReportOnlyMode)
 				{
 					var lineSpan = node.GetFileLinePosSpan();
-					ChangesReport = ChangesReport.Append(new ChangesReport(node)
+					AddReport(new ChangesReport(node)
 					{
 						LineNumber = lineSpan.StartLinePosition.Line,
 						Column = lineSpan.StartLinePosition.Character,

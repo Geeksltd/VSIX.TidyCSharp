@@ -1,5 +1,6 @@
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -11,23 +12,25 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 	{
 		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
 		{
-			return SimplifyVariableDeclarationsHelper(ProjectItemDetails, IsReportOnlyMode, Options);
-		}
-
-		public static SyntaxNode SimplifyVariableDeclarationsHelper(ProjectItemDetailsType projectItemDetails, bool isReportOnlyMode, ICleanupOption options)
-		{
-			var initialSourceNode = new Rewriter(projectItemDetails, isReportOnlyMode, options).Visit(projectItemDetails.InitialSourceNode);
-			return initialSourceNode;
+			var syntaxRewriter = new Rewriter(this.ProjectItemDetails.SemanticModel,
+				IsReportOnlyMode, Options);
+			var modifiedSyntaxNode = syntaxRewriter.Visit(initialSourceNode);
+			if (IsReportOnlyMode)
+			{
+				this.CollectMessages(syntaxRewriter.GetReport());
+				return initialSourceNode;
+			}
+			return modifiedSyntaxNode;
 		}
 
 		class Rewriter : CleanupCSharpSyntaxRewriter
 		{
 			const string VarKeyword = "var";
-			readonly ProjectItemDetailsType projectItemDetails;
-
-			public Rewriter(ProjectItemDetailsType projectItemDetails, bool isReportOnlyMode, ICleanupOption options) : base(isReportOnlyMode, options)
+			SemanticModel SemanticModel;
+			public Rewriter(SemanticModel semanticModel, bool isReportOnlyMode, ICleanupOption options)
+				: base(isReportOnlyMode, options)
 			{
-				this.projectItemDetails = projectItemDetails;
+				SemanticModel = semanticModel;
 			}
 
 			public override SyntaxNode VisitVariableDeclaration(VariableDeclarationSyntax node)
@@ -50,12 +53,23 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 				if (variable.Initializer == null) return null;
 
-				var typeOfInitializer = projectItemDetails.SemanticModel.GetTypeInfo(variable.Initializer.Value);
+				var typeOfInitializer = SemanticModel.GetTypeInfo(variable.Initializer.Value);
 
-				var typeOfTypeDef = projectItemDetails.SemanticModel.GetTypeInfo(node.Type);
+				var typeOfTypeDef = SemanticModel.GetTypeInfo(node.Type);
 
-				if (typeOfInitializer.Type == typeOfTypeDef.Type)
+				if (typeOfInitializer.Type.Name == typeOfTypeDef.Type.Name)
 				{
+					if (IsReportOnlyMode)
+					{
+						var lineSpan = node.GetFileLinePosSpan();
+						AddReport(new ChangesReport(node)
+						{
+							LineNumber = lineSpan.StartLinePosition.Line,
+							Column = lineSpan.StartLinePosition.Character,
+							Message = "Should Convert To Var",
+							Generator = nameof(SimplifyVariableDeclarations)
+						});
+					}
 					node =
 						node
 						.WithType(

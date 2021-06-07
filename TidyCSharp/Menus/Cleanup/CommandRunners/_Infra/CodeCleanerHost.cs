@@ -5,23 +5,23 @@ using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
-    public class CodeCleanerHost
-    {
-        public static void Run(ProjectItem item, CodeCleanerType command, CleanupOptions cleanupOptions, bool IsReportOnly = false)
-        {
-            if (!ActiveDocument.IsValid(item))
-                ErrorNotification.EmailError(Resources.PrivateModifierCleanUpFailed);
+	public class CodeCleanerHost
+	{
+		public static void Run(ProjectItem item, CodeCleanerType command, CleanupOptions cleanupOptions, bool IsReportOnly = false)
+		{
+			if (!ActiveDocument.IsValid(item))
+				ErrorNotification.EmailError(Resources.PrivateModifierCleanUpFailed);
 
-            else
-            {
-                var instance = CodeCleanerFactory.Create(command, cleanupOptions, IsReportOnly);
-                new CodeCleaner(instance, item).Run();
-            }
-        }
+			else
+			{
+				var instance = CodeCleanerFactory.Create(command, cleanupOptions, IsReportOnly);
+				new CodeCleaner(instance, item).Run();
+			}
+		}
 
-        public static void GenerateMessages()
-        {
-            CodeCleanerCommandRunnerBase.GenerateMessages();
-        }
-    }
+		public static void GenerateMessages()
+		{
+			CodeCleanerCommandRunnerBase.GenerateMessages();
+		}
+	}
 }
