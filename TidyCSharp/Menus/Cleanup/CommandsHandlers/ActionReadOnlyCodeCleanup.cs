@@ -23,6 +23,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 				ReadOnlyMainCleanup(CodeCleanerType.SortClassMembers));
 			CleanupOptions.Accept(new
 				ReadOnlyMainCleanup(CodeCleanerType.SimplifyVariableDeclarations));
+			CleanupOptions.Accept(new
+				ReadOnlyMainCleanup(CodeCleanerType.RemoveAttributeKeywork));
 		}
 
 		public void RunReadOnlyCleanUp()
