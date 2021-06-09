@@ -1,6 +1,7 @@
 using Geeks.GeeksProductivityTools;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -55,11 +56,26 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 				}
 				while (annotations.Any());
 
+				var lineSpan = initialSourceNode.GetAnnotatedNodes(SELECTED_METHOD_ANNOTATION_REMOVE)
+					.FirstOrDefault().GetFileLinePosSpan();
 				initialSourceNode = initialSourceNode.RemoveNodes(initialSourceNode.GetAnnotatedNodes(SELECTED_METHOD_ANNOTATION_REMOVE), SyntaxRemoveOptions.KeepEndOfLine);
 				var t = initialSourceNode.DescendantNodes().OfType<FieldDeclarationSyntax>().Where(x => x.Declaration.Variables.Count == 0);
 				initialSourceNode = initialSourceNode.RemoveNodes(t, SyntaxRemoveOptions.KeepEndOfLine);
 
 				WorkingDocument = WorkingDocument.WithSyntaxRoot(initialSourceNode);
+
+				if (IsReportOnlyMode &&
+					!IsEquivalentToUnModified(initialSourceNode))
+				{
+					this.CollectMessages(new ChangesReport(orginalDocument.GetSyntaxRootAsync()?.Result)
+					{
+						LineNumber = lineSpan.StartLinePosition.Line,
+						Column = lineSpan.StartLinePosition.Character,
+						Message = "ConvertPropertiesToAutoProperties",
+						Generator = nameof(ConvertPropertiesToAutoProperties)
+					});
+					return initialSourceNode;
+				}
 
 				return null;
 			}

@@ -27,6 +27,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 				ReadOnlyMainCleanup(CodeCleanerType.RemoveAttributeKeywork));
 			CleanupOptions.Accept(new
 				ReadOnlyMainCleanup(CodeCleanerType.UpgradeCSharpSyntax));
+			CleanupOptions.Accept(new
+				ReadOnlyMainCleanup(CodeCleanerType.ConvertPropertiesToAutoProperties));
 		}
 
 		public void RunReadOnlyCleanUp()
