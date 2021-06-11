@@ -33,6 +33,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 				ReadOnlyMainCleanup(CodeCleanerType.ConvertFullNameTypesToBuiltInTypes));
 			CleanupOptions.Accept(new
 				ReadOnlyMainCleanup(CodeCleanerType.CompactSmallIfElseStatements));
+			CleanupOptions.Accept(new
+				ReadOnlyMainCleanup(CodeCleanerType.ConvertMsharpGeneralMethods));
 		}
 
 		public void RunReadOnlyCleanUp()
