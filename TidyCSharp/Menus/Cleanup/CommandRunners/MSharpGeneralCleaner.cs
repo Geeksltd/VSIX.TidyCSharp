@@ -96,7 +96,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 					newExpression = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
 						m, SyntaxFactory.IdentifierName(newExpression.ToString()));
 
-				if (newExpression.ToFullString().Equals(node.ToFullString()))
+				if (!newExpression.ToFullString().Equals(node.ToFullString()))
 				{
 					var lineSpan = node.GetFileLinePosSpan();
 					AddReport(new ChangesReport(node)
