@@ -133,7 +133,6 @@ namespace Geeks.GeeksProductivityTools
 
 		private void BuildEvents_OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
 		{
-			TidyCSharpPackage.Instance.RefreshSolution(this.CleanupWorkingSolution);
 			var cleanUpRunner = new ActionReadOnlyCodeCleanup();
 			cleanUpRunner.RunReadOnlyCleanUp();
 			CodeCleanerHost.GenerateMessages();

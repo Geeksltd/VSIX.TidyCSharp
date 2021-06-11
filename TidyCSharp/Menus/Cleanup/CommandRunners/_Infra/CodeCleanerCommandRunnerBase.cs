@@ -27,6 +27,13 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 		protected virtual void AsyncRun(ProjectItem item)
 		{
 			ProjectItemDetails = new ProjectItemDetailsType(item);
+			if (IsReportOnlyMode)
+			{
+				RefreshResult(item.ToSyntaxNode());
+				//var newDocument = ProjectItemDetails.ProjectItemDocument.WithSyntaxRoot(item.ToSyntaxNode());
+				//TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
+				//ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
+			}
 			UnModifiedProjectItemDetails = ProjectItemDetails;
 
 			var initialSourceNode = CleanUp(ProjectItemDetails.InitialSourceNode);
@@ -160,6 +167,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 			{
 				FilePath = item.ToFullPathPropertyValue();
 				ProjectItem = item;
+
 				InitialSourceNode = ProjectItemDocument != null ? ProjectItemDocument.GetSyntaxRootAsync().Result : item.ToSyntaxNode();
 			}
 			static RoslynDocument GetRoslynDomuentByProjectItem(ProjectItem projectItem)
