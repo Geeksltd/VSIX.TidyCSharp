@@ -31,6 +31,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 				ReadOnlyMainCleanup(CodeCleanerType.ConvertPropertiesToAutoProperties));
 			CleanupOptions.Accept(new
 				ReadOnlyMainCleanup(CodeCleanerType.ConvertFullNameTypesToBuiltInTypes));
+			CleanupOptions.Accept(new
+				ReadOnlyMainCleanup(CodeCleanerType.CompactSmallIfElseStatements));
 		}
 
 		public void RunReadOnlyCleanUp()
