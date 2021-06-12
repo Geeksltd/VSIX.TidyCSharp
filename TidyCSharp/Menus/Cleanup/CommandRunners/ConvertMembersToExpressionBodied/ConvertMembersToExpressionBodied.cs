@@ -1,6 +1,7 @@
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Geeks.VSIX.TidyCSharp.Cleanup.MembersToExpressionBodied;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -19,16 +20,20 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 		class Rewriter : CleanupCSharpSyntaxRewriter
 		{
-			public Rewriter(ICleanupOption Options) : base(false, Options) { }
+			public Rewriter(bool isReportOnlyMode, ICleanupOption options) :
+				base(isReportOnlyMode, options)
+			{ }
 			public override SyntaxNode Visit(SyntaxNode node)
 			{
 				if (node == null) return base.Visit(node);
 
+				string Message = "";
 				if (node is MethodDeclarationSyntax && node.Parent is ClassDeclarationSyntax)
 				{
 					if (CheckOption((int)CleanupTypes.Convert_Methods))
 					{
 						node = ConvertToExpressionBodiedHelper(node as MethodDeclarationSyntax);
+						Message = "Method Declaration should be Converted to expression bodied";
 					}
 				}
 				else if (node is PropertyDeclarationSyntax)
@@ -36,6 +41,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 					if (CheckOption((int)CleanupTypes.Convert_ReadOnly_Property))
 					{
 						node = ConvertToExpressionBodiedHelper(node as PropertyDeclarationSyntax);
+						Message = "Property Declaration should be Converted to expression bodied";
 					}
 				}
 				else if (node is ConstructorDeclarationSyntax)
@@ -43,17 +49,33 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 					if (CheckOption((int)CleanupTypes.Convert_Constructors))
 					{
 						node = ConvertToExpressionBodiedHelper(node as ConstructorDeclarationSyntax);
+						Message = "Constructor should be Converted to expression bodied";
 					}
 				}
-
+				var lineSpan = node.GetFileLinePosSpan();
+				AddReport(new ChangesReport(node)
+				{
+					LineNumber = lineSpan.StartLinePosition.Line,
+					Column = lineSpan.StartLinePosition.Character,
+					Message = Message,
+					Generator = nameof(ConvertMembersToExpressionBodied)
+				});
 				return base.Visit(node);
 			}
 		}
 
 		static SyntaxTrivia[] _spaceTrivia = { SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, " ") };
-		public static SyntaxNode ConvertMembersToExpressionBodiedHelper(SyntaxNode initialSourceNode, ICleanupOption Options)
+		public SyntaxNode ConvertMembersToExpressionBodiedHelper(SyntaxNode initialSourceNode, ICleanupOption Options)
 		{
-			return new Rewriter(Options).Visit(initialSourceNode);
+			var rewriter = new Rewriter(IsReportOnlyMode, Options);
+			var modifiedSourceNode = rewriter.Visit(initialSourceNode);
+
+			if (IsReportOnlyMode)
+			{
+				this.CollectMessages(rewriter.GetReport());
+				return initialSourceNode;
+			}
+			return modifiedSourceNode;
 		}
 
 		public static MethodDeclarationSyntax ConvertToExpressionBodiedHelper(MethodDeclarationSyntax methodDeclaration)

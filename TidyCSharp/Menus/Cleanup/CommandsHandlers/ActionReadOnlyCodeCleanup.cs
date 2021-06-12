@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Geeks.VSIX.TidyCSharp.Cleanup;
+using Geeks.VSIX.TidyCSharp.Cleanup.MembersToExpressionBodied;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -39,6 +40,29 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 				ReadOnlyMainCleanup(CodeCleanerType.ConvertMsharpUIMethods));
 			CleanupOptions.Accept(new
 				ReadOnlyMainCleanup(CodeCleanerType.ConvertMsharpModelMethods));
+			CleanupOptions.Accept(new
+				ReadOnlyMainCleanup(CodeCleanerType.ConvertMembersToExpressionBodied,
+					new CleanerItemUIInfo[] {
+						new CleanerItemUIInfo
+						{
+							CleanerType = (int)CleanupTypes.Convert_Constructors,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(CleanupTypes), CleanupTypes.Convert_Constructors).ToString()
+						},
+						new CleanerItemUIInfo
+						{
+							CleanerType = (int)CleanupTypes.Convert_Methods,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(CleanupTypes), CleanupTypes.Convert_Methods).ToString()
+						},
+						new CleanerItemUIInfo
+						{
+							CleanerType = (int)CleanupTypes.Convert_ReadOnly_Property,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(CleanupTypes), CleanupTypes.Convert_ReadOnly_Property).ToString()
+						}
+					}
+				));
 		}
 
 		public void RunReadOnlyCleanUp()
