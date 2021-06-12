@@ -35,6 +35,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 				ReadOnlyMainCleanup(CodeCleanerType.CompactSmallIfElseStatements));
 			CleanupOptions.Accept(new
 				ReadOnlyMainCleanup(CodeCleanerType.ConvertMsharpGeneralMethods));
+			CleanupOptions.Accept(new
+				ReadOnlyMainCleanup(CodeCleanerType.ConvertMsharpUIMethods));
 		}
 
 		public void RunReadOnlyCleanUp()
