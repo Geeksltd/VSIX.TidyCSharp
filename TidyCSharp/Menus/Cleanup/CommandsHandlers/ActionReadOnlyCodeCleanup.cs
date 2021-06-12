@@ -37,6 +37,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 				ReadOnlyMainCleanup(CodeCleanerType.ConvertMsharpGeneralMethods));
 			CleanupOptions.Accept(new
 				ReadOnlyMainCleanup(CodeCleanerType.ConvertMsharpUIMethods));
+			CleanupOptions.Accept(new
+				ReadOnlyMainCleanup(CodeCleanerType.ConvertMsharpModelMethods));
 		}
 
 		public void RunReadOnlyCleanUp()
