@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Geeks.VSIX.TidyCSharp.Cleanup;
 using CamelCasedClassFieldsCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.CamelCasedClassFields.CleanupTypes;
 using MembersToExpressionBodiedCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.MembersToExpressionBodied.CleanupTypes;
+using SimplyAsyncCallCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.SimplyAsyncCall.CleanupTypes;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -82,6 +83,15 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 						Name = Enum.GetName(typeof(CamelCasedClassFieldsCleanupTypes),
 								CamelCasedClassFieldsCleanupTypes.Const_Fields).ToString()
 					},
+				}));
+			CleanupOptions.Accept(new
+				ReadOnlyMainCleanup(CodeCleanerType.SimplyAsyncCalls, new CleanerItemUIInfo[] {
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)SimplyAsyncCallCleanupTypes.Single_Expression,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(SimplyAsyncCallCleanupTypes), SimplyAsyncCallCleanupTypes.Single_Expression).ToString()
+						},
 				}));
 		}
 
