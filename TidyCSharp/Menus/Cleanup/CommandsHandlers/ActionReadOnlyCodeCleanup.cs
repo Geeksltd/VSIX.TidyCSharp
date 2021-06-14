@@ -9,6 +9,7 @@ using Geeks.VSIX.TidyCSharp.Cleanup;
 using CamelCasedClassFieldsCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.CamelCasedClassFields.CleanupTypes;
 using MembersToExpressionBodiedCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.MembersToExpressionBodied.CleanupTypes;
 using SimplyAsyncCallCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.SimplyAsyncCall.CleanupTypes;
+using RemovePrivateModifierCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.RemovePrivateModifier.CleanupTypes;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -93,6 +94,33 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 							Name = Enum.GetName(typeof(SimplyAsyncCallCleanupTypes), SimplyAsyncCallCleanupTypes.Single_Expression).ToString()
 						},
 				}));
+			CleanupOptions.Accept(new
+				ReadOnlyMainCleanup(CodeCleanerType.PrivateAccessModifier, new CleanerItemUIInfo[] {
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)RemovePrivateModifierCleanupTypes.Remove_Class_Fields_Private_Modifier,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(RemovePrivateModifierCleanupTypes), RemovePrivateModifierCleanupTypes.Remove_Class_Methods_Private_Modifier).ToString()
+						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)RemovePrivateModifierCleanupTypes.Remove_Class_Methods_Private_Modifier,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(RemovePrivateModifierCleanupTypes), RemovePrivateModifierCleanupTypes.Remove_Class_Methods_Private_Modifier).ToString()
+						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)RemovePrivateModifierCleanupTypes.Remove_Class_Properties_Private_Modifier,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(RemovePrivateModifierCleanupTypes), RemovePrivateModifierCleanupTypes.Remove_Class_Properties_Private_Modifier).ToString()
+						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)RemovePrivateModifierCleanupTypes.Remove_Nested_Class_Private_Modifier,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(RemovePrivateModifierCleanupTypes), RemovePrivateModifierCleanupTypes.Remove_Nested_Class_Private_Modifier).ToString()
+						},
+	}));
 		}
 
 		public void RunReadOnlyCleanUp()
