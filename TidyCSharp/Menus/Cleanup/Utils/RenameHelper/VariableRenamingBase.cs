@@ -7,7 +7,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
 	public abstract class VariableRenamingBase : CodeCleanerCommandRunnerBase, ICodeCleaner
 	{
-		const string SELECTED_METHOD_ANNOTATION = "SELECTED_Node_To_RENAME_ANNOTATION";
+		const string SELECTED_METHOD_ANNOTATION = "SELECTED_METHOD_ANNOTATION";
 
 		Document WorkingDocument, orginalDocument;
 
@@ -36,6 +36,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 				var rewriter = GetRewriter(WorkingDocument);
 
 				rewriter.Visit(annotatedNode);
+				this.CollectMessages(rewriter.GetReport());
 				WorkingDocument = rewriter.WorkingDocument;
 			} while (workingNode != null);
 
@@ -57,7 +58,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 		protected abstract class VariableRenamingBaseRewriter : CleanupCSharpSyntaxRewriter
 		{
 			public Document WorkingDocument { get; protected set; }
-			public VariableRenamingBaseRewriter(Document workingDocument, ICleanupOption options) : base(false, options)
+			public VariableRenamingBaseRewriter(Document workingDocument, bool isReportOnlyMode, ICleanupOption options) : base(isReportOnlyMode, options)
 			{
 				WorkingDocument = workingDocument;
 			}

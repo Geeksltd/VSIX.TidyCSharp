@@ -52,14 +52,18 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 						Message = "Constructor should be Converted to expression bodied";
 					}
 				}
-				var lineSpan = node.GetFileLinePosSpan();
-				AddReport(new ChangesReport(node)
+
+				if (!string.IsNullOrEmpty(Message))
 				{
-					LineNumber = lineSpan.StartLinePosition.Line,
-					Column = lineSpan.StartLinePosition.Character,
-					Message = Message,
-					Generator = nameof(ConvertMembersToExpressionBodied)
-				});
+					var lineSpan = node.GetFileLinePosSpan();
+					AddReport(new ChangesReport(node)
+					{
+						LineNumber = lineSpan.StartLinePosition.Line,
+						Column = lineSpan.StartLinePosition.Character,
+						Message = Message,
+						Generator = nameof(ConvertMembersToExpressionBodied)
+					});
+				}
 				return base.Visit(node);
 			}
 		}

@@ -6,7 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Geeks.VSIX.TidyCSharp.Cleanup;
-using Geeks.VSIX.TidyCSharp.Cleanup.MembersToExpressionBodied;
+using CamelCasedClassFieldsCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.CamelCasedClassFields.CleanupTypes;
+using MembersToExpressionBodiedCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.MembersToExpressionBodied.CleanupTypes;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -45,24 +46,43 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 					new CleanerItemUIInfo[] {
 						new CleanerItemUIInfo
 						{
-							CleanerType = (int)CleanupTypes.Convert_Constructors,
+							CleanerType = (int)MembersToExpressionBodiedCleanupTypes.Convert_Constructors,
 							ShouldBeSelectedByDefault = true,
-							Name = Enum.GetName(typeof(CleanupTypes), CleanupTypes.Convert_Constructors).ToString()
+							Name = Enum.GetName(typeof(MembersToExpressionBodiedCleanupTypes), MembersToExpressionBodiedCleanupTypes.Convert_Constructors).ToString()
 						},
 						new CleanerItemUIInfo
 						{
-							CleanerType = (int)CleanupTypes.Convert_Methods,
+							CleanerType = (int)MembersToExpressionBodiedCleanupTypes.Convert_Methods,
 							ShouldBeSelectedByDefault = true,
-							Name = Enum.GetName(typeof(CleanupTypes), CleanupTypes.Convert_Methods).ToString()
+							Name = Enum.GetName(typeof(MembersToExpressionBodiedCleanupTypes),
+								MembersToExpressionBodiedCleanupTypes.Convert_Methods).ToString()
 						},
 						new CleanerItemUIInfo
 						{
-							CleanerType = (int)CleanupTypes.Convert_ReadOnly_Property,
+							CleanerType = (int)MembersToExpressionBodiedCleanupTypes.Convert_ReadOnly_Property,
 							ShouldBeSelectedByDefault = true,
-							Name = Enum.GetName(typeof(CleanupTypes), CleanupTypes.Convert_ReadOnly_Property).ToString()
+							Name = Enum.GetName(typeof(MembersToExpressionBodiedCleanupTypes), MembersToExpressionBodiedCleanupTypes.Convert_ReadOnly_Property).ToString()
 						}
 					}
 				));
+			CleanupOptions.Accept(new
+				ReadOnlyMainCleanup(CodeCleanerType.CamelCasedFields, new CleanerItemUIInfo[]
+				{
+					new CleanerItemUIInfo
+					{
+						CleanerType = (int)CamelCasedClassFieldsCleanupTypes.Normal_Fields,
+						ShouldBeSelectedByDefault = true,
+						Name = Enum.GetName(typeof(CamelCasedClassFieldsCleanupTypes),
+								CamelCasedClassFieldsCleanupTypes.Normal_Fields).ToString()
+					},
+					new CleanerItemUIInfo
+					{
+						CleanerType = (int)CamelCasedClassFieldsCleanupTypes.Const_Fields,
+						ShouldBeSelectedByDefault = true,
+						Name = Enum.GetName(typeof(CamelCasedClassFieldsCleanupTypes),
+								CamelCasedClassFieldsCleanupTypes.Const_Fields).ToString()
+					},
+				}));
 		}
 
 		public void RunReadOnlyCleanUp()
