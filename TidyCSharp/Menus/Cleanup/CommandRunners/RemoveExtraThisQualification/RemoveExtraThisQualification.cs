@@ -1,5 +1,6 @@
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -13,15 +14,22 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 	{
 		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
 		{
-			return new Rewriter(ProjectItemDetails, Options).Visit(initialSourceNode);
+			var rewriter = new Rewriter(ProjectItemDetails, IsReportOnlyMode, Options);
+			var modifiedSourceNode = rewriter.Visit(initialSourceNode);
+			if (IsReportOnlyMode)
+			{
+				this.CollectMessages(rewriter.GetReport());
+				return initialSourceNode;
+			}
+			return modifiedSourceNode;
 		}
 
 		class Rewriter : CleanupCSharpSyntaxRewriter
 		{
 			readonly SemanticModel semanticModel;
 
-			public Rewriter(ProjectItemDetailsType projectItemDetails, ICleanupOption options)
-				: base(false, options)
+			public Rewriter(ProjectItemDetailsType projectItemDetails, bool isReportOnlyMode, ICleanupOption options)
+				: base(isReportOnlyMode, options)
 			{
 				semanticModel = projectItemDetails.SemanticModel;
 			}
@@ -56,7 +64,21 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 				if (newItems.Any())
 				{
-					classNode = classNode.ReplaceNodes(newItems.Keys, (node1, node2) => newItems[node1]);
+					classNode = classNode.ReplaceNodes(newItems.Keys, (node1, node2) =>
+					{
+						if (IsReportOnlyMode)
+						{
+							var lineSpan = node1.GetFileLinePosSpan();
+							AddReport(new ChangesReport(classNode)
+							{
+								LineNumber = lineSpan.StartLinePosition.Line,
+								Column = lineSpan.StartLinePosition.Character,
+								Message = "you can remove this Identifier",
+								Generator = nameof(RemoveExtraThisQualification)
+							});
+						}
+						return newItems[node1];
+					});
 				}
 
 				return classNode;
