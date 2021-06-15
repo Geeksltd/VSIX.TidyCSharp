@@ -11,6 +11,7 @@ using MembersToExpressionBodiedCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.Memb
 using SimplyAsyncCallCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.SimplyAsyncCall.CleanupTypes;
 using RemovePrivateModifierCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.RemovePrivateModifier.CleanupTypes;
 using RemoveExtraThisCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.RemoveExtraThisKeyword.CleanupTypes;
+using CamelCasedMethodCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.CamelCasedMethodVariable.CleanupTypes;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -143,6 +144,20 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 							Name = Enum.GetName(typeof(RemoveExtraThisCleanupTypes), RemoveExtraThisCleanupTypes.Remove_From_Properties_Call).ToString()
 						},
 				}));
+			CleanupOptions.Accept(new
+				ReadOnlyMainCleanup(CodeCleanerType.CamelCasedMethodVariable, new CleanerItemUIInfo[] {
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)CamelCasedMethodCleanupTypes.Local_variable,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(CamelCasedMethodCleanupTypes), CamelCasedMethodCleanupTypes.Local_variable).ToString()
+						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)CamelCasedMethodCleanupTypes.Method_Parameter,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(CamelCasedMethodCleanupTypes), CamelCasedMethodCleanupTypes.Method_Parameter).ToString()
+						}, }));
 		}
 
 		public void RunReadOnlyCleanUp()

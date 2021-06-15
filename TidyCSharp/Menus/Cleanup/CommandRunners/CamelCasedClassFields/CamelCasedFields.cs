@@ -43,14 +43,17 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 						classNode = renamingResult.Node as ClassDeclarationSyntax;
 						WorkingDocument = renamingResult.Document;
 					}
-					var lineSpan = classNode.GetFileLinePosSpan();
-					AddReport(new ChangesReport(classNode)
+					if (renamingResult != null)
 					{
-						LineNumber = lineSpan.StartLinePosition.Line,
-						Column = lineSpan.StartLinePosition.Character,
-						Message = "Camel Cased Fields",
-						Generator = nameof(CamelCasedFields)
-					});
+						var lineSpan = classNode.GetFileLinePosSpan();
+						AddReport(new ChangesReport(classNode)
+						{
+							LineNumber = lineSpan.StartLinePosition.Line,
+							Column = lineSpan.StartLinePosition.Character,
+							Message = "Camel Cased Fields",
+							Generator = nameof(CamelCasedFields)
+						});
+					}
 				}
 
 				if (CheckOption((int)CamelCasedClassFields.CleanupTypes.Const_Fields))
@@ -61,14 +64,18 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 						classNode = renamingResult.Node as ClassDeclarationSyntax;
 						WorkingDocument = renamingResult.Document;
 					}
-					var lineSpan = classNode.GetFileLinePosSpan();
-					AddReport(new ChangesReport(classNode)
+
+					if (renamingResult != null)
 					{
-						LineNumber = lineSpan.StartLinePosition.Line,
-						Column = lineSpan.StartLinePosition.Character,
-						Message = "CamelCasedFields",
-						Generator = nameof(CamelCasedFields)
-					});
+						var lineSpan = classNode.GetFileLinePosSpan();
+						AddReport(new ChangesReport(classNode)
+						{
+							LineNumber = lineSpan.StartLinePosition.Line,
+							Column = lineSpan.StartLinePosition.Character,
+							Message = "CamelCasedFields",
+							Generator = nameof(CamelCasedFields)
+						});
+					}
 				}
 
 				return classNode;
