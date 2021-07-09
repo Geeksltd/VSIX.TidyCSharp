@@ -8,6 +8,7 @@ using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 
 namespace Geeks.GeeksProductivityTools
@@ -30,7 +31,7 @@ namespace Geeks.GeeksProductivityTools
 		EnvDTE.Events events;
 		EnvDTE.BuildEvents solbuildEvents;
 		EnvDTE.CommandEvents commandEvents;
-
+		bool runInReadonlyMode = false;
 		public static TidyCSharpPackage Instance { get; private set; }
 
 		public Workspace VsWorkspace { get; set; }
@@ -121,7 +122,6 @@ namespace Geeks.GeeksProductivityTools
 
 			// Hook up event handlers
 			events = App.DTE.Events;
-
 			docEvents = events.DocumentEvents;
 			solEvents = events.SolutionEvents;
 			solbuildEvents = events.BuildEvents;
@@ -129,14 +129,21 @@ namespace Geeks.GeeksProductivityTools
 			solEvents.Opened += delegate { App.Initialize(GetDialogPage(typeof(OptionsPage)) as OptionsPage); };
 			solbuildEvents.OnBuildBegin += BuildEvents_OnBuildBegin;
 			commandEvents = events.CommandEvents;
+			events.DTEEvents.OnStartupComplete += DTEEvents_OnStartupComplete;
 		}
 
+		private void DTEEvents_OnStartupComplete()
+		{
+			runInReadonlyMode = true;
+		}
 		private void BuildEvents_OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
 		{
-			var cleanUpRunner = new ActionReadOnlyCodeCleanup();
-			cleanUpRunner.RunReadOnlyCleanUp();
-			CodeCleanerHost.GenerateMessages();
-
+			if (runInReadonlyMode)
+			{
+				var cleanUpRunner = new ActionReadOnlyCodeCleanup();
+				cleanUpRunner.RunReadOnlyCleanUp();
+				CodeCleanerHost.GenerateMessages();
+			}
 		}
 
 		void DocumentEvents_DocumentSaved(EnvDTE.Document document)
