@@ -85,11 +85,7 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 			{
 				var path = item.Properties.Item("FullPath").Value.ToString();
 				if (path.EndsWithAny(new[] { "AssemblyInfo.cs", "TheApplication.cs" })) return;
-				//System.IO.File.WriteAllText(@"c:\\onfile-1.log", "1");
-				//var window = item.Open(Constants.vsViewKindCode);
-				//System.IO.File.WriteAllText(@"c:\\onfile-2.log", "1");
-				//window.Activate();
-				//System.IO.File.WriteAllText(@"c:\\onfile-3.log", "1");
+
 				foreach (var actionTypeItem in cleanupOptions.ActionTypes)
 				{
 					if (actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces
@@ -131,7 +127,6 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 			}
 			catch (Exception e)
 			{
-				System.IO.File.WriteAllText(@"c:\\error-onfile.log", e.Message);
 				ErrorNotification.WriteErrorToFile(e);
 				ErrorNotification.EmailError(e);
 				ProcessActions.GeeksProductivityToolsProcess();

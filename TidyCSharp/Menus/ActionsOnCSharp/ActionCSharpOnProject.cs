@@ -28,7 +28,6 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 			}
 			catch (Exception e)
 			{
-				System.IO.File.WriteAllText(@"c:\\error-onproject.log", e.Message);
 				ErrorNotification.EmailError(e);
 				ErrorNotification.WriteErrorToFile(e);
 				ProcessActions.GeeksProductivityToolsProcess();
