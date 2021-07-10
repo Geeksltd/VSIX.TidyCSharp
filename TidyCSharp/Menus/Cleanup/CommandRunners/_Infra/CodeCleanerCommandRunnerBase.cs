@@ -96,9 +96,13 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
 		public void CollectMessages(params ChangesReport[] changesReports)
 		{
-			ChangesReports = ChangesReports ?? new List<ChangesReport>();
 			foreach (var report in changesReports)
 				ChangesReports.Add(report);
+		}
+
+		static CodeCleanerCommandRunnerBase()
+		{
+			ChangesReports = ChangesReports ?? new List<ChangesReport>();
 		}
 		public static void GenerateMessages()
 		{
@@ -108,6 +112,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 				+ "\\Tidy.log", xmlWriterSettings);
 			textWriter.WriteStartDocument();
 			textWriter.WriteStartElement("Reports");
+			File.WriteAllText(@"C:\\changes.txt", $"we have {ChangesReports.Count()} count.");
 			foreach (var change in ChangesReports)
 			{
 
@@ -121,6 +126,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 			}
 			textWriter.WriteEndElement();
 			textWriter.WriteEndDocument();
+			textWriter.Flush();
 			textWriter.Close();
 			ChangesReports.Clear();
 		}

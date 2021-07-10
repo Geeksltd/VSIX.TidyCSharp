@@ -23,8 +23,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 			CleanupOptions = new CleanupOptions();
 			CleanupOptions.Accept(new
 				ReadOnlyMainCleanup(CodeCleanerType.ConvertZebbleGeneralMethods));
-			CleanupOptions.Accept(new
-				ReadOnlyMainCleanup(CodeCleanerType.OrganizeUsingDirectives));
+			//CleanupOptions.Accept(new
+			//	ReadOnlyMainCleanup(CodeCleanerType.OrganizeUsingDirectives));
 			CleanupOptions.Accept(new
 				ReadOnlyMainCleanup(CodeCleanerType.SortClassMembers));
 			CleanupOptions.Accept(new
@@ -163,7 +163,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 		public void RunReadOnlyCleanUp()
 		{
 			ActionsOnCSharp.CSharpActionDelegate.TargetAction desiredAction = ActionsOnCSharp.ActionsCSharpOnFile.ReportOnlyDoNotCleanup;
-			ActionsOnCSharp.ActionCSharpOnAnyWhere.Invoke(desiredAction, CleanupOptions);
+			ActionsOnCSharp.ActionCSharpOnSolution.Invoke(desiredAction, CleanupOptions);
+			System.IO.File.WriteAllText(@"c:\\done.txt", "1");
 		}
 	}
 }

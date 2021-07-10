@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -67,7 +68,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 					return base.VisitObjectCreationExpression(node);
 				if (node.Parent.IsKind(SyntaxKind.LocalDeclarationStatement))
 					return base.VisitObjectCreationExpression(node);
-
 
 				var newNode = node.WithType(SyntaxFactory.ParseTypeName(""))
 					.WithNewKeyword(node.NewKeyword.WithoutWhitespaceTrivia());

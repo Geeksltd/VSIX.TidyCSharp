@@ -19,7 +19,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 	{
 		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
 		{
-			if (App.DTE.ActiveDocument.ProjectItem.ProjectItems.ContainingProject.Name == "#Model")
+			if (ProjectItemDetails.ProjectItem.ContainingProject.Name == "#Model")
 				return ChangeMethodHelper(initialSourceNode);
 			return initialSourceNode;
 		}

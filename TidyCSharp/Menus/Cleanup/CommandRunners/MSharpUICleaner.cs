@@ -21,7 +21,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 	{
 		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
 		{
-			if (App.DTE.ActiveDocument.ProjectItem.ProjectItems.ContainingProject.Name == "#UI")
+			if (ProjectItemDetails.ProjectItem.ContainingProject.Name == "#UI")
 				return ChangeMethodHelper(initialSourceNode);
 			return initialSourceNode;
 		}
