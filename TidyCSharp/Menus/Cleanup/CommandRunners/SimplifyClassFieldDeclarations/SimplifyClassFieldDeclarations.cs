@@ -1,5 +1,6 @@
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -14,18 +15,25 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 	{
 		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
 		{
-			return SimplifyClassFieldDeclarationsHelper(initialSourceNode, Options);
+			return SimplifyClassFieldDeclarationsHelper(initialSourceNode, this.IsReportOnlyMode, Options);
 		}
 
-		public static SyntaxNode SimplifyClassFieldDeclarationsHelper(SyntaxNode initialSourceNode, ICleanupOption options)
+		public SyntaxNode SimplifyClassFieldDeclarationsHelper(SyntaxNode initialSourceNode, bool isReportOnlyMode, ICleanupOption options)
 		{
-			initialSourceNode = new Rewriter(options).Visit(initialSourceNode);
-			return initialSourceNode;
+			var rewriter = new Rewriter(isReportOnlyMode, options);
+			var modifiedSourceNode = rewriter.Visit(initialSourceNode);
+			if (IsReportOnlyMode)
+			{
+				this.CollectMessages(rewriter.GetReport());
+				return initialSourceNode;
+			}
+			return modifiedSourceNode;
 		}
 
 		class Rewriter : CleanupCSharpSyntaxRewriter
 		{
-			public Rewriter(ICleanupOption options) : base(false, options)
+			public Rewriter(bool isReportOnlyMode, ICleanupOption options) :
+				base(isReportOnlyMode, options)
 			{
 			}
 
@@ -76,6 +84,17 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 						if (valueObj != null) return base.VisitVariableDeclarator(node);
 					}
 
+					if (IsReportOnlyMode)
+					{
+						var lineSpan = node.GetFileLinePosSpan();
+						AddReport(new ChangesReport(node)
+						{
+							LineNumber = lineSpan.StartLinePosition.Line,
+							Column = lineSpan.StartLinePosition.Character,
+							Message = "Field initialize with \"= null;\" or \"= 0;\" can be removed",
+							Generator = nameof(SimplifyClassFieldDeclarations)
+						});
+					}
 					node = node.WithInitializer(null).WithoutTrailingTrivia();
 				}
 
@@ -161,7 +180,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 				var replaceList = newDeclarationDic.Select(x => x.Value.FirstOldFieldDeclarations).ToList();
 
-				classDescriptionNode =
+				var newClassDescriptionNode =
 					classDescriptionNode
 					.ReplaceNodes
 					(
@@ -182,8 +201,18 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 							 return null;
 						 }
 					);
-
-				return classDescriptionNode;
+				if (replaceList.Any() && IsReportOnlyMode)
+				{
+					var lineSpan = classDescriptionNode.GetFileLinePosSpan();
+					AddReport(new ChangesReport(classDescriptionNode)
+					{
+						LineNumber = lineSpan.StartLinePosition.Line,
+						Column = lineSpan.StartLinePosition.Character,
+						Message = "Field initialize can be in one line",
+						Generator = nameof(SimplifyClassFieldDeclarations)
+					});
+				}
+				return newClassDescriptionNode;
 			}
 
 			NewFieldDeclarationDicKey GetKey(FieldDeclarationSyntax fieldDeclarationItem)

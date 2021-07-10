@@ -42,7 +42,6 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 			}
 			catch (Exception e)
 			{
-				System.IO.File.WriteAllText(@"c:\\error-anywhere.log", e.Message);
 				ErrorNotification.WriteErrorToFile(e);
 				ErrorNotification.EmailError(e);
 				ProcessActions.GeeksProductivityToolsProcess();

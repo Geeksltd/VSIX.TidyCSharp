@@ -376,6 +376,7 @@
     <Compile Include="Menus\Cleanup\SyntaxNodeExtractors\ArgumentListSyntaxExtractor.cs" />
     <Compile Include="Menus\Cleanup\SyntaxNodeExtractors\InvocationExpressionExtractor.cs" />
     <Compile Include="Menus\Cleanup\SyntaxNodeExtractors\SyntaxNodeExtractor.cs" />
+    <Compile Include="Menus\Cleanup\SyntaxNodeExtractors\VariableDeclaratorSyntaxExtractor.cs" />
     <Compile Include="Menus\Cleanup\SyntaxNodeTypeConverter\SyntaxNodeConverter.cs" />
     <Compile Include="Menus\Cleanup\SyntaxNodeValidators\ArgumentListSyntaxValidator.cs" />
     <Compile Include="Menus\Cleanup\SyntaxNodeValidators\ClassDeclarationValidator.cs" />

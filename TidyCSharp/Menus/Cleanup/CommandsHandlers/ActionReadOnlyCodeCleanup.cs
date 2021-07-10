@@ -12,6 +12,7 @@ using SimplyAsyncCallCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.SimplyAsyncCal
 using RemovePrivateModifierCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.RemovePrivateModifier.CleanupTypes;
 using RemoveExtraThisCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.RemoveExtraThisKeyword.CleanupTypes;
 using CamelCasedMethodCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.CamelCasedMethodVariable.CleanupTypes;
+using SimplifyClassFieldDeclarationCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.SimplifyClassFieldDeclaration.CleanupTypes;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -158,6 +159,26 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 							ShouldBeSelectedByDefault = true,
 							Name = Enum.GetName(typeof(CamelCasedMethodCleanupTypes), CamelCasedMethodCleanupTypes.Method_Parameter).ToString()
 						}, }));
+			CleanupOptions.Accept(new
+				ReadOnlyMainCleanup(CodeCleanerType.SimplifyClassFieldDeclarations, new CleanerItemUIInfo[] {
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)SimplifyClassFieldDeclarationCleanupTypes.Group_And_Merge_class_fields,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(SimplifyClassFieldDeclarationCleanupTypes), SimplifyClassFieldDeclarationCleanupTypes.Group_And_Merge_class_fields).ToString()
+						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)SimplifyClassFieldDeclarationCleanupTypes.Remove_Class_Fields_Initializer_Literal,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(SimplifyClassFieldDeclarationCleanupTypes), SimplifyClassFieldDeclarationCleanupTypes.Remove_Class_Fields_Initializer_Literal).ToString()
+						},new CleanerItemUIInfo
+						{
+							CleanerType = (int)SimplifyClassFieldDeclarationCleanupTypes.Remove_Class_Fields_Initializer_Null,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(SimplifyClassFieldDeclarationCleanupTypes), SimplifyClassFieldDeclarationCleanupTypes.Remove_Class_Fields_Initializer_Null).ToString()
+						},
+					}));
 		}
 
 		public void RunReadOnlyCleanUp()
