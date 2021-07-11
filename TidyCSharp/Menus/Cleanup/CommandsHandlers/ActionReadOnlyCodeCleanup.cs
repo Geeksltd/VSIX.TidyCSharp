@@ -13,6 +13,7 @@ using RemovePrivateModifierCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.RemovePr
 using RemoveExtraThisCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.RemoveExtraThisKeyword.CleanupTypes;
 using CamelCasedMethodCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.CamelCasedMethodVariable.CleanupTypes;
 using SimplifyClassFieldDeclarationCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.SimplifyClassFieldDeclaration.CleanupTypes;
+using NormalizeWhitespaceCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace.CleanupTypes;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -179,13 +180,93 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 							Name = Enum.GetName(typeof(SimplifyClassFieldDeclarationCleanupTypes), SimplifyClassFieldDeclarationCleanupTypes.Remove_Class_Fields_Initializer_Null).ToString()
 						},
 					}));
+			CleanupOptions.Accept(new
+				ReadOnlyMainCleanup(CodeCleanerType.NormalizeWhiteSpaces, new CleanerItemUIInfo[] {
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)NormalizeWhitespaceCleanupTypes.Adding_Blank_after_Block_Close_Bracket,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Adding_Blank_after_Block_Close_Bracket).ToString()
+						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)NormalizeWhitespaceCleanupTypes.Adding_Blank_after_Method_Close_Bracket,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Adding_Blank_after_Method_Close_Bracket).ToString()
+						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)NormalizeWhitespaceCleanupTypes.Add_blank_line_between_statements_more_than_one_line,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Add_blank_line_between_statements_more_than_one_line).ToString()
+						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)NormalizeWhitespaceCleanupTypes.Insert_Space_Before_Comment_Text,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Insert_Space_Before_Comment_Text).ToString()
+						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_BLs_after_Open_Bracket_and_Before_Close_Brackets,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_BLs_after_Open_Bracket_and_Before_Close_Brackets).ToString()
+						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_Brackets_of_block_that_has_only_one_statement_with_length_shorter_than_80_chars,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_Brackets_of_block_that_has_only_one_statement_with_length_shorter_than_80_chars).ToString()
+						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_DBL_Between_Class_Members,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_DBL_Between_Class_Members).ToString()
+						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_DBL_Between_Methods_Statements,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_DBL_Between_Methods_Statements).ToString()
+						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_DBL_Between_Namespace_Members,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_DBL_Between_Namespace_Members).ToString()
+						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_DBL_Inside_Comments,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_DBL_Inside_Comments).ToString()
+						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_DBL_Inside_Usings,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_DBL_Inside_Usings).ToString()
+						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)NormalizeWhitespaceCleanupTypes.Trim_The_File,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Trim_The_File).ToString()
+						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)NormalizeWhitespaceCleanupTypes.Use_slash_n_instead_of_slash_sr_slash_n,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Use_slash_n_instead_of_slash_sr_slash_n).ToString()
+						},
+				}));
 		}
 
 		public void RunReadOnlyCleanUp()
 		{
 			ActionsOnCSharp.CSharpActionDelegate.TargetAction desiredAction = ActionsOnCSharp.ActionsCSharpOnFile.ReportOnlyDoNotCleanup;
 			ActionsOnCSharp.ActionCSharpOnSolution.Invoke(desiredAction, CleanupOptions);
-			System.IO.File.WriteAllText(@"c:\\done.txt", "1");
 		}
 	}
 }

@@ -38,6 +38,11 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils
 		{
 			FileName = node.GetFilePath();
 		}
+
+		public ChangesReport(SyntaxTrivia trivia)
+		{
+			FileName = trivia.GetFilePath();
+		}
 		public string Message { get; set; }
 		public long LineNumber { get; set; }
 		public string FileName { get; private set; }

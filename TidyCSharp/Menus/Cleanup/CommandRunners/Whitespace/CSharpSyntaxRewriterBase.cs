@@ -12,7 +12,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 		protected SyntaxNode InitialSource;
 		static SyntaxTrivia _endOfLineTrivia = default(SyntaxTrivia);
 
-		public CSharpSyntaxRewriterBase(SyntaxNode initialSource, Options options) : base(false, options)
+		public CSharpSyntaxRewriterBase(SyntaxNode initialSource,
+			bool isReadOnlyMode, Options options) :
+			base(isReadOnlyMode, options)
 		{
 			InitialSource = initialSource;
 
