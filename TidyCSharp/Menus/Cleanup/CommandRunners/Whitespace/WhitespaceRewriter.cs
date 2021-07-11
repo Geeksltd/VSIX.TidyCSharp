@@ -21,10 +21,35 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 		public SyntaxNode Apply()
 		{
 			TrimFile();
+			AddNewLineAfterUsings();
 
 			return Visit(InitialSource);
 		}
 
+		void AddNewLineAfterUsings()
+		{
+			if (CheckOption((int)CleanupTypes.Add_an_empty_line_after_using_statements))
+			{
+				var list = InitialSource.DescendantNodesOfType<UsingDirectiveSyntax>()
+				.Select(x => new
+				{
+					StartLine = x.GetFileLinePosSpan().StartLinePosition.Line,
+					EndLine = x.GetFileLinePosSpan().EndLinePosition.Line,
+					Directive = x
+				});
+
+				var selectedDirectives = list.Join(list, a => a.EndLine + 1, b => b.StartLine, (a, b) => b.Directive)
+					.Where(x => x.GetTrailingTrivia()
+					.Count(y => y.IsKind(SyntaxKind.EndOfLineTrivia)) < 2);
+
+				InitialSource = InitialSource.ReplaceNodes(selectedDirectives, (a, b) =>
+				 {
+					 return b.WithTrailingTrivia(
+							 b.GetTrailingTrivia().AddRange(
+								 SyntaxFactory.ParseTrailingTrivia("\n")));
+				 });
+			}
+		}
 		void TrimFile()
 		{
 			var newLeadingTriviaList = CleanUpListWithNoWhitespaces(InitialSource.GetLeadingTrivia(), CleanupTypes.Trim_The_File);
@@ -66,6 +91,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
 			var nodeLeadingTriviList = node.GetLeadingTrivia();
 			SyntaxNode newNode = null;
+
+
+
 			if (node is UsingDirectiveSyntax)
 			{
 				nodeLeadingTriviList = CleanUpListWithNoWhitespaces(nodeLeadingTriviList, CleanupTypes.Remove_DBL_Inside_Usings);

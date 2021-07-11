@@ -260,6 +260,12 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 							ShouldBeSelectedByDefault = true,
 							Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Use_slash_n_instead_of_slash_sr_slash_n).ToString()
 						},
+					new CleanerItemUIInfo
+						{
+							CleanerType = (int)NormalizeWhitespaceCleanupTypes.Add_an_empty_line_after_using_statements,
+							ShouldBeSelectedByDefault = true,
+							Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Add_an_empty_line_after_using_statements).ToString()
+						},
 				}));
 		}
 
