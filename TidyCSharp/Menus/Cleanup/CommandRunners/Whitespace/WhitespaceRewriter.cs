@@ -35,12 +35,14 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 				{
 					StartLine = x.GetFileLinePosSpan().StartLinePosition.Line,
 					EndLine = x.GetFileLinePosSpan().EndLinePosition.Line,
+					EndPosition = x.FullSpan.End,
 					Directive = x
 				});
 
-				var selectedDirectives = list.Join(list, a => a.EndLine + 1, b => b.StartLine, (a, b) => b.Directive)
-					.Where(x => x.GetTrailingTrivia()
-					.Count(y => y.IsKind(SyntaxKind.EndOfLineTrivia)) < 2);
+				var selectedDirectives = list.Join(list, a => a.EndLine + 1, b => b.StartLine, (a, b) => b)
+					.Where(x => !InitialSource.FindTrivia(x.EndPosition, false)
+						.IsKind(SyntaxKind.EndOfLineTrivia))
+					.Select(x => x.Directive);
 
 				InitialSource = InitialSource.ReplaceNodes(selectedDirectives, (a, b) =>
 				 {
