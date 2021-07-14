@@ -52,7 +52,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 			catch (Exception e)
 			{
 				ErrorNotification.WriteErrorToFile(e);
-				ErrorNotification.EmailError(e);
+				ErrorNotification.WriteErrorToOutputWindow(e);
 				ProcessActions.GeeksProductivityToolsProcess();
 			}
 

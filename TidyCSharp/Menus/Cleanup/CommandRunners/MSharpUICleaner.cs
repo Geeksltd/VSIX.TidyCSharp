@@ -1587,6 +1587,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 			{
 				var listInvocations = new string[] { "OnClick" };
 				var listInvocationsWithGo = new string[] { "OnClick", "Go" };
+				if (node == null)
+					return node;
 				var invocation = node.DescendantNodesOfType<InvocationExpressionSyntax>()
 					.Where(x =>
 						//x.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
@@ -1597,7 +1599,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 						|| x.MethodNameShouldBeIn(listInvocations))
 					.FirstOrDefault();
 
-				if (invocation != null)
+				if (invocation != null &&
+					invocation.Ancestors().FirstOrDefault(x => x.IsKind(SyntaxKind.ExpressionStatement)) != null)
 				{
 					var newNode = node.ReplaceNodes(invocation.Ancestors().FirstOrDefault(x => x.IsKind(SyntaxKind.ExpressionStatement))
 						.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>(),
