@@ -1,4 +1,5 @@
-﻿using Geeks.GeeksProductivityTools.Menus.Cleanup;
+﻿
+using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
@@ -67,6 +68,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 				if (node.Parent.IsKind(SyntaxKind.ReturnStatement))
 					return base.VisitObjectCreationExpression(node);
 				if (node.Parent.IsKind(SyntaxKind.LocalDeclarationStatement))
+					return base.VisitObjectCreationExpression(node);
+				if (node.Parent.IsKind(SyntaxKind.SimpleMemberAccessExpression))
 					return base.VisitObjectCreationExpression(node);
 
 				var newNode = node.WithType(SyntaxFactory.ParseTypeName(""))
