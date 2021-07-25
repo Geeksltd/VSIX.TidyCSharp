@@ -112,7 +112,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 				+ "\\Tidy.log", xmlWriterSettings);
 			textWriter.WriteStartDocument();
 			textWriter.WriteStartElement("Reports");
-			File.WriteAllText(@"C:\\changes.txt", $"we have {ChangesReports.Count()} count.");
 			foreach (var change in ChangesReports)
 			{
 
