@@ -12,6 +12,9 @@ using Newtonsoft.Json;
 using System.Xml;
 using System.Text;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeTypeConverter;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -27,6 +30,15 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 		protected virtual void AsyncRun(ProjectItem item)
 		{
 			ProjectItemDetails = new ProjectItemDetailsType(item);
+			if (ProjectItemDetails.InitialSourceNode
+				.DescendantNodesOfType<AttributeSyntax>()
+				.Any(x => x.Name.ToString() == "EscapeGCop" &&
+				   x.ArgumentList.Arguments.FirstOrDefault().ToString()
+				   == "\"Auto generated code.\""))
+			{
+				return;
+			}
+
 			if (IsReportOnlyMode)
 			{
 				RefreshResult(item.ToSyntaxNode());
