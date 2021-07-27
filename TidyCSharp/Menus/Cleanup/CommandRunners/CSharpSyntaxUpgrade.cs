@@ -73,7 +73,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 					return base.VisitObjectCreationExpression(node);
 
 				var newNode = node.WithType(SyntaxFactory.ParseTypeName(""))
-					.WithNewKeyword(node.NewKeyword.WithoutWhitespaceTrivia());
+					.WithNewKeyword(node.NewKeyword.WithoutWhitespaceTrivia())
+					.WithArgumentList(node.ArgumentList ?? SyntaxFactory.ParseArgumentList("()"));
 				var nodeTypeinfo = semanticModel.GetTypeInfo(node);
 				var parentSymbol = semanticModel.GetSymbolInfo(node.Parent).Symbol;
 				if (parentSymbol?.Kind == SymbolKind.Method &&
