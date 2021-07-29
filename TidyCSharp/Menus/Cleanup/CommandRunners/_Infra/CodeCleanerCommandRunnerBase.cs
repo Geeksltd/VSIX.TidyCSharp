@@ -30,6 +30,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 		protected virtual void AsyncRun(ProjectItem item)
 		{
 			ProjectItemDetails = new ProjectItemDetailsType(item);
+			File.AppendAllText(@"C:\log.txt", $"{ProjectItemDetails.FilePath} : {this.ToString()}");
 			if (ProjectItemDetails.InitialSourceNode
 				.DescendantNodesOfType<AttributeSyntax>()
 				.Any(x => x.Name.ToString() == "EscapeGCop" &&
