@@ -33,7 +33,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 			if (ProjectItemDetails.InitialSourceNode
 				.DescendantNodesOfType<AttributeSyntax>()
 				.Any(x => x.Name.ToString() == "EscapeGCop" &&
-				   x.ArgumentList.Arguments.FirstOrDefault().ToString()
+				x.ArgumentList != null &&
+				x.ArgumentList.Arguments.FirstOrDefault().ToString()
 				   == "\"Auto generated code.\""))
 			{
 				return;
