@@ -361,9 +361,11 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 			var semanticModel = await annotatedDocument.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
 			var symbol = semanticModel.GetDeclaredSymbol(annotatedToken.Parent, cancellationToken);
 
-			var newSolution = await Microsoft.CodeAnalysis.Rename.Renamer.RenameSymbolAsync(annotatedSolution, symbol, newName, annotatedSolution.Workspace.Options, cancellationToken).ConfigureAwait(false);
+			var task =  Microsoft.CodeAnalysis.Rename.Renamer.RenameSymbolAsync(annotatedSolution, symbol, newName, annotatedSolution.Workspace.Options, cancellationToken);//.ConfigureAwait(false);
 
-			return newSolution;
+			task.Wait((int)TimeSpan.FromSeconds(2).TotalMilliseconds);
+
+			return task.IsCompleted ? task.Result : annotatedSolution;
 		}
 	}
 }

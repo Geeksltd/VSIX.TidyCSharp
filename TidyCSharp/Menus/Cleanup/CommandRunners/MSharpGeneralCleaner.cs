@@ -122,9 +122,18 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 			{
 				if (node.Token.ValueText.StartsWith("c#:"))
 				{
+					var classDeclaration = node.FirstAncestorOrSelf<ClassDeclarationSyntax>();
+					if(classDeclaration == null) 
+						return node;
+					if (classDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
+						return node;
+					var s = this.semanticModel.GetDeclaredSymbol(classDeclaration);
+					if (!s.AllInterfaces.Any(x => x.Name == "IMSharpConcept"))
+						return node;
+
 					var args = new SeparatedSyntaxList<ArgumentSyntax>();
 					args = args.Add(SyntaxFactory.Argument(
-						SyntaxFactory.ParseExpression("\"" + node.Token.Text.TrimStart("\"c#:"))));
+						SyntaxFactory.ParseExpression(node.Token.Text.Remove(node.Token.Text.IndexOf("c#:"), 3))));
 
 					var lineSpan = node.GetFileLinePosSpan();
 					AddReport(new ChangesReport(node)
@@ -141,6 +150,39 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 				}
 
 				return base.VisitLiteralExpression(node);
+			}
+
+			public override SyntaxNode VisitInterpolatedStringExpression(InterpolatedStringExpressionSyntax node)
+			{
+				if (node.Contents.ToString().StartsWith("c#:"))
+				{
+					var classDeclaration = node.FirstAncestorOrSelf<ClassDeclarationSyntax>();
+					if (classDeclaration == null)
+						return node;
+					if (classDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
+						return node;
+					var s = this.semanticModel.GetDeclaredSymbol(classDeclaration);
+					if (!s.AllInterfaces.Any(x => x.Name == "IMSharpConcept"))
+						return node;
+
+					var args = new SeparatedSyntaxList<ArgumentSyntax>();
+					args = args.Add(SyntaxFactory.Argument(
+						SyntaxFactory.ParseExpression(node.ToString().Remove(node.ToString().IndexOf("c#:"), 3))));
+
+					var lineSpan = node.GetFileLinePosSpan();
+					AddReport(new ChangesReport(node)
+					{
+						LineNumber = lineSpan.StartLinePosition.Line,
+						Column = lineSpan.StartLinePosition.Character,
+						Message = "\"C#:\" --> cs(\"\")",
+						Generator = nameof(CsMethodStringRewriter)
+					});
+
+
+					return SyntaxFactory.InvocationExpression(SyntaxFactory.IdentifierName("cs")
+						, SyntaxFactory.ArgumentList(args));
+				}
+				return base.VisitInterpolatedStringExpression(node);
 			}
 		}
 	}
