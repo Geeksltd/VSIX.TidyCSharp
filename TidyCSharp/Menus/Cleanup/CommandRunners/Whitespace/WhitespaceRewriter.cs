@@ -4,6 +4,8 @@ using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
@@ -39,11 +41,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 					Directive = x
 				});
 
-				var selectedDirectives = list.Join(list, a => a.EndLine + 1, b => b.StartLine, (a, b) => b)
+				var join = list.Join(list, a => a.EndLine + 1, b => b.StartLine, (a, b) => a);
+				var selectedDirectives = list.Except(join)
 					.Where(x => !InitialSource.FindTrivia(x.EndPosition, false)
-						.IsKind(SyntaxKind.EndOfLineTrivia))
+					.IsKind(SyntaxKind.EndOfLineTrivia))
 					.Select(x => x.Directive);
-
+				
 				InitialSource = InitialSource.ReplaceNodes(selectedDirectives, (a, b) =>
 				 {
 					 return b.WithTrailingTrivia(
