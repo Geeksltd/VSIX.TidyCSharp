@@ -63,6 +63,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 			public override SyntaxNode VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
 			{
+				if(((CSharpCompilation)this.semanticModel.Compilation).LanguageVersion.MapSpecifiedToEffectiveVersion() != LanguageVersion.CSharp9)
+					return base.VisitObjectCreationExpression(node);
 				if (node.NewKeyword == null)
 					return base.VisitObjectCreationExpression(node);
 				if (node.Parent.IsKind(SyntaxKind.ReturnStatement))
