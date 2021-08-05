@@ -30,15 +30,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 		protected virtual void AsyncRun(ProjectItem item)
 		{
 			ProjectItemDetails = new ProjectItemDetailsType(item);
-			if (ProjectItemDetails.InitialSourceNode
-				.DescendantNodesOfType<AttributeSyntax>()
-				.Any(x => x.Name.ToString() == "EscapeGCop" &&
-				x.ArgumentList != null &&
-				x.ArgumentList.Arguments.FirstOrDefault().ToString()
-				   == "\"Auto generated code.\""))
-			{
-				return;
-			}
 
 			if (IsReportOnlyMode)
 			{
@@ -57,18 +48,24 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
 		protected virtual SyntaxNode RefreshResult(SyntaxNode initialSourceNode)
 		{
-			//var exceptContents = new char[] { ' ', '\t', '\r', '\n' };
+			//var exceptContents = new char[] { '\r' };
 			//var actualContent =
-			//    string.Join("", initialSourceNode.ToFullString()
-			//    .ToCharArray().Where(x => !exceptContents.Contains(x)));
+			//	string.Join("", initialSourceNode.ToFullString()
+			//	.ToCharArray().Where(x => !exceptContents.Contains(x)));
 
 			//if (string.Join("", UnModifiedProjectItemDetails.ProjectItemDocument
-			//    .GetTextAsync().Result.ToString()
-			//    .ToCharArray().Where(x => !exceptContents.Contains(x))) == actualContent)
+			//	.GetTextAsync().Result.ToString()
+			//	.ToCharArray().Where(x => !exceptContents.Contains(x))) == actualContent)
 			//{
-			//    ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
-			//    return ProjectItemDetails.InitialSourceNode;
+			//	ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
+			//	return ProjectItemDetails.InitialSourceNode;
 			//}
+			if (UnModifiedProjectItemDetails.InitialSourceNode.ToFullString().Replace("\r", "")
+				.Equals(initialSourceNode.ToFullString().Replace("\r", "")))
+			{
+				ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
+				return ProjectItemDetails.InitialSourceNode;
+			}
 
 			var newDocument = ProjectItemDetails.ProjectItemDocument.WithSyntaxRoot(initialSourceNode);
 			TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
@@ -80,17 +77,18 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 		protected virtual void SaveResult(SyntaxNode initialSourceNode)
 		{
 			if (initialSourceNode == null || initialSourceNode == ProjectItemDetails.InitialSourceNode) return;
-			//var exceptContents = new char[] { ' ', '\t', '\r', '\n' };
+			//var exceptContents = new char[] { '\r' };
 			//var actualContent =
-			//    string.Join("", initialSourceNode.ToFullString()
-			//    .ToCharArray().Where(x => !exceptContents.Contains(x)));
+			//	string.Join("", initialSourceNode.ToFullString()
+			//	.ToCharArray().Where(x => !exceptContents.Contains(x)));
 
-			//if (string.Join("", UnModifiedProjectItemDetails.ProjectItemDocument
-			//    .GetTextAsync().Result.ToString()
-			//    .ToCharArray().Where(x => !exceptContents.Contains(x))) == actualContent)
-			//    return;
-			if(UnModifiedProjectItemDetails.InitialSourceNode.ToFullString()
-				.Equals(initialSourceNode.ToFullString()))
+			//var dx = UnModifiedProjectItemDetails.ProjectItemDocument
+			//	.GetTextAsync().Result.ToString()
+			//	.ToCharArray().Where(x => !exceptContents.Contains(x))
+			//	== actualContent.ToCharArray().Where(x => !exceptContents.Contains(x));
+
+			if (UnModifiedProjectItemDetails.InitialSourceNode.ToFullString().Replace("\r", "")
+				.Equals(initialSourceNode.ToFullString().Replace("\r", "")))
 				return;
 
 			if (ProjectItemDetails.ProjectItemDocument == null)

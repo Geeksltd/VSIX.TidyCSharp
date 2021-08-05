@@ -3,6 +3,8 @@ using Geeks.GeeksProductivityTools.Extensions;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.GeeksProductivityTools.Utils;
 using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Linq;
 
@@ -24,8 +26,17 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 				var path = item.Properties.Item("FullPath").Value.ToString();
 				if (path.EndsWithAny(new[] { "AssemblyInfo.cs", "TheApplication.cs" })) return;
 
-				var window = item.Open(Constants.vsViewKindCode);
+				if (item.ToSyntaxNode()
+					.DescendantNodesOfType<AttributeSyntax>()
+					.Any(x => x.Name.ToString() == "EscapeGCop" &&
+					x.ArgumentList != null &&
+					x.ArgumentList.Arguments.FirstOrDefault().ToString()
+					   == "\"Auto generated code.\""))
+				{
+					return;
+				}
 
+				var window = item.Open(Constants.vsViewKindCode);
 				window.Activate();
 
 				foreach (var actionTypeItem in cleanupOptions.ActionTypes)
