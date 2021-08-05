@@ -89,6 +89,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 			//    .GetTextAsync().Result.ToString()
 			//    .ToCharArray().Where(x => !exceptContents.Contains(x))) == actualContent)
 			//    return;
+			if(UnModifiedProjectItemDetails.InitialSourceNode.ToFullString()
+				.Equals(initialSourceNode.ToFullString()))
+				return;
 
 			if (ProjectItemDetails.ProjectItemDocument == null)
 			{
