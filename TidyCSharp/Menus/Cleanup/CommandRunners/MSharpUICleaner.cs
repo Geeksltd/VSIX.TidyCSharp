@@ -72,6 +72,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 			var onClickGoWorkFlowRewriter = new OnClickGoWorkFlowRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
 			modifiedSourceNode = onClickGoWorkFlowRewriter.Visit(modifiedSourceNode);
+			modifiedSourceNode = this.RefreshResult(modifiedSourceNode);
+
+			var mergedUpRewriter = new MergedUpRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
+			modifiedSourceNode = mergedUpRewriter.Visit(modifiedSourceNode);
 
 			if (IsReportOnlyMode)
 			{
@@ -86,6 +90,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 				this.CollectMessages(fullSearchRewriter.GetReport());
 				this.CollectMessages(customFieldRewriter.GetReport());
 				this.CollectMessages(onClickGoWorkFlowRewriter.GetReport());
+				this.CollectMessages(mergedUpRewriter.GetReport());
 				return initialSourceNode;
 			}
 
@@ -886,7 +891,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 				var newRequiredArguments = new string[] { "SendReturnUrl" };
 				var methodSymbol = (semanticModel.GetSymbolInfo(s).Symbol as IMethodSymbol);
 
-				if (s.DescendantNodesOfType<SimpleLambdaExpressionSyntax>().Count() == 1 &&
+				if (s.MethodNameShouldBe("Go") &&
+					s.DescendantNodesOfType<SimpleLambdaExpressionSyntax>().Count() == 1 &&
 					s.ArgumentsCountShouldBe(1) &&
 					editRequiredArguments.All(x => (s.FirstArgument().DescendantNodesOfType<InvocationExpressionSyntax>()
 						.Select(y => y.GetRightSideNameSyntax()?.ToString())).Any(y => y == x)) &&
@@ -985,7 +991,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 								.WithLeadingTrivia(node.GetLeadingTrivia())
 								.WithTrailingTrivia(node.GetTrailingTrivia());
 				}
-				else if (s.DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().Count() == 1 &&
+				else if (s.MethodNameShouldBe("Go") &&
+					s.DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().Count() == 1 &&
 							s.ArgumentsCountShouldBe(1) &&
 							newRequiredArguments.All(x => (s.FirstArgument().DescendantNodesOfType<InvocationExpressionSyntax>()
 							.Select(y => y.GetRightSideNameSyntax()?.ToString())).Any(y => y == x)) &&
@@ -1633,6 +1640,66 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 					});
 
 					return newNode;
+				}
+				return base.VisitInvocationExpression(node);
+			}
+		}
+
+		class MergedUpRewriter : CleanupCSharpSyntaxRewriter
+		{
+			SemanticModel semanticModel;
+			public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
+			{
+				if (node.ClassShouldHaveBase() &&
+				   node.ClassShouldHaveGenericBase() &&
+				   node.GenericClassShouldInheritFrom("ListModule"))
+					return base.VisitClassDeclaration(node);
+				return node;
+			}
+			public MergedUpRewriter(SemanticModel semanticModel, bool isReportOnlyMode, ICleanupOption options) :
+				base(isReportOnlyMode, options) => this.semanticModel = semanticModel;
+			public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
+			{
+				var listInvocations = new string[] { "NeedsMerging", "SeperatorTemplate" };
+				if (node == null)
+					return base.VisitInvocationExpression(node);
+
+				var hasBothIdentification =
+					listInvocations.All(a => node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
+					.Select(x => x.GetRightSideNameSyntax()?.Identifier.Text).Contains(a));
+				if (hasBothIdentification &&
+					node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
+					.Any(x => x.MethodNameShouldBe("NeedsMerging") &&
+							(x.ArgumentsCountShouldBe(0) ||
+							(x.ArgumentsCountShouldBe(1) && x.FirstArgumentShouldBe("true")))))
+				{
+					var invocations = node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
+						.Where(x => x.MethodNameShouldBeIn(listInvocations));
+
+					var newNode = node.ReplaceNodes(invocations, (invoc1, invoc2) =>
+					{
+						if (invoc2.MethodNameShouldBeIn(listInvocations))
+						{
+							return invoc2.GetLeftSideExpression();
+						}
+						return invoc2;
+					});
+					if (IsReportOnlyMode)
+					{
+						var lineSpan = node.GetFileLinePosSpan();
+						AddReport(new ChangesReport(node)
+						{
+							LineNumber = lineSpan.StartLinePosition.Line,
+							Column = lineSpan.StartLinePosition.Character,
+							Message = "use MergeUp instead of NeedsMerging and SeperatorTemplate",
+							Generator = nameof(MergedUpRewriter)
+						});
+					}
+					return
+						SyntaxFactory.InvocationExpression(
+							SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+							newNode, SyntaxFactory.IdentifierName("MergeUp")),
+							node.GetArgumentsOfMethod("SeperatorTemplate"));
 				}
 				return base.VisitInvocationExpression(node);
 			}
