@@ -57,7 +57,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 				var typeOfTypeDef = SemanticModel.GetTypeInfo(node.Type);
 
-				if (typeOfInitializer.Type.Name == typeOfTypeDef.Type.Name)
+				if (typeOfInitializer.Type?.Name == typeOfTypeDef.Type?.Name)
 				{
 					if (IsReportOnlyMode)
 					{
