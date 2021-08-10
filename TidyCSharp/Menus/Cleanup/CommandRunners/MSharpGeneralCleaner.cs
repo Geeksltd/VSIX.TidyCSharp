@@ -50,7 +50,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 				var trivia = new SyntaxTriviaList(SyntaxFactory.EndOfLine("\n"));
 				trivia = trivia.AddRange(node.GetLeadingTrivia().Reverse()
 					.TakeWhile(x => x.IsDirective ^ !x.IsKind(SyntaxKind.EndOfLineTrivia)));
-				trivia = trivia.Add(SyntaxFactory.Tab);
+				trivia = trivia.Add(SyntaxFactory.Whitespace("    "));
 				var newExpression = SyntaxFactory.ParseExpression("");
 				while (m != null && m.ChildNodes().Any())
 				{
@@ -123,7 +123,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 				if (node.Token.ValueText.StartsWith("c#:"))
 				{
 					var classDeclaration = node.FirstAncestorOrSelf<ClassDeclarationSyntax>();
-					if(classDeclaration == null) 
+					if (classDeclaration == null)
 						return node;
 					if (classDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
 						return node;

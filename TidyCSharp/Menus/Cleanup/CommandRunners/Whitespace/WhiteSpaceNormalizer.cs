@@ -3,6 +3,8 @@ using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Formatting;
+using System;
+using System.Text;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -25,6 +27,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 			var blockRewriter = new BlockRewriter(modifiedSourceNode, IsReportOnlyMode, options);
 			modifiedSourceNode = blockRewriter.Visit(modifiedSourceNode);
+
 			if (IsReportOnlyMode)
 			{
 				this.CollectMessages(blockRewriter.GetReport());
@@ -36,6 +39,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 				var endoflineRewriter = new EndOFLineRewriter(modifiedSourceNode, IsReportOnlyMode, options);
 				modifiedSourceNode = endoflineRewriter.Visit(modifiedSourceNode);
 				modifiedSourceNode = RefreshResult(modifiedSourceNode);
+
 				if (IsReportOnlyMode)
 				{
 					this.CollectMessages(endoflineRewriter.GetReport());
@@ -44,6 +48,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 			var whitespaceRewriter = new WhitespaceRewriter(modifiedSourceNode, IsReportOnlyMode, options);
 			modifiedSourceNode = whitespaceRewriter.Apply();
+
 			if (IsReportOnlyMode)
 			{
 				this.CollectMessages(whitespaceRewriter.GetReport());

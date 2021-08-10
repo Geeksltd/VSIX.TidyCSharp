@@ -46,7 +46,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 					.Where(x => !InitialSource.FindTrivia(x.EndPosition, false)
 					.IsKind(SyntaxKind.EndOfLineTrivia))
 					.Select(x => x.Directive);
-				
+
 				InitialSource = InitialSource.ReplaceNodes(selectedDirectives, (a, b) =>
 				 {
 					 return b.WithTrailingTrivia(
@@ -79,7 +79,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 			newLeadingTriviaList = CleanUpListWithNoWhitespaces(beforeEndOfFileToken.TrailingTrivia, CleanupTypes.Trim_The_File);
 
 			var newBeforeEndOfFileToken = beforeEndOfFileToken.WithTrailingTrivia(newLeadingTriviaList)
-			   .WithTrailingTrivia((leadingTriviList != null && leadingTriviList.Any()) ? SyntaxFactory.CarriageReturn : SyntaxFactory.ElasticSpace);
+			   .WithTrailingTrivia((leadingTriviList != null && leadingTriviList.Any()) ? SyntaxFactory.CarriageReturn : SyntaxFactory.ElasticMarker);
 
 			InitialSource = InitialSource.ReplaceTokens(new[] { endOfFileToken, beforeEndOfFileToken },
 				(token1, token2) =>
