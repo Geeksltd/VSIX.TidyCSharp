@@ -85,16 +85,40 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 				if (node.Parent.IsKind(SyntaxKind.Argument))
 				{
 					var methodInvocation = node.FirstAncestorOrSelf<InvocationExpressionSyntax>();
-					var methodSymbol = this.semanticModel.GetSymbolInfo(methodInvocation).Symbol;
-					var countofMethod = methodSymbol?.ContainingType?.GetMembers()
-						.Count(x => x.Name == methodInvocation.Expression.ToString());
-					//var countofMethod = methodSymbol?.ContainingType?.GetMembers()
-					//	.Count(x => x.Name == methodInvocation.Expression.ToString()
-					//		&& x.Kind == SymbolKind.Method
-					//		&& (x as IMethodSymbol)?.Parameters.Count() ==
-					//			methodInvocation.ArgumentList.Arguments.Count());
-					if (countofMethod > 1)
+					if (methodInvocation != null)
+					{
+						var methodSymbol = this.semanticModel.GetSymbolInfo(methodInvocation).Symbol;
+						var countofMethod = methodSymbol?.ContainingType?.GetMembers()
+							.Count(x => x.Name == methodInvocation.Expression.ToString());
+						//var countofMethod = methodSymbol?.ContainingType?.GetMembers()
+						//	.Count(x => x.Name == methodInvocation.Expression.ToString()
+						//		&& x.Kind == SymbolKind.Method
+						//		&& (x as IMethodSymbol)?.Parameters.Count() ==
+						//			methodInvocation.ArgumentList.Arguments.Count());
+						if (countofMethod > 1)
+							return base.VisitObjectCreationExpression(node);
+					}
+					else
 						return base.VisitObjectCreationExpression(node);
+					//else
+					//{
+					//	var constructorInvocation = node.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
+					//	string name = string.Empty;
+					//	if (constructorInvocation.IsKind(SyntaxKind.ThisConstructorInitializer))
+					//	{
+					//		var constructorDeclaration = node.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
+					//		name = constructorDeclaration.Identifier.ToString();
+					//	}else
+					//	{
+					//		n
+					//	}
+
+					//	var constructorSymbol = this.semanticModel.GetSymbolInfo(constructorInvocation).Symbol;
+					//	var countofConstructors = constructorSymbol?.ContainingType?.GetMembers()
+					//		.Count(x => x.Name == name);
+					//	if (countofConstructors > 1)
+					//		return base.VisitObjectCreationExpression(node);
+					//}
 				}
 				if (nodeTypeinfo.ConvertedType.Name == nodeTypeinfo.Type.Name)
 				{

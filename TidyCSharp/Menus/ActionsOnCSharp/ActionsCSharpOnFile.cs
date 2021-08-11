@@ -81,8 +81,8 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 			}
 			catch (Exception e)
 			{
-				ErrorNotification.WriteErrorToFile(e);
-				ErrorNotification.WriteErrorToOutputWindow(e);
+				ErrorNotification.WriteErrorToFile(e, item.Properties.Item("FullPath").Value.ToString());
+				ErrorNotification.WriteErrorToOutputWindow(e, item.Properties.Item("FullPath").Value.ToString());
 				ProcessActions.GeeksProductivityToolsProcess();
 			}
 		}
@@ -138,8 +138,8 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 			}
 			catch (Exception e)
 			{
-				ErrorNotification.WriteErrorToFile(e);
-				ErrorNotification.WriteErrorToOutputWindow(e);
+				ErrorNotification.WriteErrorToFile(e, item.Properties.Item("FullPath").Value.ToString());
+				ErrorNotification.WriteErrorToOutputWindow(e, item.Properties.Item("FullPath").Value.ToString());
 				ProcessActions.GeeksProductivityToolsProcess();
 			}
 		}

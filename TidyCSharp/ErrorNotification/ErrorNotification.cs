@@ -23,14 +23,23 @@ namespace Geeks.GeeksProductivityTools
 
 			outWindow.GetPane(ref customGuid, out customPane);
 		}
-		internal static void WriteErrorToOutputWindow(Exception ex)
+		internal static void WriteErrorToOutputWindow(Exception ex, string itemAddress = null)
 		{
-			customPane.OutputString(Newtonsoft.Json.JsonConvert.SerializeObject(ex) + "\n");
+			customPane.OutputString(Newtonsoft.Json.JsonConvert.SerializeObject(new
+			{
+				FileAddress = itemAddress,
+				Exception = ex
+			}) + "\n");
 			customPane.Activate();
 		}
-		internal static void WriteErrorToFile(Exception ex)
+		internal static void WriteErrorToFile(Exception ex, string itemAddress = null)
 		{
-			File.AppendAllText(Path.GetDirectoryName(App.DTE.Solution.FileName) + "\\Tidy.Error.log", Newtonsoft.Json.JsonConvert.SerializeObject(ex));
+			File.AppendAllText(Path.GetDirectoryName(App.DTE.Solution.FileName) + "\\Tidy.Error.log",
+				Newtonsoft.Json.JsonConvert.SerializeObject(new
+				{
+					FileAddress = itemAddress,
+					Exception = ex,
+				}));
 		}
 
 		internal static void EmailError(Exception ex)

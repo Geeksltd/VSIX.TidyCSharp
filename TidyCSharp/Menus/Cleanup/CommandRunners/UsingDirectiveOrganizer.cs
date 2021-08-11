@@ -51,8 +51,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 			}
 			catch (Exception e)
 			{
-				ErrorNotification.WriteErrorToFile(e);
-				ErrorNotification.WriteErrorToOutputWindow(e);
+				ErrorNotification.WriteErrorToFile(e, initialSourceNode.GetFilePath());
+				ErrorNotification.WriteErrorToOutputWindow(e, initialSourceNode.GetFilePath());
 				ProcessActions.GeeksProductivityToolsProcess();
 			}
 
