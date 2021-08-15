@@ -41,37 +41,25 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 			public NewExpressionRewriter(SemanticModel semanticModel, bool isReportOnlyMode, ICleanupOption options)
 				: base(isReportOnlyMode, options) => this.semanticModel = semanticModel;
 
-			public override SyntaxNode VisitLocalDeclarationStatement(LocalDeclarationStatementSyntax node)
+			public override SyntaxNode VisitVariableDeclaration(VariableDeclarationSyntax node)
 			{
-				if (node.Declaration.Type.IsVar)
+				if (node.Type.IsVar)
 					return node;
-				//if (node. != null)
-				//{
-				//    var newNode = node.WithType(SyntaxFactory.ParseTypeName(""))
-				//        .WithNewKeyword(node.NewKeyword.WithoutWhitespaceTrivia());
-				//    var nodeTypeinfo = semanticModel.GetTypeInfo(node);
-				//    var parentSymbol = semanticModel.GetSymbolInfo(node.Parent).Symbol;
-				//    if (parentSymbol?.Kind == SymbolKind.Method &&
-				//        (parentSymbol as IMethodSymbol)?.MethodKind == MethodKind.AnonymousFunction)
-				//        return base.VisitObjectCreationExpression(node);
-
-				//    if (nodeTypeinfo.ConvertedType.Name == nodeTypeinfo.Type.Name)
-				//        return newNode;
-				//}
-				return base.VisitLocalDeclarationStatement(node);
+				return base.VisitVariableDeclaration(node);
 			}
-
 			public override SyntaxNode VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
 			{
 				if (((CSharpCompilation)this.semanticModel.Compilation).LanguageVersion.MapSpecifiedToEffectiveVersion() != LanguageVersion.CSharp9)
 					return base.VisitObjectCreationExpression(node);
 				if (node.NewKeyword == null)
 					return base.VisitObjectCreationExpression(node);
-				if (node.Parent.IsKind(SyntaxKind.ReturnStatement))
-					return base.VisitObjectCreationExpression(node);
+				//if (node.Parent.IsKind(SyntaxKind.ReturnStatement))
+				//	return base.VisitObjectCreationExpression(node);
 				if (node.Parent.IsKind(SyntaxKind.LocalDeclarationStatement))
 					return base.VisitObjectCreationExpression(node);
 				if (node.Parent.IsKind(SyntaxKind.SimpleMemberAccessExpression))
+					return base.VisitObjectCreationExpression(node);
+				if (node.Parent.IsKind(SyntaxKind.UsingStatement))
 					return base.VisitObjectCreationExpression(node);
 
 				var newNode = node.WithType(SyntaxFactory.ParseTypeName(""))
@@ -82,19 +70,36 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 				if (parentSymbol?.Kind == SymbolKind.Method &&
 					(parentSymbol as IMethodSymbol)?.MethodKind == MethodKind.AnonymousFunction)
 					return base.VisitObjectCreationExpression(node);
-				if (node.Parent.IsKind(SyntaxKind.Argument))
+				if (node.Parent.IsKind(SyntaxKind.ReturnStatement))
+				{
+					var methodDeclaration = node.FirstAncestorOrSelf<MethodDeclarationSyntax>();
+					var methodSymbol = this.semanticModel.GetDeclaredSymbol(methodDeclaration);
+					if (methodSymbol.ReturnType.TypeKind != TypeKind.Class)
+						return base.VisitObjectCreationExpression(node);
+					if (methodDeclaration.ReturnType.ToString() != nodeTypeinfo.Type.Name)
+						return base.VisitObjectCreationExpression(node);
+				}
+				else if (node.Parent.IsKind(SyntaxKind.Argument))
 				{
 					var methodInvocation = node.FirstAncestorOrSelf<InvocationExpressionSyntax>();
 					if (methodInvocation != null)
 					{
 						var methodSymbol = this.semanticModel.GetSymbolInfo(methodInvocation).Symbol;
 						var countofMethod = methodSymbol?.ContainingType?.GetMembers()
-							.Count(x => x.Name == methodInvocation.Expression.ToString());
+							.Count(x => x.Name ==
+							(methodInvocation.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) ?
+							methodInvocation.GetRightSideNameSyntax().ToString() :
+							methodInvocation.Expression.ToString()));
 						//var countofMethod = methodSymbol?.ContainingType?.GetMembers()
 						//	.Count(x => x.Name == methodInvocation.Expression.ToString()
 						//		&& x.Kind == SymbolKind.Method
 						//		&& (x as IMethodSymbol)?.Parameters.Count() ==
 						//			methodInvocation.ArgumentList.Arguments.Count());
+						if ((methodSymbol as IMethodSymbol)?.OriginalDefinition.IsGenericMethod == true &&
+							(methodInvocation.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) ?
+							!methodInvocation.GetRightSideNameSyntax().IsKind(SyntaxKind.GenericName) :
+							!methodInvocation.Expression.IsKind(SyntaxKind.GenericName)))
+							return base.VisitObjectCreationExpression(node);
 						if (countofMethod > 1)
 							return base.VisitObjectCreationExpression(node);
 					}
@@ -119,6 +124,11 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 					//	if (countofConstructors > 1)
 					//		return base.VisitObjectCreationExpression(node);
 					//}
+				}
+				else if (node.Parent.IsKind(SyntaxKind.ArrayInitializerExpression))
+				{
+					if (node.Parent.Parent.IsKind(SyntaxKind.ImplicitArrayCreationExpression))
+						return base.VisitObjectCreationExpression(node);
 				}
 				if (nodeTypeinfo.ConvertedType.Name == nodeTypeinfo.Type.Name)
 				{
