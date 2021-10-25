@@ -52,13 +52,32 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 					});
 				}
 
-				return lambdaNode.WithBlock(null)
-					.WithExpressionBody((newNode.IsKind(SyntaxKind.ReturnStatement)
-					? (newNode as ReturnStatementSyntax).Expression :
-					(newNode as ExpressionStatementSyntax).Expression)
-						.WithoutTrivia()
+				if (newNode.IsKind(SyntaxKind.ReturnStatement))
+				{
+					var statementSyntax = newNode as ReturnStatementSyntax;
+					if (statementSyntax != null)
+					{
+						return lambdaNode.WithBlock(null).WithExpressionBody(statementSyntax.Expression);
+					}
+				}
+				else
+				{
+					var expressionStatement = newNode as ExpressionStatementSyntax;
+					if (expressionStatement != null)
+					{
+						return lambdaNode.WithBlock(null).WithExpressionBody(expressionStatement.Expression.WithoutTrivia()
 						.WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia(" ")))
-					.WithArrowToken(lambdaNode.ArrowToken.WithoutTrivia());
+						.WithArrowToken(lambdaNode.ArrowToken.WithoutTrivia());
+					}
+				}
+
+				//return lambdaNode.WithBlock(null)
+				//	.WithExpressionBody((newNode.IsKind(SyntaxKind.ReturnStatement)
+				//	? (newNode as ReturnStatementSyntax).Expression :
+				//	(newNode as ExpressionStatementSyntax).Expression)
+				//		.WithoutTrivia()
+				//		.WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia(" ")))
+				//	.WithArrowToken(lambdaNode.ArrowToken.WithoutTrivia());
 			}
 			return lambdaNode;
 		}

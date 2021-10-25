@@ -18,8 +18,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 		SyntaxNode ChangeMethodHelper(SyntaxNode initialSourceNode)
 		{
+
+			if (initialSourceNode == null) return null;
+
 			var syntaxRewriter = new NewExpressionRewriter(ProjectItemDetails.SemanticModel
 				, IsReportOnlyMode, Options);
+
+			if (syntaxRewriter == null) return null;
 
 			var modifiedSyntaxNode = syntaxRewriter.Visit(initialSourceNode);
 
@@ -110,11 +115,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 						if (countofMethod > 1)
 							return base.VisitObjectCreationExpression(node);
-						// var countofMethod = methodSymbol?.ContainingType?.GetMembers()
-						// 	.Count(x => x.Name == methodInvocation.Expression.ToString()
-						// 		&& x.Kind == SymbolKind.Method
-						// 		&& (x as IMethodSymbol)?.Parameters.Count() ==
-						// 			methodInvocation.ArgumentList.Arguments.Count());
+
 						var indexOfMethod = node.FirstAncestorOrSelf<ArgumentListSyntax>().Arguments
 							.IndexOf(node.AncestorsAndSelf().FirstOrDefault(x => x.Parent.IsKind(SyntaxKind.ArgumentList)) as ArgumentSyntax);
 
@@ -129,25 +130,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 					}
 					else
 						return base.VisitObjectCreationExpression(node);
-					// else
-					// {
-					// 	var constructorInvocation = node.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
-					// 	string name = string.Empty;
-					// 	if (constructorInvocation.IsKind(SyntaxKind.ThisConstructorInitializer))
-					// 	{
-					// 		var constructorDeclaration = node.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
-					// 		name = constructorDeclaration.Identifier.ToString();
-					// 	}else
-					// 	{
-					// 		n
-					// 	}
-
-					// 	var constructorSymbol = this.semanticModel.GetSymbolInfo(constructorInvocation).Symbol;
-					// 	var countofConstructors = constructorSymbol?.ContainingType?.GetMembers()
-					// 		.Count(x => x.Name == name);
-					// 	if (countofConstructors > 1)
-					// 		return base.VisitObjectCreationExpression(node);
-					// }
 				}
 				else if (node.Parent.IsKind(SyntaxKind.ArrayInitializerExpression))
 				{

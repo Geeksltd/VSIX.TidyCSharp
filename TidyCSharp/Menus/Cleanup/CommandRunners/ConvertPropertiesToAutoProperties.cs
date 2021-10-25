@@ -6,6 +6,7 @@ using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.FindSymbols;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -143,8 +144,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 				if (CheckVisibility(baseFieldFieldDeclaration, getNode, setNode, propertyDeclaration) == false) return null;
 
+
+
 				var refrences = Microsoft.CodeAnalysis.FindSymbols.SymbolFinder.FindReferencesAsync(baseFieldSymbol, TidyCSharpPackage.Instance.CleanupWorkingSolution);
-				var references = refrences.Result.FirstOrDefault();
+				refrences.Wait(2000);
+				ReferencedSymbol references = null;
+				if (refrences.IsCompleted)
+					references = refrences.Result.FirstOrDefault();
 
 				if (references == null) return null;
 

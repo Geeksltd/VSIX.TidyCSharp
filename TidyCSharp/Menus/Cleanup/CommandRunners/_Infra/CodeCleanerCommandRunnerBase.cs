@@ -61,15 +61,19 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 			//	ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
 			//	return ProjectItemDetails.InitialSourceNode;
 			//}
-			if (UnModifiedProjectItemDetails.InitialSourceNode.ToFullString().Replace("\r", "")
+			if (UnModifiedProjectItemDetails != null && UnModifiedProjectItemDetails.InitialSourceNode.ToFullString().Replace("\r", "")
 				.Equals(initialSourceNode.ToFullString().Replace("\r", "")))
 			{
 				ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
 				return ProjectItemDetails.InitialSourceNode;
 			}
 
-			var newDocument = ProjectItemDetails.ProjectItemDocument.WithSyntaxRoot(initialSourceNode);
-			TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
+			if (ProjectItemDetails.ProjectItemDocument != null)
+			{
+				var newDocument = ProjectItemDetails.ProjectItemDocument.WithSyntaxRoot(initialSourceNode);
+				TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
+			}
+
 			ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
 			return ProjectItemDetails.InitialSourceNode;
 		}
@@ -129,7 +133,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 			textWriter.WriteStartElement("Reports");
 			foreach (var change in ChangesReports)
 			{
+				if (change.FileName.IsEmpty())
+				{
 
+				}
 				textWriter.WriteStartElement("Report");
 				textWriter.WriteAttributeString("Generator", change.Generator);
 				textWriter.WriteElementString("LineNumber", change.LineNumber.ToString());
@@ -171,7 +178,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 			{
 				get
 				{
-					if (_semanticModel == null)
+					if (_semanticModel == null && ProjectItemDocument != null)
 					{
 						_semanticModel = ProjectItemDocument.GetSemanticModelAsync().Result;
 					}

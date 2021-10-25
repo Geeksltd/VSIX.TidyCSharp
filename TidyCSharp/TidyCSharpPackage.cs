@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Geeks.GeeksProductivityTools
 {
@@ -29,9 +30,8 @@ namespace Geeks.GeeksProductivityTools
 		EnvDTE.DocumentEvents docEvents;
 		EnvDTE.SolutionEvents solEvents;
 		EnvDTE.Events events;
-		EnvDTE.BuildEvents solbuildEvents;
-		EnvDTE.CommandEvents commandEvents;
-		bool runInReadonlyMode = false;
+		EnvDTE.BuildEvents buildEvent;
+
 		public static TidyCSharpPackage Instance { get; private set; }
 
 		public Workspace VsWorkspace { get; set; }
@@ -99,46 +99,66 @@ namespace Geeks.GeeksProductivityTools
 			bResetWorkingSolution = true;
 		}
 
+
 		protected override async System.Threading.Tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
 		{
+			await base.InitializeAsync(cancellationToken, progress);
 
 			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-			await base.InitializeAsync(cancellationToken, progress);
 
 			App.Initialize(GetDialogPage(typeof(OptionsPage)) as OptionsPage);
 
 			Instance = this;
 
-			var componentModel = (IComponentModel)await GetServiceAsync(typeof(SComponentModel));
-			VsWorkspace = componentModel.GetService<VisualStudioWorkspace>();
+			var componentModel = (IComponentModel)await GetServiceAsync(typeof(SComponentModel)).ConfigureAwait(true);
+			if (componentModel != null)
+				VsWorkspace = componentModel.GetService<VisualStudioWorkspace>();
 
 			// Add our command handlers for menu (commands must exist in the .vsct file)
-			var menuCommandService = await GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
+			var menuCommandService = await GetServiceAsync(typeof(IMenuCommandService)).ConfigureAwait(true) as OleMenuCommandService;
 
 			if (null != menuCommandService)
 			{
 				new ActionCustomCodeCleanup(menuCommandService).SetupCommands();
 			}
 
+
 			// Hook up event handlers
 			events = App.DTE.Events;
+			buildEvent= events.BuildEvents;
 			docEvents = events.DocumentEvents;
 			solEvents = events.SolutionEvents;
-			solbuildEvents = events.BuildEvents;
 			docEvents.DocumentSaved += DocumentEvents_DocumentSaved;
 			solEvents.Opened += delegate { App.Initialize(GetDialogPage(typeof(OptionsPage)) as OptionsPage); };
-			solbuildEvents.OnBuildBegin += BuildEvents_OnBuildBegin;
-			commandEvents = events.CommandEvents;
-			events.DTEEvents.OnStartupComplete += DTEEvents_OnStartupComplete;
+			buildEvent.OnBuildBegin += BuildEvent_OnBuildBegin;
 		}
 
-		private void DTEEvents_OnStartupComplete()
+		private void BuildEvent_OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
 		{
-			runInReadonlyMode = true;
-		}
-		private void BuildEvents_OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
-		{
-			if (runInReadonlyMode)
+			var CommandArgs = Environment.GetCommandLineArgs();
+			bool isReportMode = false;
+			using (var sw = new StreamWriter(Path.Combine(Path.GetTempPath(), "TidyVSArgs.txt")))
+			{
+				if (CommandArgs != null && CommandArgs.Length > 0)
+				{
+					foreach (var Arg in CommandArgs)
+					{
+						sw.WriteLine(Arg);
+						if (Arg.ToLower() == "/tidyreportswitch")
+						{
+							isReportMode = true;
+							sw.WriteLine("Tidy C# has runned in report mode");
+						}
+					}
+				}
+				else
+				{
+					sw.WriteLine("No Args !!!");
+				}
+				sw.Close();
+			}
+
+			if (isReportMode)
 			{
 				var cleanUpRunner = new ActionReadOnlyCodeCleanup();
 				cleanUpRunner.RunReadOnlyCleanUp();

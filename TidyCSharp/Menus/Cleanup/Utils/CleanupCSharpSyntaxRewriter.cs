@@ -2,6 +2,7 @@
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -28,7 +29,8 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils
 
 		public void AddReport(ChangesReport changesReports)
 		{
-			ChangesReport = ChangesReport.Append(changesReports);
+			if (changesReports.FileName.HasValue())
+				ChangesReport = ChangesReport.Append(changesReports);
 		}
 	}
 

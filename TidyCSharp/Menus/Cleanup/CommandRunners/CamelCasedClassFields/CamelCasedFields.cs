@@ -4,6 +4,7 @@ using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Linq;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
@@ -51,7 +52,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 							LineNumber = lineSpan.StartLinePosition.Line,
 							Column = lineSpan.StartLinePosition.Character,
 							Message = "Camel Cased Fields",
-							Generator = nameof(CamelCasedFields)
+							Generator = nameof(CamelCasedFields),
 						});
 					}
 				}
