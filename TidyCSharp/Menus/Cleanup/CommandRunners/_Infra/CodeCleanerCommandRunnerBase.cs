@@ -35,9 +35,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 			if (IsReportOnlyMode)
 			{
 				RefreshResult(item.ToSyntaxNode());
-				//var newDocument = ProjectItemDetails.ProjectItemDocument.WithSyntaxRoot(item.ToSyntaxNode());
-				//TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
-				//ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
 			}
 			UnModifiedProjectItemDetails = ProjectItemDetails;
 
@@ -49,18 +46,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
 		protected virtual SyntaxNode RefreshResult(SyntaxNode initialSourceNode)
 		{
-			//var exceptContents = new char[] { '\r' };
-			//var actualContent =
-			//	string.Join("", initialSourceNode.ToFullString()
-			//	.ToCharArray().Where(x => !exceptContents.Contains(x)));
-
-			//if (string.Join("", UnModifiedProjectItemDetails.ProjectItemDocument
-			//	.GetTextAsync().Result.ToString()
-			//	.ToCharArray().Where(x => !exceptContents.Contains(x))) == actualContent)
-			//{
-			//	ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
-			//	return ProjectItemDetails.InitialSourceNode;
-			//}
 			if (UnModifiedProjectItemDetails != null && UnModifiedProjectItemDetails.InitialSourceNode.ToFullString().Replace("\r", "")
 				.Equals(initialSourceNode.ToFullString().Replace("\r", "")))
 			{
@@ -82,15 +67,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 		protected virtual void SaveResult(SyntaxNode initialSourceNode)
 		{
 			if (initialSourceNode == null || initialSourceNode == ProjectItemDetails.InitialSourceNode) return;
-			//var exceptContents = new char[] { '\r' };
-			//var actualContent =
-			//	string.Join("", initialSourceNode.ToFullString()
-			//	.ToCharArray().Where(x => !exceptContents.Contains(x)));
-
-			//var dx = UnModifiedProjectItemDetails.ProjectItemDocument
-			//	.GetTextAsync().Result.ToString()
-			//	.ToCharArray().Where(x => !exceptContents.Contains(x))
-			//	== actualContent.ToCharArray().Where(x => !exceptContents.Contains(x));
 
 			if (UnModifiedProjectItemDetails.InitialSourceNode.ToFullString().Replace("\r", "")
 				.Equals(initialSourceNode.ToFullString().Replace("\r", "")))
@@ -133,10 +109,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 			textWriter.WriteStartElement("Reports");
 			foreach (var change in ChangesReports)
 			{
-				if (change.FileName.IsEmpty())
-				{
-
-				}
 				textWriter.WriteStartElement("Report");
 				textWriter.WriteAttributeString("Generator", change.Generator);
 				textWriter.WriteElementString("LineNumber", change.LineNumber.ToString());
