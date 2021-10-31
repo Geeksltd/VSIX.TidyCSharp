@@ -1,12 +1,13 @@
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.VSIX.TidyCSharp.Cleanup.RemovePrivateModifier;
 using Microsoft.CodeAnalysis;
+using System.Threading.Tasks;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
 	public class PrivateModifierRemover : CodeCleanerCommandRunnerBase, ICodeCleaner
 	{
-		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
+		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
 		{
 			return RemoveExplicitPrivateModifiers(initialSourceNode);
 		}

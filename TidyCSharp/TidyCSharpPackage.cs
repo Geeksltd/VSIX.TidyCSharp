@@ -182,6 +182,30 @@ namespace Geeks.GeeksProductivityTools
 
 		private void BuildEvent_OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
 		{
+			if (File.Exists(Path.Combine(Path.GetTempPath(), "TidyCurrentfile.txt")))
+			{
+				try
+				{
+					File.Delete(Path.Combine(Path.GetTempPath(), "TidyCurrentfile.txt"));
+				}
+				catch
+				{
+
+				}
+			}
+
+			if (File.Exists(Path.Combine(Path.GetTempPath(), "TidyCurrentActions.txt")))
+			{
+				try
+				{
+					File.Delete(Path.Combine(Path.GetTempPath(), "TidyCurrentActions.txt"));
+				}
+				catch
+				{
+
+				}
+			}
+
 			using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
 			{
 				tidyLogWriter.WriteLine("Build process has finished...");

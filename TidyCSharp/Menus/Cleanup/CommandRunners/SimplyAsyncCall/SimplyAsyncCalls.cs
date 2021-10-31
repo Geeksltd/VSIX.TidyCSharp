@@ -12,7 +12,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
 	public class SimplyAsyncCalls : CodeCleanerCommandRunnerBase, ICodeCleaner
 	{
-		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
+		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
 		{
 			var rewriter = new Rewriter(IsReportOnlyMode, Options);
 			var modifiedSourceNode = rewriter.Visit(initialSourceNode);

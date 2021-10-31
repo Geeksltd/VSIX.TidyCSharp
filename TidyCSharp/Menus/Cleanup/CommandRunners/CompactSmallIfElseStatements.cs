@@ -9,12 +9,13 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
 	public class CompactSmallIfElseStatements : CodeCleanerCommandRunnerBase, ICodeCleaner
 	{
-		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
+		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
 		{
 			var syntaxRewriter = new Rewriter(initialSourceNode, this.IsReportOnlyMode, Options);
 			var modifiedSourceNode = syntaxRewriter.Visit(initialSourceNode);

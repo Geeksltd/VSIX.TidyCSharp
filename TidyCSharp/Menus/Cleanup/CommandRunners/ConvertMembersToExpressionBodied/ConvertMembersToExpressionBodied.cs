@@ -8,12 +8,13 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
 	public class ConvertMembersToExpressionBodied : CodeCleanerCommandRunnerBase, ICodeCleaner
 	{
-		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
+		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
 		{
 			return ConvertMembersToExpressionBodiedHelper(initialSourceNode, Options);
 		}

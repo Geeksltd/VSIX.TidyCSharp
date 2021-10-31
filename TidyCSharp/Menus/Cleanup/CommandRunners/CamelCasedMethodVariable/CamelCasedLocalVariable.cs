@@ -5,7 +5,9 @@ using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -30,14 +32,22 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 			public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
 			{
-				return base.VisitMethodDeclaration(RenameDeclarations(node) as MethodDeclarationSyntax);
+
+				MethodDeclarationSyntax methodDeclarationSyntax = null;
+				Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async delegate
+				{
+					methodDeclarationSyntax = await RenameDeclarations(node);
+				});
+
+				return base.VisitMethodDeclaration(methodDeclarationSyntax as MethodDeclarationSyntax);
 			}
 
-			MethodDeclarationSyntax RenameDeclarations(MethodDeclarationSyntax methodNode)
+			async Task<MethodDeclarationSyntax> RenameDeclarations(MethodDeclarationSyntax methodNode)
 			{
 				if (CheckOption((int)CamelCasedMethodVariable.CleanupTypes.Local_variable))
 				{
-					var renamingResult = new VariableRenamer(WorkingDocument).RenameDeclarations(methodNode);
+
+					var renamingResult = await new VariableRenamer(WorkingDocument).RenameDeclarations(methodNode);
 					if (renamingResult != null && renamingResult.Node != null)
 					{
 						methodNode = renamingResult.Node as MethodDeclarationSyntax;
@@ -58,12 +68,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 				if (CheckOption((int)CamelCasedMethodVariable.CleanupTypes.Method_Parameter))
 				{
-					var renamingResult = new ParameterRenamer(WorkingDocument).RenameDeclarations(methodNode);
+					var renamingResult = await new ParameterRenamer(WorkingDocument).RenameDeclarations(methodNode);
 					if (renamingResult != null && renamingResult.Node != null)
 					{
 						methodNode = renamingResult.Node as MethodDeclarationSyntax;
 						WorkingDocument = renamingResult.Document;
 					}
+
 					if (renamingResult != null)
 					{
 						var lineSpan = methodNode.GetFileLinePosSpan();

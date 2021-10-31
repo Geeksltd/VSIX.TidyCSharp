@@ -6,12 +6,13 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Threading.Tasks;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
 	public class RemoveAttributeKeywork : CodeCleanerCommandRunnerBase, ICodeCleaner
 	{
-		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
+		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
 		{
 			return RemoveAttributeKeyworkHelper(initialSourceNode, ProjectItemDetails.SemanticModel);
 		}

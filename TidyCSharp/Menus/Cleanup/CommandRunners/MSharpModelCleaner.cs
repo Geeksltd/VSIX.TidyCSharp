@@ -17,7 +17,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
 	public class MSharpModelCleaner : CodeCleanerCommandRunnerBase, ICodeCleaner
 	{
-		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
+		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
 		{
 			if (ProjectItemDetails.ProjectItem.ContainingProject.Name == "#Model")
 				return ChangeMethodHelper(initialSourceNode);

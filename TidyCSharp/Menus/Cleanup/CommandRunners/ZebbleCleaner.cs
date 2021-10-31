@@ -18,7 +18,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
 	public class ZebbleCleaner : CodeCleanerCommandRunnerBase, ICodeCleaner
 	{
-		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
+		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
 		{
 			var syntaxRewriter = new ReadOnlyRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
 			var modifiedSourceNode = syntaxRewriter.Visit(initialSourceNode);

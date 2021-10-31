@@ -5,12 +5,13 @@ using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Threading.Tasks;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
 	public class SimplifyVariableDeclarations : CodeCleanerCommandRunnerBase, ICodeCleaner
 	{
-		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
+		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
 		{
 			var syntaxRewriter = new Rewriter(this.ProjectItemDetails.SemanticModel,
 				IsReportOnlyMode, Options);

@@ -4,8 +4,10 @@ using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.VisualStudio.Shell;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -31,14 +33,19 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 			public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
 			{
-				return base.VisitClassDeclaration(RenameDeclarations(node) as ClassDeclarationSyntax);
+				ClassDeclarationSyntax classDeclarationSyntax = null;
+				Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async delegate
+				{
+					classDeclarationSyntax = await RenameDeclarations(node);
+				});
+				return base.VisitClassDeclaration(classDeclarationSyntax as ClassDeclarationSyntax);
 			}
 
-			ClassDeclarationSyntax RenameDeclarations(ClassDeclarationSyntax classNode)
+			async Task<ClassDeclarationSyntax> RenameDeclarations(ClassDeclarationSyntax classNode)
 			{
 				if (CheckOption((int)CamelCasedClassFields.CleanupTypes.Normal_Fields))
 				{
-					var renamingResult = new FieldRenamer(WorkingDocument).RenameDeclarations(classNode);
+					var renamingResult = await new FieldRenamer(WorkingDocument).RenameDeclarations(classNode);
 					if (renamingResult != null && renamingResult.Node != null)
 					{
 						classNode = renamingResult.Node as ClassDeclarationSyntax;
@@ -59,7 +66,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 				if (CheckOption((int)CamelCasedClassFields.CleanupTypes.Const_Fields))
 				{
-					var renamingResult = new CONSTRenamer(WorkingDocument).RenameDeclarations(classNode);
+					var renamingResult = await new CONSTRenamer(WorkingDocument).RenameDeclarations(classNode);
 					if (renamingResult != null && renamingResult.Node != null)
 					{
 						classNode = renamingResult.Node as ClassDeclarationSyntax;

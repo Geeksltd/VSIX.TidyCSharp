@@ -2,6 +2,7 @@ using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -11,7 +12,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
 		Document WorkingDocument, orginalDocument;
 
-		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
+		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
 		{
 			var annotationForSelectedNode = new SyntaxAnnotation(SELECTED_METHOD_ANNOTATION);
 			orginalDocument = ProjectItemDetails.ProjectItemDocument;
@@ -30,7 +31,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 				var annotatedNode = workingNode.WithAdditionalAnnotations(annotationForSelectedNode);
 				annotatedRoot = annotatedRoot.ReplaceNode(workingNode, annotatedNode);
 				WorkingDocument = WorkingDocument.WithSyntaxRoot(annotatedRoot);
-				annotatedRoot = WorkingDocument.GetSyntaxRootAsync().Result;
+				annotatedRoot = await WorkingDocument.GetSyntaxRootAsync();
 				annotatedNode = annotatedRoot.GetAnnotatedNodes(annotationForSelectedNode).FirstOrDefault();
 
 				var rewriter = GetRewriter(WorkingDocument);
@@ -43,9 +44,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 			return null;
 		}
 
-		protected override void SaveResult(SyntaxNode initialSourceNode)
+		protected override async Task SaveResult(SyntaxNode initialSourceNode)
 		{
-			if (string.Compare(WorkingDocument.GetTextAsync().Result.ToString(), ProjectItemDetails.InitialSourceNode.GetText().ToString(), false) != 0)
+			var text = await WorkingDocument.GetTextAsync();
+			if (string.Compare(text?.ToString(), ProjectItemDetails.InitialSourceNode.GetText().ToString(), false) != 0)
 			{
 				TidyCSharpPackage.Instance.RefreshSolution(WorkingDocument.Project.Solution);
 			}

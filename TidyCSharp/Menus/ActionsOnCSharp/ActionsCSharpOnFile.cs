@@ -124,7 +124,7 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 				var path = item.Properties.Item("FullPath").Value.ToString();
 				if (path.EndsWithAny(new[] { "AssemblyInfo.cs", "TheApplication.cs" })) return;
 
-				StreamWriter sw = new StreamWriter(Path.Combine(Path.GetTempPath(), "Currentfile.txt"), true);
+				StreamWriter sw = new StreamWriter(Path.Combine(Path.GetTempPath(), "TidyCurrentfile.txt"), true);
 
 				sw.WriteLine(path);
 
@@ -133,19 +133,13 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 
 				foreach (var actionTypeItem in cleanupOptions.ActionTypes)
 				{
-					sw = new StreamWriter(Path.Combine(Path.GetTempPath(), "TidyActions.txt"), true);
+					sw = new StreamWriter(Path.Combine(Path.GetTempPath(), "TidyCurrentActions.txt"), true);
 					sw.WriteLine("Phase1: " + actionTypeItem.ToString());
 					sw.Close();
 
 					if (actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces
 						&& actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.OrganizeUsingDirectives
-						&& actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.ConvertMsharpGeneralMethods
-
-						&& actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.CamelCasedMethodVariable     //Disable due to freezing TidyC#
-						&& actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.CamelCasedFields)             //Disable due to freezing TidyC#
-																												   //&& actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.ConvertMsharpGeneralMethods  //Disable due to freezing TidyC#
-																												   //&& actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.ConvertMsharpUIMethods       //Disable due to freezing TidyC#
-																												   //&& actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.ConvertMsharpModelMethods)   //Disable due to freezing TidyC#
+						&& actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.ConvertMsharpGeneralMethods)
 
 						CodeCleanerHost.Run(item, actionTypeItem, cleanupOptions, true);
 				}

@@ -19,7 +19,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
 	public class MSharpUICleaner : CodeCleanerCommandRunnerBase, ICodeCleaner
 	{
-		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
+		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
 		{
 			if (ProjectItemDetails.ProjectItem.ContainingProject.Name == "#UI")
 				return ChangeMethodHelper(initialSourceNode);
@@ -1318,7 +1318,14 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 					{
 						var invocation = node.Variables.FirstOrDefault().Initializer.Value
 							.As<InvocationExpressionSyntax>();
-						var result = Task.Run(() => GetReferencedSymbolsAsync(identifierName)).Result;
+
+						IEnumerable<ReferencedSymbol> result = null;
+
+						Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async delegate
+						{
+							result = await GetReferencedSymbolsAsync(identifierName);
+						});
+
 						if (result.Count() == 1 && invocation.ArgumentsCountShouldBe(0))
 						{
 							SyntaxNode nextNode = node.SyntaxTree.GetRoot().FindNode(result.FirstOrDefault().Locations

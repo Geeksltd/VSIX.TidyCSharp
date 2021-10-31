@@ -10,6 +10,7 @@ using Microsoft.CodeAnalysis.FindSymbols;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -19,7 +20,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 		const string SELECTED_METHOD_ANNOTATION_RENAME = "SELECTED_METHOD_ANNOTATION_RENAME";
 		const string SELECTED_METHOD_ANNOTATION_REMOVE = "SELECTED_METHOD_ANNOTATION_REMOVE";
 
-		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
+		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
 		{
 			orginalDocument = ProjectItemDetails.ProjectItemDocument;
 			WorkingDocument = ProjectItemDetails.ProjectItemDocument;
@@ -44,16 +45,16 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 					var firstAnnotatedItem = annotations.FirstOrDefault();
 					var annotationOfFirstAnnotatedItem = firstAnnotatedItem.GetAnnotations(SELECTED_METHOD_ANNOTATION_RENAME).FirstOrDefault();
 
-					var renameResult = Renamer.RenameSymbol(WorkingDocument, initialSourceNode, null, firstAnnotatedItem, annotationOfFirstAnnotatedItem.Data);
+					var renameResult = await Renamer.RenameSymbol(WorkingDocument, initialSourceNode, null, firstAnnotatedItem, annotationOfFirstAnnotatedItem.Data);
 
 					WorkingDocument = renameResult.Document;
-					initialSourceNode = WorkingDocument.GetSyntaxRootAsync().Result;
+					initialSourceNode = await WorkingDocument.GetSyntaxRootAsync();
 
 					firstAnnotatedItem = initialSourceNode.GetAnnotatedNodes(annotationOfFirstAnnotatedItem).FirstOrDefault();
 					initialSourceNode = initialSourceNode.ReplaceNode(firstAnnotatedItem, firstAnnotatedItem.WithoutAnnotations(SELECTED_METHOD_ANNOTATION_RENAME));
 
 					WorkingDocument = WorkingDocument.WithSyntaxRoot(initialSourceNode);
-					initialSourceNode = WorkingDocument.GetSyntaxRootAsync().Result;
+					initialSourceNode = await WorkingDocument.GetSyntaxRootAsync();
 				}
 				while (annotations.Any());
 
@@ -68,7 +69,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 				if (IsReportOnlyMode &&
 					!IsEquivalentToUnModified(initialSourceNode))
 				{
-					this.CollectMessages(new ChangesReport(orginalDocument.GetSyntaxRootAsync()?.Result)
+					this.CollectMessages(new ChangesReport(await orginalDocument.GetSyntaxRootAsync())
 					{
 						LineNumber = lineSpan.StartLinePosition.Line,
 						Column = lineSpan.StartLinePosition.Character,
@@ -84,9 +85,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 			return initialSourceNode;
 		}
 
-		protected override void SaveResult(SyntaxNode initialSourceNode)
+		protected override async Task SaveResult(SyntaxNode initialSourceNode)
 		{
-			if (string.Compare(WorkingDocument.GetTextAsync().Result.ToString(), ProjectItemDetails.InitialSourceNode.GetText().ToString(), false) != 0)
+			var text = await WorkingDocument.GetTextAsync();
+			if (string.Compare(text?.ToString(), ProjectItemDetails.InitialSourceNode.GetText().ToString(), false) != 0)
 			{
 				TidyCSharpPackage.Instance.RefreshSolution(WorkingDocument.Project.Solution);
 			}
@@ -106,12 +108,15 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 			public override void VisitPropertyDeclaration(PropertyDeclarationSyntax propertyDeclaration)
 			{
-				FindFullPropertyForConvertingAutoProperty(propertyDeclaration);
+				Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async delegate
+				{
+					await FindFullPropertyForConvertingAutoProperty(propertyDeclaration);
+				});
 			}
 
 			public List<Tuple<VariableDeclaratorSyntax, PropertyDeclarationSyntax, bool>> VariablesToRemove = new List<Tuple<VariableDeclaratorSyntax, PropertyDeclarationSyntax, bool>>();
 
-			PropertyDeclarationSyntax FindFullPropertyForConvertingAutoProperty(PropertyDeclarationSyntax propertyDeclaration)
+			async Task<PropertyDeclarationSyntax> FindFullPropertyForConvertingAutoProperty(PropertyDeclarationSyntax propertyDeclaration)
 			{
 				if (propertyDeclaration.AccessorList == null) return null;
 				if (propertyDeclaration.AccessorList.Accessors.Count != 2) return null;
@@ -146,11 +151,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
 
 
-				var refrences = Microsoft.CodeAnalysis.FindSymbols.SymbolFinder.FindReferencesAsync(baseFieldSymbol, TidyCSharpPackage.Instance.CleanupWorkingSolution);
-				refrences.Wait(2000);
+				var refrences = await Microsoft.CodeAnalysis.FindSymbols.SymbolFinder.FindReferencesAsync(baseFieldSymbol, TidyCSharpPackage.Instance.CleanupWorkingSolution);
+
 				ReferencedSymbol references = null;
-				if (refrences.IsCompleted)
-					references = refrences.Result.FirstOrDefault();
+				references = refrences.FirstOrDefault();
 
 				if (references == null) return null;
 

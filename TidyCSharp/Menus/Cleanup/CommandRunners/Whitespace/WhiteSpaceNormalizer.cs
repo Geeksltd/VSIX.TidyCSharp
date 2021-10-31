@@ -5,12 +5,13 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Formatting;
 using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
 	public class WhiteSpaceNormalizer : CodeCleanerCommandRunnerBase, ICodeCleaner
 	{
-		public override SyntaxNode CleanUp(SyntaxNode initialSourceNode)
+		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
 		{
 			return NormalizeWhiteSpaceHelper(initialSourceNode, Options);
 		}

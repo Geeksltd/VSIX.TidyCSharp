@@ -27,7 +27,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 		public ProjectItemDetailsType ProjectItemDetails { get; protected set; }
 		public ProjectItemDetailsType UnModifiedProjectItemDetails { get; protected set; }
 
-		protected virtual void AsyncRun(ProjectItem item)
+		protected virtual async void AsyncRun(ProjectItem item)
 		{
 			ProjectItemDetails = new ProjectItemDetailsType(item);
 
@@ -40,7 +40,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 			var initialSourceNode = CleanUp(ProjectItemDetails.InitialSourceNode);
 
 			if (!IsReportOnlyMode)
-				SaveResult(initialSourceNode);
+				SaveResult(await initialSourceNode);
 		}
 
 		protected virtual SyntaxNode RefreshResult(SyntaxNode initialSourceNode)
@@ -63,7 +63,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 		}
 
 
-		protected virtual void SaveResult(SyntaxNode initialSourceNode)
+		protected virtual async Task SaveResult(SyntaxNode initialSourceNode)
 		{
 			if (initialSourceNode == null || initialSourceNode == ProjectItemDetails.InitialSourceNode) return;
 
@@ -81,7 +81,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 			TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
 		}
 
-		public abstract SyntaxNode CleanUp(SyntaxNode initialSourceNode);
+		public virtual async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+		{
+			return null;
+		}
 
 		public bool IsEquivalentToUnModified(SyntaxNode initialSourceNode)
 		{
@@ -151,7 +154,11 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 				{
 					if (_semanticModel == null && ProjectItemDocument != null)
 					{
-						_semanticModel = ProjectItemDocument.GetSemanticModelAsync().Result;
+
+						Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async delegate
+						{
+							_semanticModel = await ProjectItemDocument.GetSemanticModelAsync();
+						});
 					}
 
 					return _semanticModel;
@@ -166,7 +173,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 				FilePath = item.ToFullPathPropertyValue();
 				ProjectItem = item;
 
-				InitialSourceNode = ProjectItemDocument != null ? ProjectItemDocument.GetSyntaxRootAsync().Result : item.ToSyntaxNode();
+				Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async delegate
+				{
+					InitialSourceNode = ProjectItemDocument != null ? await ProjectItemDocument.GetSyntaxRootAsync() : item.ToSyntaxNode();
+				});
 			}
 			static RoslynDocument GetRoslynDomuentByProjectItem(ProjectItem projectItem)
 			{
