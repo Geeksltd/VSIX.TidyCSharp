@@ -32,6 +32,9 @@ namespace Geeks.GeeksProductivityTools
 		EnvDTE.Events events;
 		EnvDTE.BuildEvents buildEvent;
 
+
+		string TidyProcesLogsPath = Path.Combine(Path.GetTempPath() + "Tidy.Process.Log.txt");
+
 		public static TidyCSharpPackage Instance { get; private set; }
 
 		public Workspace VsWorkspace { get; set; }
@@ -102,11 +105,32 @@ namespace Geeks.GeeksProductivityTools
 
 		protected override async System.Threading.Tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
 		{
+			using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, false))
+			{
+				tidyLogWriter.WriteLine("Initialization has begun...");
+			}
+
+
 			await base.InitializeAsync(cancellationToken, progress);
 
+			using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
+			{
+				tidyLogWriter.WriteLine("Base has initialized");
+			}
+
+
 			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+			using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
+			{
+				tidyLogWriter.WriteLine("Switched to main thread");
+			}
 
 			App.Initialize(GetDialogPage(typeof(OptionsPage)) as OptionsPage);
+
+			using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
+			{
+				tidyLogWriter.WriteLine("App initialized");
+			}
 
 			Instance = this;
 
@@ -114,55 +138,117 @@ namespace Geeks.GeeksProductivityTools
 			if (componentModel != null)
 				VsWorkspace = componentModel.GetService<VisualStudioWorkspace>();
 
+			using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
+			{
+				if (componentModel == null)
+					tidyLogWriter.WriteLine("component Model is null");
+				else
+					tidyLogWriter.WriteLine("component has value");
+			}
+
 			// Add our command handlers for menu (commands must exist in the .vsct file)
 			var menuCommandService = await GetServiceAsync(typeof(IMenuCommandService)).ConfigureAwait(true) as OleMenuCommandService;
+
+
 
 			if (null != menuCommandService)
 			{
 				new ActionCustomCodeCleanup(menuCommandService).SetupCommands();
 			}
 
+			using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
+			{
+				if (menuCommandService == null)
+					tidyLogWriter.WriteLine("menu Command Service  is null");
+				else
+					tidyLogWriter.WriteLine("menu Command Service has value");
+			}
+
 
 			// Hook up event handlers
 			events = App.DTE.Events;
-			buildEvent= events.BuildEvents;
+			buildEvent = events.BuildEvents;
 			docEvents = events.DocumentEvents;
 			solEvents = events.SolutionEvents;
 			docEvents.DocumentSaved += DocumentEvents_DocumentSaved;
 			solEvents.Opened += delegate { App.Initialize(GetDialogPage(typeof(OptionsPage)) as OptionsPage); };
 			buildEvent.OnBuildBegin += BuildEvent_OnBuildBegin;
+
+			using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
+			{
+				tidyLogWriter.WriteLine("Initialization has finished...");
+			}
 		}
 
 		private void BuildEvent_OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
 		{
-			var CommandArgs = Environment.GetCommandLineArgs();
-			bool isReportMode = false;
-			using (var sw = new StreamWriter(Path.Combine(Path.GetTempPath(), "TidyVSArgs.txt")))
+			using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
 			{
-				if (CommandArgs != null && CommandArgs.Length > 0)
+				tidyLogWriter.WriteLine("Build process has finished...");
+			}
+
+			var commandLineArgs = Environment.GetCommandLineArgs().ToList();
+			bool isReportMode = false;
+
+			if (commandLineArgs != null && commandLineArgs.Any())
+			{
+				foreach (var argum in commandLineArgs)
 				{
-					foreach (var Arg in CommandArgs)
+					if (argum.ToLower() == "/tidyreportswitch")
 					{
-						sw.WriteLine(Arg);
-						if (Arg.ToLower() == "/tidyreportswitch")
-						{
-							isReportMode = true;
-							sw.WriteLine("Tidy C# has runned in report mode");
-						}
+						isReportMode = true;
+						break;
+					}
+				}
+			}
+
+			using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
+			{
+				tidyLogWriter.WriteLine("Command line arguments ========================");
+				if (commandLineArgs != null && commandLineArgs.Any())
+				{
+					foreach (var argum in commandLineArgs)
+					{
+						tidyLogWriter.WriteLine(argum);
 					}
 				}
 				else
 				{
-					sw.WriteLine("No Args !!!");
+					tidyLogWriter.WriteLine("No arguments!!!");
 				}
-				sw.Close();
+
+				if (isReportMode)
+				{
+					tidyLogWriter.WriteLine("Report mode is on");
+				}
+				else
+				{
+					tidyLogWriter.WriteLine("Report mode is off");
+				}
+
 			}
 
 			if (isReportMode)
 			{
+				using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
+				{
+					tidyLogWriter.WriteLine("ActionReadOnlyCodeCleanup");
+				}
 				var cleanUpRunner = new ActionReadOnlyCodeCleanup();
+				using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
+				{
+					tidyLogWriter.WriteLine("RunReadOnlyCleanUp");
+				}
 				cleanUpRunner.RunReadOnlyCleanUp();
+				using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
+				{
+					tidyLogWriter.WriteLine("GenerateMessages");
+				}
 				CodeCleanerHost.GenerateMessages();
+				using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
+				{
+					tidyLogWriter.WriteLine("Tidy Report process has done.");
+				}
 			}
 		}
 

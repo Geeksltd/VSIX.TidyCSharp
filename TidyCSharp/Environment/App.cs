@@ -2,6 +2,7 @@ using EnvDTE80;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
+using System.IO;
 
 namespace Geeks.GeeksProductivityTools
 {
@@ -13,7 +14,6 @@ namespace Geeks.GeeksProductivityTools
 
 		public static void Initialize(OptionsPage optionsPage)
 		{
-
 			AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(GlobalExceptionHandlerEvent);
 
 			DTE = (DTE2)TidyCSharpPackage.GetGlobalService(typeof(SDTE));
@@ -27,6 +27,10 @@ namespace Geeks.GeeksProductivityTools
 		{
 			ErrorNotification.WriteErrorToFile((Exception)args.ExceptionObject);
 			ErrorNotification.WriteErrorToOutputWindow((Exception)args.ExceptionObject);
+			using (var sw = new StreamWriter("C:\\TidyException.txt", true))
+			{
+				sw.Write(args);
+			}
 		}
 	}
 }
