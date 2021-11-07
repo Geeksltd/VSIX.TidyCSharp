@@ -6,6 +6,7 @@ using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using Microsoft.VisualStudio.Shell;
 using System;
 using System.IO;
 using System.Linq;
@@ -107,6 +108,11 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 			try
 			{
 
+				ThreadHelper.JoinableTaskFactory.Run(async delegate
+				{
+					await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+				});
+				
 				//Sometimes cannot find document's file
 				try
 				{
@@ -124,61 +130,61 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 				var path = item.Properties.Item("FullPath").Value.ToString();
 				if (path.EndsWithAny(new[] { "AssemblyInfo.cs", "TheApplication.cs" })) return;
 
-				StreamWriter sw = new StreamWriter(Path.Combine(Path.GetTempPath(), "TidyCurrentfile.txt"), true);
-
-				sw.WriteLine(path);
-
-				sw.Close();
+				using (var tidyruntimelog = new StreamWriter(Path.Combine(Path.GetTempPath(), "TidyCurrentfilelog.txt"), true))
+				{
+					tidyruntimelog.WriteLine(path);
+				}
 
 
 				foreach (var actionTypeItem in cleanupOptions.ActionTypes)
 				{
-					sw = new StreamWriter(Path.Combine(Path.GetTempPath(), "TidyCurrentActions.txt"), true);
-					sw.WriteLine("Phase1: " + actionTypeItem.ToString());
-					sw.Close();
-
 					if (actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces
 						&& actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.OrganizeUsingDirectives
 						&& actionTypeItem != VSIX.TidyCSharp.Cleanup.CodeCleanerType.ConvertMsharpGeneralMethods)
-
+					{
+						var watch = System.Diagnostics.Stopwatch.StartNew();
 						CodeCleanerHost.Run(item, actionTypeItem, cleanupOptions, true);
+						watch.Stop();
+
+						using(var tidyruntimelog = new StreamWriter( Path.Combine(Path.GetTempPath(), "TidyCurrentActionslog.txt"), true))
+                        {
+							tidyruntimelog.WriteLine("Phase1-" + actionTypeItem.ToString()+"-"+ watch.ElapsedMilliseconds+" ms");
+						}
+					}
 				}
 
 
 				if (cleanupOptions.ActionTypes.Contains(VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces))
 				{
-					sw = new StreamWriter(Path.Combine(Path.GetTempPath(), "TidyActions.txt"), true);
-					sw.WriteLine("Phase2: NormalizeWhiteSpaces");
-					sw.Close();
+					var watch = System.Diagnostics.Stopwatch.StartNew();
 					CodeCleanerHost.Run(item, VSIX.TidyCSharp.Cleanup.CodeCleanerType.NormalizeWhiteSpaces, cleanupOptions, true);
+					watch.Stop();
+					using (var tidyruntimelog = new StreamWriter(Path.Combine(Path.GetTempPath(), "TidyCurrentActionslog.txt"), true))
+					{
+						tidyruntimelog.WriteLine("Phase2-" + "NormalizeWhiteSpaces" + "-" + watch.ElapsedMilliseconds + " ms");
+					}
 				}
 
 				if (cleanupOptions.ActionTypes.Contains(VSIX.TidyCSharp.Cleanup.CodeCleanerType.OrganizeUsingDirectives))
 				{
-					sw = new StreamWriter(Path.Combine(Path.GetTempPath(), "TidyActions.txt"), true);
-					sw.WriteLine("Phase3: OrganizeUsingDirectives");
-					sw.Close();
-
+					var watch = System.Diagnostics.Stopwatch.StartNew();
 					CodeCleanerHost.Run(item, VSIX.TidyCSharp.Cleanup.CodeCleanerType.OrganizeUsingDirectives, cleanupOptions, true);
-
+					watch.Stop();
+					using (var tidyruntimelog = new StreamWriter(Path.Combine(Path.GetTempPath(), "TidyCurrentActionslog.txt"), true))
+					{
+						tidyruntimelog.WriteLine("Phase3-" + "OrganizeUsingDirectives" + "-" + watch.ElapsedMilliseconds + " ms");
+					}
 				}
-				else
-				{
-					//window.Document.Save();
-				}
-
 
 				if (cleanupOptions.ActionTypes.Contains(VSIX.TidyCSharp.Cleanup.CodeCleanerType.ConvertMsharpGeneralMethods))
 				{
-					sw = new StreamWriter(Path.Combine(Path.GetTempPath(), "TidyActions.txt"), true);
-					sw.WriteLine("Phase4: ConvertMsharpGeneralMethods");
-					sw.Close();
+					var watch = System.Diagnostics.Stopwatch.StartNew();
 					CodeCleanerHost.Run(item, VSIX.TidyCSharp.Cleanup.CodeCleanerType.ConvertMsharpGeneralMethods, cleanupOptions, true);
-				}
-
-				if (fileWindowMustBeOpend == false)
-				{
-					//window.Close(vsSaveChanges.vsSaveChangesYes);
+					watch.Stop();
+					using (var tidyruntimelog = new StreamWriter(Path.Combine(Path.GetTempPath(), "TidyCurrentActionslog.txt"), true))
+					{
+						tidyruntimelog.WriteLine("Phase4-" + "ConvertMsharpGeneralMethods" + "-" + watch.ElapsedMilliseconds + " ms");
+					}
 				}
 			}
 			catch (Exception e)

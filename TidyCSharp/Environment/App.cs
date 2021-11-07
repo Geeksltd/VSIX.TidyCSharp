@@ -27,10 +27,6 @@ namespace Geeks.GeeksProductivityTools
 		{
 			ErrorNotification.WriteErrorToFile((Exception)args.ExceptionObject);
 			ErrorNotification.WriteErrorToOutputWindow((Exception)args.ExceptionObject);
-			using (var sw = new StreamWriter("C:\\TidyException.txt", true))
-			{
-				sw.Write(args);
-			}
 		}
 	}
 }

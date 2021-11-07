@@ -1,6 +1,7 @@
 using EnvDTE;
 using Geeks.GeeksProductivityTools.Utils;
 using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
+using Microsoft.VisualStudio.Shell;
 using System;
 using static Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp.CSharpActionDelegate;
 

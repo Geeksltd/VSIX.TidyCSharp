@@ -182,11 +182,11 @@ namespace Geeks.GeeksProductivityTools
 
 		private void BuildEvent_OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
 		{
-			if (File.Exists(Path.Combine(Path.GetTempPath(), "TidyCurrentfile.txt")))
+			if (File.Exists(Path.Combine(Path.GetTempPath(), "TidyCurrentfilelog.txt")))
 			{
 				try
 				{
-					File.Delete(Path.Combine(Path.GetTempPath(), "TidyCurrentfile.txt"));
+					File.Delete(Path.Combine(Path.GetTempPath(), "TidyCurrentfilelog.txt"));
 				}
 				catch
 				{
@@ -194,11 +194,11 @@ namespace Geeks.GeeksProductivityTools
 				}
 			}
 
-			if (File.Exists(Path.Combine(Path.GetTempPath(), "TidyCurrentActions.txt")))
+			if (File.Exists(Path.Combine(Path.GetTempPath(), "TidyCurrentActionslog.txt")))
 			{
 				try
 				{
-					File.Delete(Path.Combine(Path.GetTempPath(), "TidyCurrentActions.txt"));
+					File.Delete(Path.Combine(Path.GetTempPath(), "TidyCurrentActionslog.txt"));
 				}
 				catch
 				{
