@@ -8,9 +8,7 @@ using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Geeks.GeeksProductivityTools
 {
@@ -31,7 +29,6 @@ namespace Geeks.GeeksProductivityTools
         EnvDTE.SolutionEvents solEvents;
         EnvDTE.Events events;
         EnvDTE.BuildEvents buildEvent;
-
 
         string TidyProcesLogsPath = Path.Combine(Path.GetTempPath() + "Tidy.Process.Log.txt");
 
@@ -67,17 +64,21 @@ namespace Geeks.GeeksProductivityTools
             {
                 var pchanges = oldSolution.GetChanges(newSolution).GetProjectChanges();
                 var changedSolution = oldSolution;
+
                 foreach (var changedProject in pchanges)
                 {
                     var docchanges = changedProject.GetChangedDocuments();
+
                     foreach (var changedDocumentId in docchanges)
                     {
                         var changedDocument = changedProject.OldProject.GetDocument(changedDocumentId);
                         var documentRoot = changedDocument.GetSyntaxRootAsync().Result;
                         documentRoot.WriteSourceTo(changedDocument.FilePath);
                         changedSolution = changedSolution.WithDocumentSyntaxRoot(changedDocumentId, documentRoot);
+
                         {
                             var otherSharedProjects = changedSolution.Projects.Where(p => p.Name != changedDocument.Project.Name);
+
                             foreach (var otherProject in otherSharedProjects)
                             {
                                 foreach (var documentItem in otherProject.Documents.Where(d => d.FilePath == changedDocument.FilePath))
@@ -97,44 +98,39 @@ namespace Geeks.GeeksProductivityTools
         {
             if (_CleanupWorkingSolution == null) return;
             var changedSolution = ExtactChanges(VsWorkspace.CurrentSolution, _CleanupWorkingSolution);
-            bool b = VsWorkspace.TryApplyChanges(changedSolution);
+            var b = VsWorkspace.TryApplyChanges(changedSolution);
             _CleanupWorkingSolution = null;
             bResetWorkingSolution = true;
         }
 
-
         protected override async System.Threading.Tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, false))
-            {
                 tidyLogWriter.WriteLine("Initialization has begun...");
-            }
 
 
             await base.InitializeAsync(cancellationToken, progress);
 
             using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
-            {
                 tidyLogWriter.WriteLine("Base has initialized");
-            }
 
 
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
             using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
-            {
                 tidyLogWriter.WriteLine("Switched to main thread");
-            }
+
 
             App.Initialize(GetDialogPage(typeof(OptionsPage)) as OptionsPage);
 
             using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
-            {
                 tidyLogWriter.WriteLine("App initialized");
-            }
+
 
             Instance = this;
 
             var componentModel = (IComponentModel)await GetServiceAsync(typeof(SComponentModel)).ConfigureAwait(true);
+
             if (componentModel != null)
                 VsWorkspace = componentModel.GetService<VisualStudioWorkspace>();
 
@@ -149,8 +145,6 @@ namespace Geeks.GeeksProductivityTools
             // Add our command handlers for menu (commands must exist in the .vsct file)
             var menuCommandService = await GetServiceAsync(typeof(IMenuCommandService)).ConfigureAwait(true) as OleMenuCommandService;
 
-
-
             if (null != menuCommandService)
             {
                 new ActionCustomCodeCleanup(menuCommandService).SetupCommands();
@@ -164,7 +158,6 @@ namespace Geeks.GeeksProductivityTools
                     tidyLogWriter.WriteLine("menu Command Service has value");
             }
 
-
             // Hook up event handlers
             events = App.DTE.Events;
             buildEvent = events.BuildEvents;
@@ -175,17 +168,16 @@ namespace Geeks.GeeksProductivityTools
             solEvents.Opened += delegate { App.Initialize(GetDialogPage(typeof(OptionsPage)) as OptionsPage); };
 
             using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
-            {
                 tidyLogWriter.WriteLine("Initialization has finished...");
-            }
+
         }
 
-        private void BuildEvents_OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
+        void BuildEvents_OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
         {
             throw new NotImplementedException();
         }
 
-        private void BuildEvent_OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
+        void BuildEvent_OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
         {
             if (File.Exists(Path.Combine(Path.GetTempPath(), "TidyCurrentfilelog.txt")))
             {
@@ -195,7 +187,6 @@ namespace Geeks.GeeksProductivityTools
                 }
                 catch
                 {
-
                 }
             }
 
@@ -207,17 +198,15 @@ namespace Geeks.GeeksProductivityTools
                 }
                 catch
                 {
-
                 }
             }
 
             using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
-            {
                 tidyLogWriter.WriteLine("Build process has finished...");
-            }
+
 
             var commandLineArgs = Environment.GetCommandLineArgs().ToList();
-            bool isReportMode = false;
+            var isReportMode = false;
 
             if (commandLineArgs != null && commandLineArgs.Any())
             {
@@ -234,12 +223,12 @@ namespace Geeks.GeeksProductivityTools
             using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
             {
                 tidyLogWriter.WriteLine("Command line arguments ========================");
+
                 if (commandLineArgs != null && commandLineArgs.Any())
                 {
                     foreach (var argum in commandLineArgs)
-                    {
                         tidyLogWriter.WriteLine(argum);
-                    }
+
                 }
                 else
                 {
@@ -254,30 +243,31 @@ namespace Geeks.GeeksProductivityTools
                 {
                     tidyLogWriter.WriteLine("Report mode is off");
                 }
-
             }
 
             if (isReportMode)
             {
                 using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
-                {
                     tidyLogWriter.WriteLine("ActionReadOnlyCodeCleanup");
-                }
+
+
                 var cleanUpRunner = new ActionReadOnlyCodeCleanup();
+
                 using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
-                {
                     tidyLogWriter.WriteLine("RunReadOnlyCleanUp");
-                }
+
+
                 cleanUpRunner.RunReadOnlyCleanUp();
+
                 using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
-                {
                     tidyLogWriter.WriteLine("GenerateMessages");
-                }
+
+
                 CodeCleanerHost.GenerateMessages();
+
                 using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
-                {
                     tidyLogWriter.WriteLine("Tidy Report process has done.");
-                }
+
             }
         }
 

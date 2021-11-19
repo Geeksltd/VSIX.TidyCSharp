@@ -3,7 +3,6 @@ using Geeks.GeeksProductivityTools;
 using Geeks.GeeksProductivityTools.Definition;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
 using Geeks.GeeksProductivityTools.Utils;
-using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
@@ -11,7 +10,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.Threading.Tasks;
-using static Microsoft.VisualStudio.Threading.AsyncReaderWriterLock;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -39,24 +37,26 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     document.DTE.ExecuteCommand(UsingsCommands.REMOVE_AND_SORT_COMMAND_NAME);
                 }
 
-                EnvDTE.TextDocument doc = (EnvDTE.TextDocument)(document.Object("TextDocument"));
+                var doc = (EnvDTE.TextDocument)(document.Object("TextDocument"));
                 var p = doc.StartPoint.CreateEditPoint();
-                string s = p.GetText(doc.EndPoint);
+                var s = p.GetText(doc.EndPoint);
                 var modified = SyntaxFactory.ParseSyntaxTree(s);
 
                 if (IsReportOnlyMode &&
                     !IsEquivalentToUnModified(modified.GetRoot()))
                 {
-                    this.CollectMessages(new ChangesReport(initialSourceNode)
+                    CollectMessages(new ChangesReport(initialSourceNode)
                     {
                         LineNumber = 1,
                         Column = 1,
                         Message = "Your Using usage is not good",
                         Generator = nameof(UsingDirectiveOrganizer)
                     });
+
                     document.Undo();
                     return initialSourceNode;
                 }
+
                 document.Save();
             }
             catch (Exception e)

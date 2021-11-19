@@ -33,17 +33,12 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             {
                 result += "<";
 
-                bool isFirstIteration = true;
+                var isFirstIteration = true;
+
                 foreach (INamedTypeSymbol typeArg in type.TypeArguments)
                 {
-                    if (isFirstIteration)
-                    {
-                        isFirstIteration = false;
-                    }
-                    else
-                    {
-                        result += ", ";
-                    }
+                    if (isFirstIteration) isFirstIteration = false;
+                    else result += ", ";
 
                     result += typeArg.GetFullTypeString();
                 }
@@ -77,21 +72,14 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
         {
             var result = methodSymbol.DeclaredAccessibility.ConvertAccessabilityToString();
 
-            if (methodSymbol.IsAsync)
-                result += " async";
+            if (methodSymbol.IsAsync) result += " async";
 
             if (methodSymbol.IsAbstract)
                 result += " abstract";
 
-            if (methodSymbol.IsVirtual)
-            {
-                result += " virtual";
-            }
+            if (methodSymbol.IsVirtual) result += " virtual";
 
-            if (methodSymbol.IsStatic)
-            {
-                result += " static";
-            }
+            if (methodSymbol.IsStatic) result += " static";
 
             if (methodSymbol.IsOverride)
             {
@@ -109,17 +97,12 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 
             result += " " + methodSymbol.Name + "(";
 
-            bool isFirstParameter = true;
+            var isFirstParameter = true;
+
             foreach (IParameterSymbol parameter in methodSymbol.Parameters)
             {
-                if (isFirstParameter)
-                {
-                    isFirstParameter = false;
-                }
-                else
-                {
-                    result += ", ";
-                }
+                if (isFirstParameter) isFirstParameter = false;
+                else result += ", ";
 
                 if (parameter.RefKind == RefKind.Out)
                 {
@@ -156,10 +139,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
                 .Where((constructorParam) => constructorParam.Name == argName).FirstOrDefault();
 
             // get the index of the parameter
-            int parameterIdx = attributeData.AttributeConstructor.Parameters.IndexOf(parameterSymbol);
+            var parameterIdx = attributeData.AttributeConstructor.Parameters.IndexOf(parameterSymbol);
 
             // get the construct argument corresponding to this parameter
-            TypedConstant constructorArg = attributeData.ConstructorArguments[parameterIdx];
+            var constructorArg = attributeData.ConstructorArguments[parameterIdx];
 
             // return the value passed to the attribute
             return constructorArg.Value;

@@ -4,90 +4,96 @@ using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.VisualStudio.Shell;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
-	public class CamelCasedFields : VariableRenamingBase, ICodeCleaner
-	{
-		protected override SyntaxNode GetWorkingNode(SyntaxNode initialSourceNode, SyntaxAnnotation annotationForSelectedNodes)
-		{
-			return
-				initialSourceNode
-					.DescendantNodes()
-					.OfType<ClassDeclarationSyntax>()
-					.FirstOrDefault(m => !m.HasAnnotation(annotationForSelectedNodes));
-		}
+    public class CamelCasedFields : VariableRenamingBase, ICodeCleaner
+    {
+        protected override SyntaxNode GetWorkingNode(SyntaxNode initialSourceNode, SyntaxAnnotation annotationForSelectedNodes)
+        {
+            return
+                initialSourceNode
+                    .DescendantNodes()
+                    .OfType<ClassDeclarationSyntax>()
+                    .FirstOrDefault(m => !m.HasAnnotation(annotationForSelectedNodes));
+        }
 
-		protected override VariableRenamingBaseRewriter GetRewriter(Document workingDocument)
-		{
-			return new Rewriter(workingDocument, IsReportOnlyMode, Options);
-		}
+        protected override VariableRenamingBaseRewriter GetRewriter(Document workingDocument)
+        {
+            return new Rewriter(workingDocument, IsReportOnlyMode, Options);
+        }
 
-		class Rewriter : VariableRenamingBaseRewriter
-		{
-			public Rewriter(Document workingDocument, bool isReportOnlyMode, ICleanupOption options) : base(workingDocument, isReportOnlyMode, options) { }
+        class Rewriter : VariableRenamingBaseRewriter
+        {
+            public Rewriter(Document workingDocument, bool isReportOnlyMode, ICleanupOption options) : base(workingDocument, isReportOnlyMode, options) { }
 
-			public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
-			{
-				ClassDeclarationSyntax classDeclarationSyntax = null;
-				Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async delegate
-				{
-					classDeclarationSyntax = await RenameDeclarations(node);
-				});
-				return base.VisitClassDeclaration(classDeclarationSyntax as ClassDeclarationSyntax);
-			}
+            public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
+            {
+                ClassDeclarationSyntax classDeclarationSyntax = null;
 
-			async Task<ClassDeclarationSyntax> RenameDeclarations(ClassDeclarationSyntax classNode)
-			{
-				if (CheckOption((int)CamelCasedClassFields.CleanupTypes.Normal_Fields))
-				{
-					var renamingResult = await new FieldRenamer(WorkingDocument).RenameDeclarations(classNode);
-					if (renamingResult != null && renamingResult.Node != null)
-					{
-						classNode = renamingResult.Node as ClassDeclarationSyntax;
-						WorkingDocument = renamingResult.Document;
-					}
-					if (renamingResult != null)
-					{
-						var lineSpan = classNode.GetFileLinePosSpan();
-						AddReport(new ChangesReport(classNode)
-						{
-							LineNumber = lineSpan.StartLinePosition.Line,
-							Column = lineSpan.StartLinePosition.Character,
-							Message = "Camel Cased Fields",
-							Generator = nameof(CamelCasedFields),
-						});
-					}
-				}
+                Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory
+                    .Run(async delegate
+                {
+                    classDeclarationSyntax = await RenameDeclarations(node);
+                });
 
-				if (CheckOption((int)CamelCasedClassFields.CleanupTypes.Const_Fields))
-				{
-					var renamingResult = await new CONSTRenamer(WorkingDocument).RenameDeclarations(classNode);
-					if (renamingResult != null && renamingResult.Node != null)
-					{
-						classNode = renamingResult.Node as ClassDeclarationSyntax;
-						WorkingDocument = renamingResult.Document;
-					}
+                return base.VisitClassDeclaration(classDeclarationSyntax as ClassDeclarationSyntax);
+            }
 
-					if (renamingResult != null)
-					{
-						var lineSpan = classNode.GetFileLinePosSpan();
-						AddReport(new ChangesReport(classNode)
-						{
-							LineNumber = lineSpan.StartLinePosition.Line,
-							Column = lineSpan.StartLinePosition.Character,
-							Message = "CamelCasedFields",
-							Generator = nameof(CamelCasedFields)
-						});
-					}
-				}
+            async Task<ClassDeclarationSyntax> RenameDeclarations(ClassDeclarationSyntax classNode)
+            {
+                if (CheckOption((int)CamelCasedClassFields.CleanupTypes.Normal_Fields))
+                {
+                    var renamingResult = await new FieldRenamer(WorkingDocument).RenameDeclarations(classNode);
 
-				return classNode;
-			}
-		}
-	}
+                    if (renamingResult != null && renamingResult.Node != null)
+                    {
+                        classNode = renamingResult.Node as ClassDeclarationSyntax;
+                        WorkingDocument = renamingResult.Document;
+                    }
+
+                    if (renamingResult != null)
+                    {
+                        var lineSpan = classNode.GetFileLinePosSpan();
+
+                        AddReport(new ChangesReport(classNode)
+                        {
+                            LineNumber = lineSpan.StartLinePosition.Line,
+                            Column = lineSpan.StartLinePosition.Character,
+                            Message = "Camel Cased Fields",
+                            Generator = nameof(CamelCasedFields),
+                        });
+                    }
+                }
+
+                if (CheckOption((int)CamelCasedClassFields.CleanupTypes.Const_Fields))
+                {
+                    var renamingResult = await new CONSTRenamer(WorkingDocument).RenameDeclarations(classNode);
+
+                    if (renamingResult != null && renamingResult.Node != null)
+                    {
+                        classNode = renamingResult.Node as ClassDeclarationSyntax;
+                        WorkingDocument = renamingResult.Document;
+                    }
+
+                    if (renamingResult != null)
+                    {
+                        var lineSpan = classNode.GetFileLinePosSpan();
+
+                        AddReport(new ChangesReport(classNode)
+                        {
+                            LineNumber = lineSpan.StartLinePosition.Line,
+                            Column = lineSpan.StartLinePosition.Character,
+                            Message = "CamelCasedFields",
+                            Generator = nameof(CamelCasedFields)
+                        });
+                    }
+                }
+
+                return classNode;
+            }
+        }
+    }
 }

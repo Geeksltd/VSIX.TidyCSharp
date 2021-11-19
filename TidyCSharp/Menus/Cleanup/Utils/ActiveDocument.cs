@@ -10,6 +10,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             if (item == null) return false;
 
             var path = item.Properties.Item("FullPath").Value.ToString();
+
             if (string.IsNullOrEmpty(path) || !File.Exists(path))
                 return false;
 

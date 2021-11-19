@@ -14,7 +14,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         protected override IEnumerable<SyntaxToken> GetItemsToRename(SyntaxNode currentNode)
         {
-            List<VariableDeclaratorSyntax> output = new List<VariableDeclaratorSyntax>();
+            var output = new List<VariableDeclaratorSyntax>();
 
             var selectedFields =
                 (currentNode as ClassDeclarationSyntax)
@@ -28,7 +28,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             foreach (var item in selectedFields)
                 output.AddRange(item.Declaration.Variables);
 
-
             return output.Select(x => x.Identifier);
         }
 
@@ -37,6 +36,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             if (currentName.StartsWith("_"))
             {
                 currentName = currentName.TrimStart('_');
+
                 if (char.IsLetter(currentName[0]))
                 {
                     return new[] { GetCamelCased(currentName), GetPascalCased(currentName) };

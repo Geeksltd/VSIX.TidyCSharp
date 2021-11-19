@@ -15,7 +15,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         protected override IEnumerable<SyntaxToken> GetItemsToRename(SyntaxNode currentNode)
         {
-            List<VariableDeclaratorSyntax> output = new List<VariableDeclaratorSyntax>();
+            var output = new List<VariableDeclaratorSyntax>();
+
             {
                 var selectedFields =
                     (currentNode as ClassDeclarationSyntax)
@@ -28,8 +29,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
                 foreach (var item in selectedFields)
                     output.AddRange(item.Declaration.Variables);
-
             }
+
             {
                 var selectedFields =
                     (currentNode as ClassDeclarationSyntax)
@@ -41,7 +42,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
                 foreach (var item in selectedFields)
                     output.AddRange(item.Declaration.Variables);
-
             }
 
             return output.Select(x => x.Identifier);
@@ -52,7 +52,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             const char UNDERLINE = '_';
 
             var newNameBuilder = new StringBuilder();
-            bool lastCharIsLowwer = false;
+            var lastCharIsLowwer = false;
+
             foreach (var c in currentName)
             {
                 if (char.IsUpper(c))
@@ -64,15 +65,12 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
                     lastCharIsLowwer = false;
                 }
-                else if (c != UNDERLINE)
-                {
-                    lastCharIsLowwer = true;
-                }
+                else if (c != UNDERLINE) lastCharIsLowwer = true;
 
                 newNameBuilder.Append(c);
             }
 
-            if ( string.Compare(currentName, currentName.ToUpper(), false) == 0) return null;
+            if (string.Compare(currentName, currentName.ToUpper(), false) == 0) return null;
 
             return new[] { newNameBuilder.ToString().ToUpper() };
         }

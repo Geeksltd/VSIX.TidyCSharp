@@ -8,7 +8,6 @@ namespace GeeksAddin
 
     static class DteExtensions
     {
-        
         /// <summary>
         /// Returns the selected text or null if selected text cannot be found
         /// </summary>
@@ -65,13 +64,11 @@ namespace GeeksAddin
         public static Project GetSolutionItemsProject()
         {
             var solution = App.DTE.Solution as Solution2;
+
             return solution.Projects
                            .OfType<Project>()
                            .FirstOrDefault(p => p.Name.Equals(SolutionItemsFolder, StringComparison.OrdinalIgnoreCase))
                       ?? solution.AddSolutionFolder(SolutionItemsFolder);
         }
-
-
-
     }
 }

@@ -1,6 +1,7 @@
 ﻿namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 {
     using Microsoft.CodeAnalysis.CSharp;
+
     internal static class SyntaxKindEx
     {
         public const SyntaxKind UnderscoreToken = (SyntaxKind)8491;

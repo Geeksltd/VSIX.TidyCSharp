@@ -9,79 +9,85 @@ using System.Threading.Tasks;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
-	public class SimplifyVariableDeclarations : CodeCleanerCommandRunnerBase, ICodeCleaner
-	{
-		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
-		{
-			var syntaxRewriter = new Rewriter(this.ProjectItemDetails.SemanticModel,
-				IsReportOnlyMode, Options);
-			var modifiedSyntaxNode = syntaxRewriter.Visit(initialSourceNode);
-			if (IsReportOnlyMode)
-			{
-				this.CollectMessages(syntaxRewriter.GetReport());
-				return initialSourceNode;
-			}
-			return modifiedSyntaxNode;
-		}
+    public class SimplifyVariableDeclarations : CodeCleanerCommandRunnerBase, ICodeCleaner
+    {
+        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        {
+            var syntaxRewriter = new Rewriter(ProjectItemDetails.SemanticModel,
+                IsReportOnlyMode, Options);
 
-		class Rewriter : CleanupCSharpSyntaxRewriter
-		{
-			const string VarKeyword = "var";
-			SemanticModel SemanticModel;
-			public Rewriter(SemanticModel semanticModel, bool isReportOnlyMode, ICleanupOption options)
-				: base(isReportOnlyMode, options)
-			{
-				SemanticModel = semanticModel;
-			}
+            var modifiedSyntaxNode = syntaxRewriter.Visit(initialSourceNode);
 
-			public override SyntaxNode VisitVariableDeclaration(VariableDeclarationSyntax node)
-			{
-				return ConvertToVar(node) ?? node;
-			}
+            if (IsReportOnlyMode)
+            {
+                CollectMessages(syntaxRewriter.GetReport());
+                return initialSourceNode;
+            }
 
-			SyntaxNode ConvertToVar(VariableDeclarationSyntax node)
-			{
-				if (node.Parent is LocalDeclarationStatementSyntax == false) return null;
-				if ((node.Parent as LocalDeclarationStatementSyntax).IsConst) return null;
-				if (node.Type is IdentifierNameSyntax varIdentifierNameSyntax)
-				{
-					if (varIdentifierNameSyntax.Identifier.ValueText == VarKeyword) return null;
-				}
+            return modifiedSyntaxNode;
+        }
 
-				if (node.Variables.Count > 1) return null;
+        class Rewriter : CleanupCSharpSyntaxRewriter
+        {
+            const string VarKeyword = "var";
+            SemanticModel SemanticModel;
+            public Rewriter(SemanticModel semanticModel, bool isReportOnlyMode, ICleanupOption options)
+                : base(isReportOnlyMode, options)
+            {
+                SemanticModel = semanticModel;
+            }
 
-				var variable = node.Variables.FirstOrDefault();
+            public override SyntaxNode VisitVariableDeclaration(VariableDeclarationSyntax node)
+            {
+                return ConvertToVar(node) ?? node;
+            }
 
-				if (variable.Initializer == null) return null;
+            SyntaxNode ConvertToVar(VariableDeclarationSyntax node)
+            {
+                if (node.Parent is LocalDeclarationStatementSyntax == false) return null;
+                if ((node.Parent as LocalDeclarationStatementSyntax).IsConst) return null;
 
-				var typeOfInitializer = SemanticModel.GetTypeInfo(variable.Initializer.Value);
+                if (node.Type is IdentifierNameSyntax varIdentifierNameSyntax)
+                {
+                    if (varIdentifierNameSyntax.Identifier.ValueText == VarKeyword) return null;
+                }
 
-				var typeOfTypeDef = SemanticModel.GetTypeInfo(node.Type);
+                if (node.Variables.Count > 1) return null;
 
-				if (typeOfInitializer.Type?.Name == typeOfTypeDef.Type?.Name)
-				{
-					if (IsReportOnlyMode)
-					{
-						var lineSpan = node.GetFileLinePosSpan();
-						AddReport(new ChangesReport(node)
-						{
-							LineNumber = lineSpan.StartLinePosition.Line,
-							Column = lineSpan.StartLinePosition.Character,
-							Message = "Should Convert To Var",
-							Generator = nameof(SimplifyVariableDeclarations)
-						});
-					}
-					node =
-						node
-						.WithType(
-							SyntaxFactory.ParseTypeName(VarKeyword)
-							.WithTrailingTrivia(SyntaxFactory.Space)
-							.WithLeadingTrivia(node.Type.GetLeadingTrivia())
-						);
-				}
+                var variable = node.Variables.FirstOrDefault();
 
-				return base.VisitVariableDeclaration(node);
-			}
-		}
-	}
+                if (variable.Initializer == null) return null;
+
+                var typeOfInitializer = SemanticModel.GetTypeInfo(variable.Initializer.Value);
+
+                var typeOfTypeDef = SemanticModel.GetTypeInfo(node.Type);
+
+                if (typeOfInitializer.Type?.Name == typeOfTypeDef.Type?.Name)
+                {
+                    if (IsReportOnlyMode)
+                    {
+                        var lineSpan = node.GetFileLinePosSpan();
+
+                        AddReport(new ChangesReport(node)
+                        {
+                            LineNumber = lineSpan.StartLinePosition.Line,
+                            Column = lineSpan.StartLinePosition.Character,
+                            Message = "Should Convert To Var",
+                            Generator = nameof(SimplifyVariableDeclarations)
+                        });
+                    }
+
+                    node =
+                        node
+                        .WithType(
+                            SyntaxFactory.ParseTypeName(VarKeyword)
+                            .WithTrailingTrivia(SyntaxFactory.Space)
+                            .WithLeadingTrivia(node.Type.GetLeadingTrivia())
+                        );
+                }
+
+                return base.VisitVariableDeclaration(node);
+            }
+        }
+    }
 }

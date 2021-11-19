@@ -10,130 +10,132 @@ using System.Threading.Tasks;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
-	public class SimplyAsyncCalls : CodeCleanerCommandRunnerBase, ICodeCleaner
-	{
-		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
-		{
-			var rewriter = new Rewriter(IsReportOnlyMode, Options);
-			var modifiedSourceNode = rewriter.Visit(initialSourceNode);
+    public class SimplyAsyncCalls : CodeCleanerCommandRunnerBase, ICodeCleaner
+    {
+        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        {
+            var rewriter = new Rewriter(IsReportOnlyMode, Options);
+            var modifiedSourceNode = rewriter.Visit(initialSourceNode);
 
-			if (IsReportOnlyMode)
-			{
-				this.CollectMessages(rewriter.GetReport());
-				return initialSourceNode;
-			}
-			return modifiedSourceNode;
-			// return SimplyAsyncCallsHelper2(initialSourceNode);
-		}
-		class Rewriter : CleanupCSharpSyntaxRewriter
-		{
-			public Rewriter(bool isReportOnlyMode, ICleanupOption options)
-				: base(isReportOnlyMode, options)
-			{
-			}
+            if (IsReportOnlyMode)
+            {
+                CollectMessages(rewriter.GetReport());
+                return initialSourceNode;
+            }
 
-			public override SyntaxNode Visit(SyntaxNode node)
-			{
-				if (node == null) return base.Visit(node);
-				if (node is MethodDeclarationSyntax == false) return base.Visit(node);
-				if (node.Parent is ClassDeclarationSyntax == false) return base.Visit(node);
+            return modifiedSourceNode;
+            // return SimplyAsyncCallsHelper2(initialSourceNode);
+        }
+        class Rewriter : CleanupCSharpSyntaxRewriter
+        {
+            public Rewriter(bool isReportOnlyMode, ICleanupOption options)
+                : base(isReportOnlyMode, options)
+            {
+            }
 
-				var newNode = SimplyAsyncCallsHelper((MethodDeclarationSyntax)node, Options);
+            public override SyntaxNode Visit(SyntaxNode node)
+            {
+                if (node == null) return base.Visit(node);
+                if (node is MethodDeclarationSyntax == false) return base.Visit(node);
+                if (node.Parent is ClassDeclarationSyntax == false) return base.Visit(node);
 
-				if (!newNode.IsEquivalentTo(node) && IsReportOnlyMode)
-				{
-					var lineSpan = node.GetFileLinePosSpan();
-					AddReport(new ChangesReport(node)
-					{
-						LineNumber = lineSpan.StartLinePosition.Line,
-						Column = lineSpan.StartLinePosition.Character,
-						Message = "you can remove await/async modifiers",
-						Generator = nameof(SimplyAsyncCalls)
-					});
-				}
+                var newNode = SimplyAsyncCallsHelper((MethodDeclarationSyntax)node, Options);
 
-				return base.Visit(newNode);
-			}
+                if (!newNode.IsEquivalentTo(node) && IsReportOnlyMode)
+                {
+                    var lineSpan = node.GetFileLinePosSpan();
 
-			static SyntaxTrivia[] _spaceTrivia = { SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, " ") };
+                    AddReport(new ChangesReport(node)
+                    {
+                        LineNumber = lineSpan.StartLinePosition.Line,
+                        Column = lineSpan.StartLinePosition.Character,
+                        Message = "you can remove await/async modifiers",
+                        Generator = nameof(SimplyAsyncCalls)
+                    });
+                }
 
-			public SyntaxNode SimplyAsyncCallsHelper(SyntaxNode initialSource, ICleanupOption options)
-			{
-				return
-					initialSource
-						.ReplaceNodes
-						(
-							initialSource
-								.DescendantNodes()
-								.Where(node => node is MethodDeclarationSyntax && node.Parent is ClassDeclarationSyntax)
-							, (node1, node2) => SimplyAsyncCallsHelper((MethodDeclarationSyntax)node1, options)
-						);
-			}
+                return base.Visit(newNode);
+            }
 
-			public MethodDeclarationSyntax SimplyAsyncCallsHelper(MethodDeclarationSyntax method, ICleanupOption options)
-			{
-				if ((method.Parent is ClassDeclarationSyntax) == false) return method;
-				if (method.Modifiers.Any(x => x.IsKind(SyntaxKind.AsyncKeyword)) == false) return method;
-				if (method.Body == null) return method;
-				if (method.ReturnType.WithoutTrivia().ToFullString() == typeof(Task).Name) return method;
-				if (method.ReturnType.WithoutTrivia().ToFullString() == "void") return method;
-				if (method.Body.Statements.Count != 1) return method;
+            static SyntaxTrivia[] _spaceTrivia = { SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, " ") };
 
-				var singleStatement = method.Body.Statements.FirstOrDefault();
+            public SyntaxNode SimplyAsyncCallsHelper(SyntaxNode initialSource, ICleanupOption options)
+            {
+                return
+                    initialSource
+                        .ReplaceNodes
+                        (
+                            initialSource
+                                .DescendantNodes()
+                                .Where(node => node is MethodDeclarationSyntax && node.Parent is ClassDeclarationSyntax)
+                            , (node1, node2) => SimplyAsyncCallsHelper((MethodDeclarationSyntax)node1, options)
+                        );
+            }
 
-				if (singleStatement.DescendantNodesAndSelf()
-					.Count(x => x.IsKind(SyntaxKind.AwaitExpression)) > 1)
-					return method;
+            public MethodDeclarationSyntax SimplyAsyncCallsHelper(MethodDeclarationSyntax method, ICleanupOption options)
+            {
+                if ((method.Parent is ClassDeclarationSyntax) == false) return method;
+                if (method.Modifiers.Any(x => x.IsKind(SyntaxKind.AsyncKeyword)) == false) return method;
+                if (method.Body == null) return method;
+                if (method.ReturnType.WithoutTrivia().ToFullString() == typeof(Task).Name) return method;
+                if (method.ReturnType.WithoutTrivia().ToFullString() == "void") return method;
+                if (method.Body.Statements.Count != 1) return method;
 
-				AwaitExpressionSyntax awaitStatementExpression = null;
+                var singleStatement = method.Body.Statements.FirstOrDefault();
 
-				if (singleStatement is ReturnStatementSyntax retSS)
-				{
-					awaitStatementExpression = retSS.Expression as AwaitExpressionSyntax;
-				}
-				else if (singleStatement is ExpressionStatementSyntax eSS)
-				{
-					awaitStatementExpression = eSS.Expression as AwaitExpressionSyntax;
-				}
+                if (singleStatement.DescendantNodesAndSelf()
+                    .Count(x => x.IsKind(SyntaxKind.AwaitExpression)) > 1)
+                    return method;
 
-				if (awaitStatementExpression == null) return method;
+                AwaitExpressionSyntax awaitStatementExpression = null;
 
-				if (awaitStatementExpression.Expression is InvocationExpressionSyntax invSS)
-				{
-					if (invSS.ArgumentList.Arguments.Any(a => a.Expression.IsKind(SyntaxKind.AwaitExpression)))
-						return method;
-				}
+                if (singleStatement is ReturnStatementSyntax retSS)
+                {
+                    awaitStatementExpression = retSS.Expression as AwaitExpressionSyntax;
+                }
+                else if (singleStatement is ExpressionStatementSyntax eSS)
+                {
+                    awaitStatementExpression = eSS.Expression as AwaitExpressionSyntax;
+                }
 
-				var newStatement = singleStatement;
+                if (awaitStatementExpression == null) return method;
 
-				if (options.Should((int)SimplyAsyncCall.CleanupTypes.Single_Expression))
-				{
-					if (singleStatement is ReturnStatementSyntax rss)
-					{
-						newStatement = rss.WithExpression(awaitStatementExpression.Expression);
-					}
-					else if (singleStatement is ExpressionStatementSyntax)
-					{
-						var newReturnStatement =
-						SyntaxFactory
-							.ReturnStatement(awaitStatementExpression.Expression)
-							.WithLeadingTrivia(singleStatement.GetLeadingTrivia())
-							.WithTrailingTrivia(singleStatement.GetTrailingTrivia());
+                if (awaitStatementExpression.Expression is InvocationExpressionSyntax invSS)
+                {
+                    if (invSS.ArgumentList.Arguments.Any(a => a.Expression.IsKind(SyntaxKind.AwaitExpression)))
+                        return method;
+                }
 
-						newStatement =
-							newReturnStatement.WithReturnKeyword(
-								newReturnStatement.ReturnKeyword.WithTrailingTrivia(_spaceTrivia));
-					}
-				}
+                var newStatement = singleStatement;
 
-				return
-					method
-						.ReplaceNode(singleStatement, newStatement)
-						.WithModifiers(
-							method.Modifiers.Remove(method.Modifiers.FirstOrDefault(x => x.IsKind(SyntaxKind.AsyncKeyword))))
-						.WithLeadingTrivia(method.GetLeadingTrivia())
-						.WithTrailingTrivia(method.GetTrailingTrivia());
-			}
-		}
-	}
+                if (options.Should((int)SimplyAsyncCall.CleanupTypes.Single_Expression))
+                {
+                    if (singleStatement is ReturnStatementSyntax rss)
+                    {
+                        newStatement = rss.WithExpression(awaitStatementExpression.Expression);
+                    }
+                    else if (singleStatement is ExpressionStatementSyntax)
+                    {
+                        var newReturnStatement =
+                        SyntaxFactory
+                            .ReturnStatement(awaitStatementExpression.Expression)
+                            .WithLeadingTrivia(singleStatement.GetLeadingTrivia())
+                            .WithTrailingTrivia(singleStatement.GetTrailingTrivia());
+
+                        newStatement =
+                            newReturnStatement.WithReturnKeyword(
+                                newReturnStatement.ReturnKeyword.WithTrailingTrivia(_spaceTrivia));
+                    }
+                }
+
+                return
+                    method
+                        .ReplaceNode(singleStatement, newStatement)
+                        .WithModifiers(
+                            method.Modifiers.Remove(method.Modifiers.FirstOrDefault(x => x.IsKind(SyntaxKind.AsyncKeyword))))
+                        .WithLeadingTrivia(method.GetLeadingTrivia())
+                        .WithTrailingTrivia(method.GetTrailingTrivia());
+            }
+        }
+    }
 }

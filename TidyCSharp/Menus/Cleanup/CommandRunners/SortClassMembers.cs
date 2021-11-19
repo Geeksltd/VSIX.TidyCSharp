@@ -1,5 +1,4 @@
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
-using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -9,90 +8,93 @@ using System.Threading.Tasks;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
-	public class SortClassMembers : CodeCleanerCommandRunnerBase, ICodeCleaner
-	{
-		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
-		{
-			var modifiedSourceNode = SortClassMembersHelper(initialSourceNode);
-			if (IsReportOnlyMode &&
-				   !IsEquivalentToUnModified(modifiedSourceNode))
-			{
-				this.CollectMessages(new ChangesReport(initialSourceNode)
-				{
-					LineNumber = 1,
-					Column = 1,
-					Message = "Sort Class Members",
-					Generator = nameof(SortClassMembers)
-				});
-				return initialSourceNode;
-			}
-			return modifiedSourceNode;
-		}
+    public class SortClassMembers : CodeCleanerCommandRunnerBase, ICodeCleaner
+    {
+        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        {
+            var modifiedSourceNode = SortClassMembersHelper(initialSourceNode);
 
-		public static SyntaxNode SortClassMembersHelper(SyntaxNode initialSource)
-		{
-			var classes =
-				initialSource
-				.DescendantNodes()
-				.Where(x => x is ClassDeclarationSyntax)
-				.OfType<ClassDeclarationSyntax>();
+            if (IsReportOnlyMode &&
+                   !IsEquivalentToUnModified(modifiedSourceNode))
+            {
+                CollectMessages(new ChangesReport(initialSourceNode)
+                {
+                    LineNumber = 1,
+                    Column = 1,
+                    Message = "Sort Class Members",
+                    Generator = nameof(SortClassMembers)
+                });
 
-			var newClassesDic = new Dictionary<ClassDeclarationSyntax, ClassDeclarationSyntax>();
+                return initialSourceNode;
+            }
 
-			foreach (var classNode in classes)
-			{
-				var newClassNode = SortClassMemebersHelper(classNode);
-				newClassesDic.Add(classNode, newClassNode);
-			}
+            return modifiedSourceNode;
+        }
 
-			initialSource =
-				initialSource
-					.ReplaceNodes
-					(
-						classes,
-						(oldNode1, oldNode2) =>
-						{
-							var newClass = newClassesDic[oldNode1];
-							if (oldNode1 != newClass) return newClass;
-							return oldNode1;
-						}
-					);
+        public static SyntaxNode SortClassMembersHelper(SyntaxNode initialSource)
+        {
+            var classes =
+                initialSource
+                .DescendantNodes()
+                .Where(x => x is ClassDeclarationSyntax)
+                .OfType<ClassDeclarationSyntax>();
 
-			return initialSource;
-		}
+            var newClassesDic = new Dictionary<ClassDeclarationSyntax, ClassDeclarationSyntax>();
 
-		public static ClassDeclarationSyntax SortClassMemebersHelper(ClassDeclarationSyntax classNode)
-		{
-			var methods = classNode.Members.Where(x => x is MethodDeclarationSyntax).ToList();
-			var firstMethod = methods.FirstOrDefault();
-			if (firstMethod == null) return classNode;
+            foreach (var classNode in classes)
+            {
+                var newClassNode = SortClassMemebersHelper(classNode);
+                newClassesDic.Add(classNode, newClassNode);
+            }
 
-			var methodAnnotation = new SyntaxAnnotation();
-			var annotatedClassNode = classNode.ReplaceNode(firstMethod, firstMethod.WithAdditionalAnnotations(methodAnnotation));
+            initialSource =
+                initialSource
+                    .ReplaceNodes
+                    (
+                        classes,
+                        (oldNode1, oldNode2) =>
+                        {
+                            var newClass = newClassesDic[oldNode1];
+                            if (oldNode1 != newClass) return newClass;
+                            return oldNode1;
+                        }
+                    );
 
-			var constructors = annotatedClassNode.Members.Where(x => x is ConstructorDeclarationSyntax).ToList();
-			if (constructors.Any() == false) return classNode;
+            return initialSource;
+        }
 
-			var constructorsToMoveList = new List<SyntaxNode>();
+        public static ClassDeclarationSyntax SortClassMemebersHelper(ClassDeclarationSyntax classNode)
+        {
+            var methods = classNode.Members.Where(x => x is MethodDeclarationSyntax).ToList();
+            var firstMethod = methods.FirstOrDefault();
+            if (firstMethod == null) return classNode;
 
-			foreach (var constructorItem in constructors)
-			{
-				if (firstMethod.SpanStart < constructorItem.SpanStart)
-				{
-					constructorsToMoveList.Add(constructorItem);
-				}
-			}
+            var methodAnnotation = new SyntaxAnnotation();
+            var annotatedClassNode = classNode.ReplaceNode(firstMethod, firstMethod.WithAdditionalAnnotations(methodAnnotation));
 
-			if (constructorsToMoveList.Any())
-			{
-				annotatedClassNode = annotatedClassNode.RemoveNodes(constructorsToMoveList, SyntaxRemoveOptions.KeepNoTrivia);
-				var annotatedMethod = annotatedClassNode.GetAnnotatedNodes(methodAnnotation).FirstOrDefault();
-				annotatedClassNode = annotatedClassNode.InsertNodesBefore(annotatedMethod, constructorsToMoveList);
+            var constructors = annotatedClassNode.Members.Where(x => x is ConstructorDeclarationSyntax).ToList();
+            if (constructors.Any() == false) return classNode;
 
-				return annotatedClassNode;
-			}
+            var constructorsToMoveList = new List<SyntaxNode>();
 
-			return classNode;
-		}
-	}
+            foreach (var constructorItem in constructors)
+            {
+                if (firstMethod.SpanStart < constructorItem.SpanStart)
+                {
+                    constructorsToMoveList.Add(constructorItem);
+                }
+            }
+
+            if (constructorsToMoveList.Any())
+            {
+                annotatedClassNode = annotatedClassNode.RemoveNodes(constructorsToMoveList, SyntaxRemoveOptions.KeepNoTrivia);
+                var annotatedMethod = annotatedClassNode.GetAnnotatedNodes(methodAnnotation).FirstOrDefault();
+                annotatedClassNode = annotatedClassNode.InsertNodesBefore(annotatedMethod, constructorsToMoveList);
+
+                return annotatedClassNode;
+            }
+
+            return classNode;
+        }
+    }
 }

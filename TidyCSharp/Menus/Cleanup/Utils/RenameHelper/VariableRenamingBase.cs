@@ -6,64 +6,66 @@ using System.Threading.Tasks;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
-	public abstract class VariableRenamingBase : CodeCleanerCommandRunnerBase, ICodeCleaner
-	{
-		const string SELECTED_METHOD_ANNOTATION = "SELECTED_METHOD_ANNOTATION";
+    public abstract class VariableRenamingBase : CodeCleanerCommandRunnerBase, ICodeCleaner
+    {
+        const string SELECTED_METHOD_ANNOTATION = "SELECTED_METHOD_ANNOTATION";
 
-		Document WorkingDocument, orginalDocument;
+        Document WorkingDocument, orginalDocument;
 
-		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
-		{
-			var annotationForSelectedNode = new SyntaxAnnotation(SELECTED_METHOD_ANNOTATION);
-			orginalDocument = ProjectItemDetails.ProjectItemDocument;
-			WorkingDocument = ProjectItemDetails.ProjectItemDocument;
+        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        {
+            var annotationForSelectedNode = new SyntaxAnnotation(SELECTED_METHOD_ANNOTATION);
+            orginalDocument = ProjectItemDetails.ProjectItemDocument;
+            WorkingDocument = ProjectItemDetails.ProjectItemDocument;
 
-			if (orginalDocument == null) return initialSourceNode;
+            if (orginalDocument == null) return initialSourceNode;
 
-			SyntaxNode workingNode;
-			var annotatedRoot = initialSourceNode;
-			do
-			{
-				workingNode = GetWorkingNode(annotatedRoot, annotationForSelectedNode);
+            SyntaxNode workingNode;
+            var annotatedRoot = initialSourceNode;
 
-				if (workingNode == null) continue;
+            do
+            {
+                workingNode = GetWorkingNode(annotatedRoot, annotationForSelectedNode);
 
-				var annotatedNode = workingNode.WithAdditionalAnnotations(annotationForSelectedNode);
-				annotatedRoot = annotatedRoot.ReplaceNode(workingNode, annotatedNode);
-				WorkingDocument = WorkingDocument.WithSyntaxRoot(annotatedRoot);
-				annotatedRoot = await WorkingDocument.GetSyntaxRootAsync();
-				annotatedNode = annotatedRoot.GetAnnotatedNodes(annotationForSelectedNode).FirstOrDefault();
+                if (workingNode == null) continue;
 
-				var rewriter = GetRewriter(WorkingDocument);
+                var annotatedNode = workingNode.WithAdditionalAnnotations(annotationForSelectedNode);
+                annotatedRoot = annotatedRoot.ReplaceNode(workingNode, annotatedNode);
+                WorkingDocument = WorkingDocument.WithSyntaxRoot(annotatedRoot);
+                annotatedRoot = await WorkingDocument.GetSyntaxRootAsync();
+                annotatedNode = annotatedRoot.GetAnnotatedNodes(annotationForSelectedNode).FirstOrDefault();
 
-				rewriter.Visit(annotatedNode);
-				this.CollectMessages(rewriter.GetReport());
-				WorkingDocument = rewriter.WorkingDocument;
-			} while (workingNode != null);
+                var rewriter = GetRewriter(WorkingDocument);
 
-			return null;
-		}
+                rewriter.Visit(annotatedNode);
+                CollectMessages(rewriter.GetReport());
+                WorkingDocument = rewriter.WorkingDocument;
+            } while (workingNode != null);
 
-		protected override async Task SaveResult(SyntaxNode initialSourceNode)
-		{
-			var text = await WorkingDocument.GetTextAsync();
-			if (string.Compare(text?.ToString(), ProjectItemDetails.InitialSourceNode.GetText().ToString(), false) != 0)
-			{
-				TidyCSharpPackage.Instance.RefreshSolution(WorkingDocument.Project.Solution);
-			}
-		}
+            return null;
+        }
 
-		protected abstract SyntaxNode GetWorkingNode(SyntaxNode initialSourceNode, SyntaxAnnotation annotationForSelectedNodes);
+        protected override async Task SaveResult(SyntaxNode initialSourceNode)
+        {
+            var text = await WorkingDocument.GetTextAsync();
 
-		protected abstract VariableRenamingBaseRewriter GetRewriter(Document workingDocument);
+            if (string.Compare(text?.ToString(), ProjectItemDetails.InitialSourceNode.GetText().ToString(), false) != 0)
+            {
+                TidyCSharpPackage.Instance.RefreshSolution(WorkingDocument.Project.Solution);
+            }
+        }
 
-		protected abstract class VariableRenamingBaseRewriter : CleanupCSharpSyntaxRewriter
-		{
-			public Document WorkingDocument { get; protected set; }
-			public VariableRenamingBaseRewriter(Document workingDocument, bool isReportOnlyMode, ICleanupOption options) : base(isReportOnlyMode, options)
-			{
-				WorkingDocument = workingDocument;
-			}
-		}
-	}
+        protected abstract SyntaxNode GetWorkingNode(SyntaxNode initialSourceNode, SyntaxAnnotation annotationForSelectedNodes);
+
+        protected abstract VariableRenamingBaseRewriter GetRewriter(Document workingDocument);
+
+        protected abstract class VariableRenamingBaseRewriter : CleanupCSharpSyntaxRewriter
+        {
+            public Document WorkingDocument { get; protected set; }
+            public VariableRenamingBaseRewriter(Document workingDocument, bool isReportOnlyMode, ICleanupOption options) : base(isReportOnlyMode, options)
+            {
+                WorkingDocument = workingDocument;
+            }
+        }
+    }
 }

@@ -13,209 +13,210 @@ using System.Threading.Tasks;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
-	public class CompactSmallIfElseStatements : CodeCleanerCommandRunnerBase, ICodeCleaner
-	{
-		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
-		{
-			var syntaxRewriter = new Rewriter(initialSourceNode, this.IsReportOnlyMode, Options);
-			var modifiedSourceNode = syntaxRewriter.Visit(initialSourceNode);
+    public class CompactSmallIfElseStatements : CodeCleanerCommandRunnerBase, ICodeCleaner
+    {
+        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        {
+            var syntaxRewriter = new Rewriter(initialSourceNode, IsReportOnlyMode, Options);
+            var modifiedSourceNode = syntaxRewriter.Visit(initialSourceNode);
 
-			if (IsReportOnlyMode)
-			{
-				this.CollectMessages(syntaxRewriter.GetReport());
-				return initialSourceNode;
-			}
+            if (IsReportOnlyMode)
+            {
+                CollectMessages(syntaxRewriter.GetReport());
+                return initialSourceNode;
+            }
 
-			if (modifiedSourceNode != initialSourceNode && TidyCSharpPackage.Instance != null)
-			{
-				initialSourceNode = Formatter.Format(modifiedSourceNode, TidyCSharpPackage.Instance.CleanupWorkingSolution.Workspace);
-			}
+            if (modifiedSourceNode != initialSourceNode && TidyCSharpPackage.Instance != null)
+            {
+                initialSourceNode = Formatter.Format(modifiedSourceNode, TidyCSharpPackage.Instance.CleanupWorkingSolution.Workspace);
+            }
 
-			return initialSourceNode;
-		}
+            return initialSourceNode;
+        }
 
-		static SyntaxTrivia _endOfLineTrivia = default(SyntaxTrivia);
-		const int MAX_IF_LINE_LENGTH = 50;
-		const int MAX_RETURN_STATEMENT_LENGTH = 10;
+        static SyntaxTrivia _endOfLineTrivia = default(SyntaxTrivia);
+        const int MAX_IF_LINE_LENGTH = 50, MAX_RETURN_STATEMENT_LENGTH = 10;
 
-		class Rewriter : CleanupCSharpSyntaxRewriter
-		{
-			public Rewriter(SyntaxNode initialSource, bool isReportOnlyMode, ICleanupOption options) :
-				base(isReportOnlyMode, options)
-			{
-				_endOfLineTrivia =
-					initialSource
-						.SyntaxTree
-						.GetRoot()
-						.DescendantTrivia(descendIntoTrivia: true)
-						.FirstOrDefault(x => x.IsKind(SyntaxKind.EndOfLineTrivia));
-			}
+        class Rewriter : CleanupCSharpSyntaxRewriter
+        {
+            public Rewriter(SyntaxNode initialSource, bool isReportOnlyMode, ICleanupOption options) :
+                base(isReportOnlyMode, options)
+            {
+                _endOfLineTrivia =
+                    initialSource
+                        .SyntaxTree
+                        .GetRoot()
+                        .DescendantTrivia(descendIntoTrivia: true)
+                        .FirstOrDefault(x => x.IsKind(SyntaxKind.EndOfLineTrivia));
+            }
 
-			public override SyntaxNode VisitIfStatement(IfStatementSyntax mainIFnode)
-			{
-				var newIfNode = Cleanup(mainIFnode);
+            public override SyntaxNode VisitIfStatement(IfStatementSyntax mainIFnode)
+            {
+                var newIfNode = Cleanup(mainIFnode);
 
-				if (!string.Equals(newIfNode.ToFullString().Trim(), mainIFnode.ToFullString().Trim(), StringComparison.Ordinal))
-				{
-					var nextToken = mainIFnode.GetLastToken().GetNextToken();
+                if (!string.Equals(newIfNode.ToFullString().Trim(), mainIFnode.ToFullString().Trim(), StringComparison.Ordinal))
+                {
+                    var nextToken = mainIFnode.GetLastToken().GetNextToken();
 
-					var lineSpan = mainIFnode.GetFileLinePosSpan();
-					AddReport(new ChangesReport(mainIFnode)
-					{
-						LineNumber = lineSpan.StartLinePosition.Line,
-						Column = lineSpan.StartLinePosition.Character,
-						Message = "CompactSmallIfElseStatements",
-						Generator = nameof(CompactSmallIfElseStatements)
-					});
+                    var lineSpan = mainIFnode.GetFileLinePosSpan();
 
-					if
-					(
-						nextToken != null &&
-						mainIFnode.GetTrailingTrivia().Any(t => t.IsKind(SyntaxKind.EndOfLineTrivia)) == false &&
-						nextToken.LeadingTrivia.Any(t => t.IsKind(SyntaxKind.EndOfLineTrivia)) == false
-					)
-					{
-						return newIfNode.WithTrailingTrivia(newIfNode.GetTrailingTrivia().Add(_endOfLineTrivia));
-					}
+                    AddReport(new ChangesReport(mainIFnode)
+                    {
+                        LineNumber = lineSpan.StartLinePosition.Line,
+                        Column = lineSpan.StartLinePosition.Character,
+                        Message = "CompactSmallIfElseStatements",
+                        Generator = nameof(CompactSmallIfElseStatements)
+                    });
 
-					return newIfNode.WithTrailingTrivia(newIfNode.GetTrailingTrivia());
-				}
+                    if
+                    (
+                        nextToken != null &&
+                        mainIFnode.GetTrailingTrivia().Any(t => t.IsKind(SyntaxKind.EndOfLineTrivia)) == false &&
+                        nextToken.LeadingTrivia.Any(t => t.IsKind(SyntaxKind.EndOfLineTrivia)) == false
+                    )
+                    {
+                        return newIfNode.WithTrailingTrivia(newIfNode.GetTrailingTrivia().Add(_endOfLineTrivia));
+                    }
 
-				return mainIFnode;
-			}
+                    return newIfNode.WithTrailingTrivia(newIfNode.GetTrailingTrivia());
+                }
 
-			SyntaxNode Cleanup(IfStatementSyntax originalIfNode)
-			{
-				if (originalIfNode.DescendantTrivia(descendIntoTrivia: true).HasNoneWhitespaceTrivia()) return base.VisitIfStatement(originalIfNode);
+                return mainIFnode;
+            }
 
-				var singleStatementInsideIf = GetInsideStatement(originalIfNode.Statement);
+            SyntaxNode Cleanup(IfStatementSyntax originalIfNode)
+            {
+                if (originalIfNode.DescendantTrivia(descendIntoTrivia: true).HasNoneWhitespaceTrivia()) return base.VisitIfStatement(originalIfNode);
 
-				if (singleStatementInsideIf == null || singleStatementInsideIf is IfStatementSyntax) return base.VisitIfStatement(originalIfNode);
+                var singleStatementInsideIf = GetInsideStatement(originalIfNode.Statement);
 
-				var newIf = GetNewIF(originalIfNode, singleStatementInsideIf);
+                if (singleStatementInsideIf == null || singleStatementInsideIf is IfStatementSyntax) return base.VisitIfStatement(originalIfNode);
 
-				if (newIf == originalIfNode) return base.VisitIfStatement(originalIfNode);
-				if (newIf.Else == null) return newIf;
+                var newIf = GetNewIF(originalIfNode, singleStatementInsideIf);
 
-				var singleStatementInsideElse = GetInsideStatement(newIf.Else.Statement);
+                if (newIf == originalIfNode) return base.VisitIfStatement(originalIfNode);
+                if (newIf.Else == null) return newIf;
 
-				if (singleStatementInsideElse == null) return base.VisitIfStatement(originalIfNode);
+                var singleStatementInsideElse = GetInsideStatement(newIf.Else.Statement);
 
-				if (singleStatementInsideElse is IfStatementSyntax ifSingleStatement)
-				{
-					singleStatementInsideElse = Cleanup(ifSingleStatement) as IfStatementSyntax;
-				}
+                if (singleStatementInsideElse == null) return base.VisitIfStatement(originalIfNode);
 
-				newIf = newIf.WithElse(GetNewIfWithElse(newIf.Else, singleStatementInsideElse));
+                if (singleStatementInsideElse is IfStatementSyntax ifSingleStatement)
+                {
+                    singleStatementInsideElse = Cleanup(ifSingleStatement) as IfStatementSyntax;
+                }
 
-				return newIf;
-			}
+                newIf = newIf.WithElse(GetNewIfWithElse(newIf.Else, singleStatementInsideElse));
 
-			IfStatementSyntax GetNewIF(IfStatementSyntax orginalIFnode, StatementSyntax singleStatementInsideIf)
-			{
-				var closeParenTrivia = orginalIFnode.CloseParenToken.WithoutWhitespaceTrivia();
-				var trailingTriviaList =
-					new SyntaxTriviaList()
-					.AddRange(closeParenTrivia.TrailingTrivia.Where(t => t.IsWhitespaceTrivia() == false))
-					.AddRange(singleStatementInsideIf.GetTrailingTrivia().Where(t => t.IsWhitespaceTrivia() == false));
+                return newIf;
+            }
 
-				if (singleStatementInsideIf != orginalIFnode.Statement)
-				{
-					trailingTriviaList = trailingTriviaList.AddRange(orginalIFnode.Statement.GetTrailingTrivia().Where(t => t.IsWhitespaceTrivia() == false));
-				}
+            IfStatementSyntax GetNewIF(IfStatementSyntax orginalIFnode, StatementSyntax singleStatementInsideIf)
+            {
+                var closeParenTrivia = orginalIFnode.CloseParenToken.WithoutWhitespaceTrivia();
 
-				trailingTriviaList = trailingTriviaList.Add(_endOfLineTrivia);
+                var trailingTriviaList =
+                    new SyntaxTriviaList()
+                    .AddRange(closeParenTrivia.TrailingTrivia.Where(t => t.IsWhitespaceTrivia() == false))
+                    .AddRange(singleStatementInsideIf.GetTrailingTrivia().Where(t => t.IsWhitespaceTrivia() == false));
 
-				var newIf =
-					orginalIFnode
-						.WithIfKeyword(orginalIFnode.IfKeyword.WithTrailingTrivia(SyntaxFactory.Space))
-						.WithOpenParenToken(orginalIFnode.OpenParenToken.WithoutWhitespaceTrivia())
-						.WithCloseParenToken(SyntaxTokenExtensions.WithoutTrivia(closeParenTrivia))
-						.WithCondition(orginalIFnode.Condition.WithoutWhitespaceTrivia())
-						.WithStatement(
-							singleStatementInsideIf
-								.WithLeadingTrivia(SyntaxFactory.Space)
-								.WithTrailingTrivia(trailingTriviaList)
-						);
+                if (singleStatementInsideIf != orginalIFnode.Statement)
+                {
+                    trailingTriviaList = trailingTriviaList.AddRange(orginalIFnode.Statement.GetTrailingTrivia().Where(t => t.IsWhitespaceTrivia() == false));
+                }
 
-				if (singleStatementInsideIf is ReturnStatementSyntax returnStatement)
-				{
-					if
-					(
-						(returnStatement.Expression == null && newIf.WithElse(null).Span.Length <= 2 * MAX_IF_LINE_LENGTH) ||
-						(
-							newIf.WithElse(null).Span.Length <= MAX_IF_LINE_LENGTH
-							&&
-							(returnStatement.Expression is LiteralExpressionSyntax || returnStatement.Expression.Span.Length <= MAX_RETURN_STATEMENT_LENGTH)
-						)
-					)
-						return newIf;
+                trailingTriviaList = trailingTriviaList.Add(_endOfLineTrivia);
 
-					if (singleStatementInsideIf.WithoutTrivia().DescendantTrivia().Any(t => t.IsKind(SyntaxKind.EndOfLineTrivia))) return orginalIFnode;
-					if (newIf.WithElse(null).WithoutTrivia().Span.Length <= MAX_IF_LINE_LENGTH) return newIf;
-					return orginalIFnode;
-				}
+                var newIf =
+                    orginalIFnode
+                        .WithIfKeyword(orginalIFnode.IfKeyword.WithTrailingTrivia(SyntaxFactory.Space))
+                        .WithOpenParenToken(orginalIFnode.OpenParenToken.WithoutWhitespaceTrivia())
+                        .WithCloseParenToken(SyntaxTokenExtensions.WithoutTrivia(closeParenTrivia))
+                        .WithCondition(orginalIFnode.Condition.WithoutWhitespaceTrivia())
+                        .WithStatement(
+                            singleStatementInsideIf
+                                .WithLeadingTrivia(SyntaxFactory.Space)
+                                .WithTrailingTrivia(trailingTriviaList)
+                        );
 
-				if (singleStatementInsideIf.WithoutTrivia().DescendantTrivia().Any(t => t.IsKind(SyntaxKind.EndOfLineTrivia))) return orginalIFnode;
-				if (newIf.WithElse(null).Span.Length > MAX_IF_LINE_LENGTH) return orginalIFnode;
+                if (singleStatementInsideIf is ReturnStatementSyntax returnStatement)
+                {
+                    if
+                    (
+                        (returnStatement.Expression == null && newIf.WithElse(null).Span.Length <= 2 * MAX_IF_LINE_LENGTH) ||
+                        (
+                            newIf.WithElse(null).Span.Length <= MAX_IF_LINE_LENGTH
+                            &&
+                            (returnStatement.Expression is LiteralExpressionSyntax || returnStatement.Expression.Span.Length <= MAX_RETURN_STATEMENT_LENGTH)
+                        )
+                    )
+                        return newIf;
 
-				return newIf;
-			}
+                    if (singleStatementInsideIf.WithoutTrivia().DescendantTrivia().Any(t => t.IsKind(SyntaxKind.EndOfLineTrivia))) return orginalIFnode;
+                    if (newIf.WithElse(null).WithoutTrivia().Span.Length <= MAX_IF_LINE_LENGTH) return newIf;
+                    return orginalIFnode;
+                }
 
-			ElseClauseSyntax GetNewIfWithElse(ElseClauseSyntax elseNode, StatementSyntax singleStatementInsideElse)
-			{
-				var newElse =
-						elseNode
-							.WithElseKeyword(
-								elseNode.ElseKeyword
-								.WithTrailingTrivia()
-							)
-							.WithStatement(
-								singleStatementInsideElse
-								.WithLeadingTrivia(SyntaxFactory.Space)
-							//.WithTrailingTrivia(trailingTriviaList)
-							);
+                if (singleStatementInsideIf.WithoutTrivia().DescendantTrivia().Any(t => t.IsKind(SyntaxKind.EndOfLineTrivia))) return orginalIFnode;
+                if (newIf.WithElse(null).Span.Length > MAX_IF_LINE_LENGTH) return orginalIFnode;
 
-				if (singleStatementInsideElse is ReturnStatementSyntax returnStatement)
-				{
-					if (returnStatement.Expression == null || returnStatement.Expression is LiteralExpressionSyntax || returnStatement.Expression.Span.Length <= MAX_RETURN_STATEMENT_LENGTH)
-						return newElse;
-				}
+                return newIf;
+            }
 
-				if (singleStatementInsideElse is IfStatementSyntax == false)
-				{
-					if (
-						singleStatementInsideElse.WithoutTrivia().DescendantTrivia().Any(t => t.IsKind(SyntaxKind.EndOfLineTrivia))
-						||
-						singleStatementInsideElse.Span.Length + 5 > MAX_IF_LINE_LENGTH
-					   )
-						return elseNode.WithStatement(singleStatementInsideElse);
-				}
+            ElseClauseSyntax GetNewIfWithElse(ElseClauseSyntax elseNode, StatementSyntax singleStatementInsideElse)
+            {
+                var newElse =
+                        elseNode
+                            .WithElseKeyword(
+                                elseNode.ElseKeyword
+                                .WithTrailingTrivia()
+                            )
+                            .WithStatement(
+                                singleStatementInsideElse
+                                .WithLeadingTrivia(SyntaxFactory.Space)
+                            //.WithTrailingTrivia(trailingTriviaList)
+                            );
 
-				return newElse;
-			}
+                if (singleStatementInsideElse is ReturnStatementSyntax returnStatement)
+                {
+                    if (returnStatement.Expression == null || returnStatement.Expression is LiteralExpressionSyntax || returnStatement.Expression.Span.Length <= MAX_RETURN_STATEMENT_LENGTH)
+                        return newElse;
+                }
 
-			StatementSyntax GetInsideStatement(BlockSyntax block)
-			{
-				if (block.Statements.Count != 1) return null;
-				if (block.HasNoneWhitespaceTrivia()) return null;
-				var firstStatement = block.Statements.FirstOrDefault();
-				if (firstStatement is IfStatementSyntax) return firstStatement;
-				if (firstStatement.Span.Length <= NormalizeWhitespace.Options.BLOCK_SINGLE_STATEMENT_MAX_LENGTH) return firstStatement;
-				return null;
-			}
+                if (singleStatementInsideElse is IfStatementSyntax == false)
+                {
+                    if (
+                        singleStatementInsideElse.WithoutTrivia().DescendantTrivia().Any(t => t.IsKind(SyntaxKind.EndOfLineTrivia))
+                        ||
+                        singleStatementInsideElse.Span.Length + 5 > MAX_IF_LINE_LENGTH
+                       )
+                        return elseNode.WithStatement(singleStatementInsideElse);
+                }
 
-			StatementSyntax GetInsideStatement(StatementSyntax singleStatement)
-			{
-				if (singleStatement is BlockSyntax newBlockStatement)
-				{
-					if ((singleStatement = GetInsideStatement(newBlockStatement)) == null) return null;
-				}
+                return newElse;
+            }
 
-				if (singleStatement.HasNoneWhitespaceTrivia()) return null;
+            StatementSyntax GetInsideStatement(BlockSyntax block)
+            {
+                if (block.Statements.Count != 1) return null;
+                if (block.HasNoneWhitespaceTrivia()) return null;
+                var firstStatement = block.Statements.FirstOrDefault();
+                if (firstStatement is IfStatementSyntax) return firstStatement;
+                if (firstStatement.Span.Length <= NormalizeWhitespace.Options.BLOCK_SINGLE_STATEMENT_MAX_LENGTH) return firstStatement;
+                return null;
+            }
 
-				return singleStatement;
-			}
-		}
-	}
+            StatementSyntax GetInsideStatement(StatementSyntax singleStatement)
+            {
+                if (singleStatement is BlockSyntax newBlockStatement)
+                {
+                    if ((singleStatement = GetInsideStatement(newBlockStatement)) == null) return null;
+                }
+
+                if (singleStatement.HasNoneWhitespaceTrivia()) return null;
+
+                return singleStatement;
+            }
+        }
+    }
 }

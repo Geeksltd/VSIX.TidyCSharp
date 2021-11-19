@@ -1,12 +1,7 @@
 namespace System
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
     public static class Extensions
     {
-
         public static bool HasValue(this string text) => !string.IsNullOrEmpty(text);
 
         public static string Or(this string text, string ifEmpty) => text.HasValue() ? text : ifEmpty;
@@ -40,8 +35,7 @@ namespace System
             if (numberOfCharacters < 0)
                 throw new ArgumentException("numberOfCharacters must be greater than 0.");
 
-            if (numberOfCharacters == 0)
-                return text;
+            if (numberOfCharacters == 0) return text;
 
             if (text.IsEmpty() || text.Length <= numberOfCharacters)
                 return string.Empty;
@@ -53,8 +47,7 @@ namespace System
 
         public static string Remove(this string text, params string[] substringsToExclude)
         {
-            if (text.IsEmpty())
-                return text;
+            if (text.IsEmpty()) return text;
 
             var result = text;
 
@@ -64,13 +57,10 @@ namespace System
             return result;
         }
 
-
         public static bool EndsWithAny(this string input, params string[] listOfEndings)
         {
             foreach (var option in listOfEndings)
-                if (input.EndsWith(option))
-                    return true;
-
+                if (input.EndsWith(option)) return true;
 
             return false;
         }
@@ -285,8 +275,7 @@ namespace System
             return retval;
         }
 
-        const string SingleQuote = "'";
-        const string DoubleQuote = "\"";
+        const string SingleQuote = "'", DoubleQuote = "\"";
 
         public static string StripQuotation(this string str)
         {

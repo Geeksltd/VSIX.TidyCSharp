@@ -8,6 +8,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+
     internal static class LightupHelpers
     {
         static readonly ConcurrentDictionary<Type, ConcurrentDictionary<SyntaxKind, bool>> SupportedWrappers
@@ -30,10 +31,11 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
                 return false;
             }
 
-            ConcurrentDictionary<SyntaxKind, bool> wrappedSyntax = SupportedWrappers.GetOrAdd(underlyingType, _ => new ConcurrentDictionary<SyntaxKind, bool>());
+            var wrappedSyntax = SupportedWrappers.GetOrAdd(underlyingType, _ => new ConcurrentDictionary<SyntaxKind, bool>());
 
             // Avoid creating the delegate if the value already exists
             bool canCast;
+
             if (!wrappedSyntax.TryGetValue((SyntaxKind)node.RawKind, out canCast))
             {
                 canCast = wrappedSyntax.GetOrAdd(
@@ -59,10 +61,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
                     return default(TProperty);
                 };
 
-            if (type == null)
-            {
-                return fallbackAccessor;
-            }
+            if (type == null) return fallbackAccessor;
 
             if (!typeof(TSyntax).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
             {
@@ -70,10 +69,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             }
 
             var property = type.GetTypeInfo().GetDeclaredProperty(propertyName);
-            if (property == null)
-            {
-                return fallbackAccessor;
-            }
+            if (property == null) return fallbackAccessor;
 
             if (!typeof(TProperty).GetTypeInfo().IsAssignableFrom(property.PropertyType.GetTypeInfo()))
             {
@@ -81,15 +77,17 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             }
 
             var syntaxParameter = Expression.Parameter(typeof(TSyntax), "syntax");
+
             var instance =
                 type.GetTypeInfo().IsAssignableFrom(typeof(TSyntax).GetTypeInfo())
                 ? (Expression)syntaxParameter
                 : Expression.Convert(syntaxParameter, type);
 
-            Expression<Func<TSyntax, TProperty>> expression =
+            var expression =
                 Expression.Lambda<Func<TSyntax, TProperty>>(
                     Expression.Call(instance, property.GetMethod),
                     syntaxParameter);
+
             return expression.Compile();
         }
 
@@ -108,10 +106,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
                     return SeparatedSyntaxListWrapper<TProperty>.UnsupportedEmpty;
                 };
 
-            if (type == null)
-            {
-                return fallbackAccessor;
-            }
+            if (type == null) return fallbackAccessor;
 
             if (!typeof(TSyntax).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
             {
@@ -119,10 +114,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             }
 
             var property = type.GetTypeInfo().GetDeclaredProperty(propertyName);
-            if (property == null)
-            {
-                return fallbackAccessor;
-            }
+            if (property == null) return fallbackAccessor;
 
             if (property.PropertyType.GetGenericTypeDefinition() != typeof(SeparatedSyntaxList<>))
             {
@@ -132,20 +124,23 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             var propertySyntaxType = property.PropertyType.GenericTypeArguments[0];
 
             var syntaxParameter = Expression.Parameter(typeof(TSyntax), "syntax");
+
             var instance =
                 type.GetTypeInfo().IsAssignableFrom(typeof(TSyntax).GetTypeInfo())
                 ? (Expression)syntaxParameter
                 : Expression.Convert(syntaxParameter, type);
+
             Expression propertyAccess = Expression.Call(instance, property.GetMethod);
 
             var unboundWrapperType = typeof(SeparatedSyntaxListWrapper<>.AutoWrapSeparatedSyntaxList<>);
             var boundWrapperType = unboundWrapperType.MakeGenericType(typeof(TProperty), propertySyntaxType);
             var constructorInfo = boundWrapperType.GetTypeInfo().DeclaredConstructors.Single();
 
-            Expression<Func<TSyntax, SeparatedSyntaxListWrapper<TProperty>>> expression =
+            var expression =
                 Expression.Lambda<Func<TSyntax, SeparatedSyntaxListWrapper<TProperty>>>(
                     Expression.New(constructorInfo, propertyAccess),
                     syntaxParameter);
+
             return expression.Compile();
         }
 
@@ -169,10 +164,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
                     throw new NotSupportedException();
                 };
 
-            if (type == null)
-            {
-                return fallbackAccessor;
-            }
+            if (type == null) return fallbackAccessor;
 
             if (!typeof(TSyntax).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
             {
@@ -180,10 +172,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             }
 
             var property = type.GetTypeInfo().GetDeclaredProperty(propertyName);
-            if (property == null)
-            {
-                return fallbackAccessor;
-            }
+            if (property == null) return fallbackAccessor;
 
             if (!typeof(TProperty).GetTypeInfo().IsAssignableFrom(property.PropertyType.GetTypeInfo()))
             {
@@ -195,20 +184,23 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 
             var syntaxParameter = Expression.Parameter(typeof(TSyntax), "syntax");
             var valueParameter = Expression.Parameter(typeof(TProperty), methodInfo.GetParameters()[0].Name);
+
             var instance =
                 type.GetTypeInfo().IsAssignableFrom(typeof(TSyntax).GetTypeInfo())
                 ? (Expression)syntaxParameter
                 : Expression.Convert(syntaxParameter, type);
+
             var value =
                 property.PropertyType.GetTypeInfo().IsAssignableFrom(typeof(TProperty).GetTypeInfo())
                 ? (Expression)valueParameter
                 : Expression.Convert(valueParameter, property.PropertyType);
 
-            Expression<Func<TSyntax, TProperty, TSyntax>> expression =
+            var expression =
                 Expression.Lambda<Func<TSyntax, TProperty, TSyntax>>(
                     Expression.Call(instance, methodInfo, value),
                     syntaxParameter,
                     valueParameter);
+
             return expression.Compile();
         }
 
@@ -232,10 +224,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
                     throw new NotSupportedException();
                 };
 
-            if (type == null)
-            {
-                return fallbackAccessor;
-            }
+            if (type == null) return fallbackAccessor;
 
             if (!typeof(TSyntax).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
             {
@@ -243,10 +232,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
             }
 
             var property = type.GetTypeInfo().GetDeclaredProperty(propertyName);
-            if (property == null)
-            {
-                return fallbackAccessor;
-            }
+            if (property == null) return fallbackAccessor;
 
             if (property.PropertyType.GetGenericTypeDefinition() != typeof(SeparatedSyntaxList<>))
             {
@@ -260,21 +246,24 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 
             var syntaxParameter = Expression.Parameter(typeof(TSyntax), "syntax");
             var valueParameter = Expression.Parameter(typeof(SeparatedSyntaxListWrapper<TProperty>), methodInfo.GetParameters()[0].Name);
+
             var instance =
                 type.GetTypeInfo().IsAssignableFrom(typeof(TSyntax).GetTypeInfo())
                 ? (Expression)syntaxParameter
                 : Expression.Convert(syntaxParameter, type);
 
             var underlyingListProperty = typeof(SeparatedSyntaxListWrapper<TProperty>).GetTypeInfo().GetDeclaredProperty(nameof(SeparatedSyntaxListWrapper<TProperty>.UnderlyingList));
+
             Expression value = Expression.Convert(
                 Expression.Call(valueParameter, underlyingListProperty.GetMethod),
                 property.PropertyType);
 
-            Expression<Func<TSyntax, SeparatedSyntaxListWrapper<TProperty>, TSyntax>> expression =
+            var expression =
                 Expression.Lambda<Func<TSyntax, SeparatedSyntaxListWrapper<TProperty>, TSyntax>>(
                     Expression.Call(instance, methodInfo, value),
                     syntaxParameter,
                     valueParameter);
+
             return expression.Compile();
         }
     }

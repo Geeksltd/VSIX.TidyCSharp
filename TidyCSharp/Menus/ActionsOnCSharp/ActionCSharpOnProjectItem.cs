@@ -13,10 +13,9 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
             if (item.ProjectItems == null) return;
 
             for (var i = 1; i <= item.ProjectItems.Count; i++)
-            {
-                
+
                 Action(item.ProjectItems.Item(i), targetAction, cleanupOptions);
-            }
+
         }
     }
 }

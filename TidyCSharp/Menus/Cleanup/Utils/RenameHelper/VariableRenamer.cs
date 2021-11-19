@@ -27,6 +27,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             {
                 currentName = currentName.TrimStart('_');
                 if (currentName.Length == 0) return null;
+
                 if (char.IsLetter(currentName[0]))
                 {
                     return new[] { GetCamelCased(currentName) };

@@ -33,12 +33,13 @@
         {
             if (symbol.Kind == SymbolKind.NamedType)
             {
-                TypeKind typeKind = ((INamedTypeSymbol)symbol).TypeKind;
+                var typeKind = ((INamedTypeSymbol)symbol).TypeKind;
 
                 // If the symbol is a class or struct, the name can't be the same as any of its members.
                 if (typeKind == TypeKind.Class || typeKind == TypeKind.Struct)
                 {
                     var members = (symbol as INamedTypeSymbol)?.GetMembers(name);
+
                     if (members.HasValue && !members.Value.IsDefaultOrEmpty)
                     {
                         return false;
@@ -52,6 +53,7 @@
             {
                 // If the symbol is a type parameter, the name can't be the same as any type parameters of the containing type.
                 var parentSymbol = containingSymbol?.ContainingSymbol as INamedTypeSymbol;
+
                 if (parentSymbol != null
                     && parentSymbol.TypeParameters.Any(t => t.Name == name))
                 {
@@ -63,6 +65,7 @@
             }
 
             var containingNamespaceOrTypeSymbol = containingSymbol as INamespaceOrTypeSymbol;
+
             if (containingNamespaceOrTypeSymbol != null)
             {
                 if (containingNamespaceOrTypeSymbol.Kind == SymbolKind.Namespace)
@@ -72,7 +75,7 @@
                 }
                 else if (containingNamespaceOrTypeSymbol.Kind == SymbolKind.NamedType)
                 {
-                    TypeKind typeKind = ((INamedTypeSymbol)containingNamespaceOrTypeSymbol).TypeKind;
+                    var typeKind = ((INamedTypeSymbol)containingNamespaceOrTypeSymbol).TypeKind;
 
                     // If the containing type is a class or struct, the name can't be the same as the name of the containing
                     // type.
@@ -90,6 +93,7 @@
             else if (containingSymbol.Kind == SymbolKind.Method)
             {
                 var methodSymbol = (IMethodSymbol)containingSymbol;
+
                 if (methodSymbol.Parameters.Any(i => i.Name == name)
                     || methodSymbol.TypeParameters.Any(i => i.Name == name))
                 {
@@ -97,9 +101,11 @@
                 }
 
                 var outermostMethod = methodSymbol;
+
                 while (outermostMethod.ContainingSymbol.Kind == SymbolKind.Method)
                 {
                     outermostMethod = (IMethodSymbol)outermostMethod.ContainingSymbol;
+
                     if (outermostMethod.Parameters.Any(i => i.Name == name)
                         || outermostMethod.TypeParameters.Any(i => i.Name == name))
                     {
@@ -112,10 +118,7 @@
                     var syntaxNode = await syntaxReference.GetSyntaxAsync(cancellationToken).ConfigureAwait(false);
                     var localNameFinder = new LocalNameFinder(name);
                     localNameFinder.Visit(syntaxNode);
-                    if (localNameFinder.Found)
-                    {
-                        return false;
-                    }
+                    if (localNameFinder.Found) return false;
                 }
 
                 return true;

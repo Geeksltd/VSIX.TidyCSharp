@@ -5,6 +5,7 @@ namespace Geeks.GeeksProductivityTools.Utils
         public static void GeeksProductivityToolsProcess()
         {
             var visualStudioProcesses = System.Diagnostics.Process.GetProcessesByName("devenv");
+
             foreach (var process in visualStudioProcesses)
             {
                 if (!process.MainWindowTitle.Contains("GeeksProductivityTools")) continue;

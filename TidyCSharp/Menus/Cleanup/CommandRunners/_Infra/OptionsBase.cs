@@ -19,7 +19,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.Infra
 
                 foreach (var item in selectedItems)
                     CleanupItemsInteger |= item;
-
             }
         }
 

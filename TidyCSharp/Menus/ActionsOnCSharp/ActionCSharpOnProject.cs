@@ -3,7 +3,6 @@ using Geeks.GeeksProductivityTools.Utils;
 using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
 using System;
 using System.Windows;
-using System.Windows.Forms;
 using static Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp.CSharpActionDelegate;
 
 namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
@@ -18,9 +17,11 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
                 var currentProject = projects.GetValue(0) as Project;
 
                 if (currentProject.ProjectItems == null) return;
+
                 if (currentProject.FullName.EndsWith(".shproj", StringComparison.OrdinalIgnoreCase))
                 {
-                    System.Windows.MessageBox.Show("Clean up can't be called direlctly on Shared Project", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    System.Windows.MessageBox
+                        .Show("Clean up can't be called direlctly on Shared Project", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 

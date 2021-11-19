@@ -12,270 +12,279 @@ using System.Threading.Tasks;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
-	public class SimplifyClassFieldDeclarations : CodeCleanerCommandRunnerBase, ICodeCleaner
-	{
-		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
-		{
-			return SimplifyClassFieldDeclarationsHelper(initialSourceNode, this.IsReportOnlyMode, Options);
-		}
+    public class SimplifyClassFieldDeclarations : CodeCleanerCommandRunnerBase, ICodeCleaner
+    {
+        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        {
+            return SimplifyClassFieldDeclarationsHelper(initialSourceNode, IsReportOnlyMode, Options);
+        }
 
-		public SyntaxNode SimplifyClassFieldDeclarationsHelper(SyntaxNode initialSourceNode, bool isReportOnlyMode, ICleanupOption options)
-		{
-			var rewriter = new Rewriter(isReportOnlyMode, options);
-			var modifiedSourceNode = rewriter.Visit(initialSourceNode);
-			if (IsReportOnlyMode)
-			{
-				this.CollectMessages(rewriter.GetReport());
-				return initialSourceNode;
-			}
-			return modifiedSourceNode;
-		}
+        public SyntaxNode SimplifyClassFieldDeclarationsHelper(SyntaxNode initialSourceNode, bool isReportOnlyMode, ICleanupOption options)
+        {
+            var rewriter = new Rewriter(isReportOnlyMode, options);
+            var modifiedSourceNode = rewriter.Visit(initialSourceNode);
 
-		class Rewriter : CleanupCSharpSyntaxRewriter
-		{
-			public Rewriter(bool isReportOnlyMode, ICleanupOption options) :
-				base(isReportOnlyMode, options)
-			{
-			}
+            if (IsReportOnlyMode)
+            {
+                CollectMessages(rewriter.GetReport());
+                return initialSourceNode;
+            }
 
-			public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
-			{
-				if (CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Group_And_Merge_class_fields))
-				{
-					node = Apply(node) as ClassDeclarationSyntax;
-					return node;
-				}
+            return modifiedSourceNode;
+        }
 
-				return base.VisitClassDeclaration(node);
-			}
+        class Rewriter : CleanupCSharpSyntaxRewriter
+        {
+            public Rewriter(bool isReportOnlyMode, ICleanupOption options) :
+                base(isReportOnlyMode, options)
+            {
+            }
 
-			public override SyntaxNode VisitVariableDeclarator(VariableDeclaratorSyntax node)
-			{
-				if (node.Initializer == null) return base.VisitVariableDeclarator(node);
-				if (node.Parent is VariableDeclarationSyntax == false) return base.VisitVariableDeclarator(node);
-				if (node.Parent.Parent is FieldDeclarationSyntax == false) return base.VisitVariableDeclarator(node);
-				if ((node.Parent.Parent as FieldDeclarationSyntax).Modifiers.Any(x => x.ValueText == "const")) return base.VisitVariableDeclarator(node);
+            public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
+            {
+                if (CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Group_And_Merge_class_fields))
+                {
+                    node = Apply(node) as ClassDeclarationSyntax;
+                    return node;
+                }
 
-				var value = node.Initializer.Value;
+                return base.VisitClassDeclaration(node);
+            }
 
-				if
-				(
-					!CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Null) &&
-					!CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Literal)
-				)
-					return base.VisitVariableDeclarator(node);
+            public override SyntaxNode VisitVariableDeclarator(VariableDeclaratorSyntax node)
+            {
+                if (node.Initializer == null) return base.VisitVariableDeclarator(node);
+                if (node.Parent is VariableDeclarationSyntax == false) return base.VisitVariableDeclarator(node);
+                if (node.Parent.Parent is FieldDeclarationSyntax == false) return base.VisitVariableDeclarator(node);
+                if ((node.Parent.Parent as FieldDeclarationSyntax).Modifiers.Any(x => x.ValueText == "const")) return base.VisitVariableDeclarator(node);
 
-				if (value is LiteralExpressionSyntax)
-				{
-					var variableTypeNode = GetSystemTypeOfTypeNode((node.Parent as VariableDeclarationSyntax));
-					var valueObj = (value as LiteralExpressionSyntax).Token.Value;
+                var value = node.Initializer.Value;
 
-					if (TypesMapItem.GetAllPredefinedTypesDic().ContainsKey(variableTypeNode))
-					{
-						if (CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Literal) == false) return base.VisitVariableDeclarator(node);
+                if
+                (
+                    !CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Null) &&
+                    !CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Literal)
+                )
+                    return base.VisitVariableDeclarator(node);
 
-						var typeItem = TypesMapItem.GetAllPredefinedTypesDic()[variableTypeNode];
+                if (value is LiteralExpressionSyntax)
+                {
+                    var variableTypeNode = GetSystemTypeOfTypeNode((node.Parent as VariableDeclarationSyntax));
+                    var valueObj = (value as LiteralExpressionSyntax).Token.Value;
 
-						if ((typeItem.DefaultValue == null && valueObj != null) || (typeItem.DefaultValue != null && !typeItem.DefaultValue.Equals(valueObj)))
-							return base.VisitVariableDeclarator(node);
-					}
-					else
-					{
-						if (CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Null) == false) return base.VisitVariableDeclarator(node);
-						if (valueObj != null) return base.VisitVariableDeclarator(node);
-					}
+                    if (TypesMapItem.GetAllPredefinedTypesDic().ContainsKey(variableTypeNode))
+                    {
+                        if (CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Literal) == false) return base.VisitVariableDeclarator(node);
 
-					if (IsReportOnlyMode)
-					{
-						var lineSpan = node.GetFileLinePosSpan();
-						AddReport(new ChangesReport(node)
-						{
-							LineNumber = lineSpan.StartLinePosition.Line,
-							Column = lineSpan.StartLinePosition.Character,
-							Message = "Field initialize with \"= null;\" or \"= 0;\" can be removed",
-							Generator = nameof(SimplifyClassFieldDeclarations)
-						});
-					}
-					node = node.WithInitializer(null).WithoutTrailingTrivia();
-				}
+                        var typeItem = TypesMapItem.GetAllPredefinedTypesDic()[variableTypeNode];
 
-				return base.VisitVariableDeclarator(node);
-			}
+                        if ((typeItem.DefaultValue == null && valueObj != null) || (typeItem.DefaultValue != null && !typeItem.DefaultValue.Equals(valueObj)))
+                            return base.VisitVariableDeclarator(node);
+                    }
+                    else
+                    {
+                        if (CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Null) == false) return base.VisitVariableDeclarator(node);
+                        if (valueObj != null) return base.VisitVariableDeclarator(node);
+                    }
 
-			SyntaxTrivia spaceTrivia = SyntaxFactory.Whitespace(" ");
-			SyntaxNode Apply(ClassDeclarationSyntax classDescriptionNode)
-			{
-				var newDeclarationDic = new Dictionary<NewFieldDeclarationDicKey, NewFieldDeclarationDicItem>();
+                    if (IsReportOnlyMode)
+                    {
+                        var lineSpan = node.GetFileLinePosSpan();
 
-				var fieldDeclarations =
-					classDescriptionNode
-						.Members
-						.OfType<FieldDeclarationSyntax>()
-						.Where(fd => fd.AttributeLists.Any() == false)
-						.Where(fd => fd.HasStructuredTrivia == false)
-						.Where(fd => fd.DescendantTrivia().Any(t => t.IsKind(SyntaxKind.SingleLineCommentTrivia) || t.IsKind(SyntaxKind.MultiLineCommentTrivia)) == false)
-						.Where(fd => fd.Declaration.Variables.All(x => x.Initializer == null || x.Initializer.Value is LiteralExpressionSyntax))
-						.ToList();
+                        AddReport(new ChangesReport(node)
+                        {
+                            LineNumber = lineSpan.StartLinePosition.Line,
+                            Column = lineSpan.StartLinePosition.Character,
+                            Message = "Field initialize with \"= null;\" or \"= 0;\" can be removed",
+                            Generator = nameof(SimplifyClassFieldDeclarations)
+                        });
+                    }
 
-				foreach (var fieldDeclarationItem in fieldDeclarations)
-				{
-					var variableType = GetSystemTypeOfTypeNode(fieldDeclarationItem.Declaration);
+                    node = node.WithInitializer(null).WithoutTrailingTrivia();
+                }
 
-					var key = GetKey(fieldDeclarationItem);
+                return base.VisitVariableDeclarator(node);
+            }
 
-					if (newDeclarationDic.ContainsKey(key) == false)
-					{
-						newDeclarationDic
-							.Add
-							(
-								key,
-								new NewFieldDeclarationDicItem
-								{
-									VariablesWithoutInitializer = new List<VariableDeclaratorSyntax>(),
-									VariablesWithInitializer = new List<VariableDeclaratorSyntax>(),
-									OldFieldDeclarations = new List<FieldDeclarationSyntax>()
-								}
-							);
-					}
+            SyntaxTrivia spaceTrivia = SyntaxFactory.Whitespace(" ");
+            SyntaxNode Apply(ClassDeclarationSyntax classDescriptionNode)
+            {
+                var newDeclarationDic = new Dictionary<NewFieldDeclarationDicKey, NewFieldDeclarationDicItem>();
 
-					var currentItem = newDeclarationDic[key];
+                var fieldDeclarations =
+                    classDescriptionNode
+                        .Members
+                        .OfType<FieldDeclarationSyntax>()
+                        .Where(fd => fd.AttributeLists.Any() == false)
+                        .Where(fd => fd.HasStructuredTrivia == false)
+                        .Where(fd => fd.DescendantTrivia().Any(t => t.IsKind(SyntaxKind.SingleLineCommentTrivia) || t.IsKind(SyntaxKind.MultiLineCommentTrivia)) == false)
+                        .Where(fd => fd.Declaration.Variables.All(x => x.Initializer == null || x.Initializer.Value is LiteralExpressionSyntax))
+                        .ToList();
 
-					currentItem.OldFieldDeclarations.Add(fieldDeclarationItem);
+                foreach (var fieldDeclarationItem in fieldDeclarations)
+                {
+                    var variableType = GetSystemTypeOfTypeNode(fieldDeclarationItem.Declaration);
 
-					var newDeclaration = VisitFieldDeclaration(fieldDeclarationItem) as FieldDeclarationSyntax;
+                    var key = GetKey(fieldDeclarationItem);
 
-					currentItem.VariablesWithoutInitializer.AddRange(newDeclaration.Declaration.Variables.Where(v => v.Initializer == null));
-					currentItem.VariablesWithInitializer.AddRange(newDeclaration.Declaration.Variables.Where(v => v.Initializer != null));
-				}
+                    if (newDeclarationDic.ContainsKey(key) == false)
+                    {
+                        newDeclarationDic
+.Add
+                            (
+                                key,
+                                new NewFieldDeclarationDicItem
+                                {
+                                    VariablesWithoutInitializer = new List<VariableDeclaratorSyntax>(),
+                                    VariablesWithInitializer = new List<VariableDeclaratorSyntax>(),
+                                    OldFieldDeclarations = new List<FieldDeclarationSyntax>()
+                                }
+                            );
+                    }
 
-				var newDeclarationDicAllItems = newDeclarationDic.ToList();
+                    var currentItem = newDeclarationDic[key];
 
-				newDeclarationDic.Clear();
+                    currentItem.OldFieldDeclarations.Add(fieldDeclarationItem);
 
-				foreach (var newDelarationItem in newDeclarationDicAllItems)
-				{
-					var finalList = newDelarationItem.Value.VariablesWithoutInitializer.Select(x => x.WithoutTrailingTrivia().WithLeadingTrivia(spaceTrivia)).ToList();
-					finalList.AddRange(newDelarationItem.Value.VariablesWithInitializer.Select(x => x.WithoutTrailingTrivia().WithLeadingTrivia(spaceTrivia)));
+                    var newDeclaration = VisitFieldDeclaration(fieldDeclarationItem) as FieldDeclarationSyntax;
 
-					finalList[0] = finalList[0].WithoutLeadingTrivia();
+                    currentItem.VariablesWithoutInitializer
+                        .AddRange(newDeclaration.Declaration.Variables.Where(v => v.Initializer == null));
+                    currentItem.VariablesWithInitializer
+                        .AddRange(newDeclaration.Declaration.Variables.Where(v => v.Initializer != null));
+                }
 
-					newDelarationItem.Value.NewFieldDeclaration =
-						newDelarationItem.Value.FirstOldFieldDeclarations
-						.WithDeclaration(
-							newDelarationItem.Value.FirstOldFieldDeclarations
-								.Declaration
-								.WithVariables(SyntaxFactory.SeparatedList(finalList))
-						);
+                var newDeclarationDicAllItems = newDeclarationDic.ToList();
 
-					if (newDelarationItem.Value.NewFieldDeclaration.Span.Length <= SimplifyClassFieldDeclaration.Options.MAX_FIELD_DECLARATION_LENGTH)
-					{
-						newDeclarationDic.Add(newDelarationItem.Key, newDelarationItem.Value);
-					}
-					else
-					{
-						foreach (var item in newDelarationItem.Value.OldFieldDeclarations)
-							fieldDeclarations.Remove(item);
+                newDeclarationDic.Clear();
 
-					}
-				}
+                foreach (var newDelarationItem in newDeclarationDicAllItems)
+                {
+                    var finalList = newDelarationItem.Value.VariablesWithoutInitializer.Select(x => x.WithoutTrailingTrivia().WithLeadingTrivia(spaceTrivia)).ToList();
+                    finalList.AddRange(newDelarationItem.Value.VariablesWithInitializer.Select(x => x.WithoutTrailingTrivia().WithLeadingTrivia(spaceTrivia)));
 
-				var replaceList = newDeclarationDic.Select(x => x.Value.FirstOldFieldDeclarations).ToList();
+                    finalList[0] = finalList[0].WithoutLeadingTrivia();
 
-				var newClassDescriptionNode =
-					classDescriptionNode
-					.ReplaceNodes
-					(
-						 fieldDeclarations,
-						 (node1, node2) =>
-						 {
-							 if (replaceList.Contains(node1))
-							 {
-								 var dicItem = newDeclarationDic[GetKey(node1 as FieldDeclarationSyntax)];
+                    newDelarationItem.Value.NewFieldDeclaration =
+                        newDelarationItem.Value.FirstOldFieldDeclarations
+                        .WithDeclaration(
+                            newDelarationItem.Value.FirstOldFieldDeclarations
+                                .Declaration
+                                .WithVariables(SyntaxFactory.SeparatedList(finalList))
+                        );
 
-								 return
-									dicItem
-									.NewFieldDeclaration
-									.WithLeadingTrivia(dicItem.FirstOldFieldDeclarations.GetLeadingTrivia())
-									.WithTrailingTrivia(dicItem.FirstOldFieldDeclarations.GetTrailingTrivia());
-							 }
+                    if (newDelarationItem.Value.NewFieldDeclaration.Span.Length <= SimplifyClassFieldDeclaration.Options.MAX_FIELD_DECLARATION_LENGTH)
+                    {
+                        newDeclarationDic.Add(newDelarationItem.Key, newDelarationItem.Value);
+                    }
+                    else
+                    {
+                        foreach (var item in newDelarationItem.Value.OldFieldDeclarations)
+                            fieldDeclarations.Remove(item);
+                    }
+                }
 
-							 return null;
-						 }
-					);
-				if (replaceList.Any() && IsReportOnlyMode)
-				{
-					var lineSpan = classDescriptionNode.GetFileLinePosSpan();
-					AddReport(new ChangesReport(classDescriptionNode)
-					{
-						LineNumber = lineSpan.StartLinePosition.Line,
-						Column = lineSpan.StartLinePosition.Character,
-						Message = "Field initialize can be in one line",
-						Generator = nameof(SimplifyClassFieldDeclarations)
-					});
-				}
-				return newClassDescriptionNode;
-			}
+                var replaceList = newDeclarationDic.Select(x => x.Value.FirstOldFieldDeclarations).ToList();
 
-			NewFieldDeclarationDicKey GetKey(FieldDeclarationSyntax fieldDeclarationItem)
-			{
-				var header = new NewFieldDeclarationDicKey
-				{
-					TypeName = GetSystemTypeOfTypeNode(fieldDeclarationItem.Declaration),
-				};
+                var newClassDescriptionNode =
+                    classDescriptionNode
+                    .ReplaceNodes
+                    (
+                         fieldDeclarations,
+                         (node1, node2) =>
+                         {
+                             if (replaceList.Contains(node1))
+                             {
+                                 var dicItem = newDeclarationDic[GetKey(node1 as FieldDeclarationSyntax)];
 
-				if (fieldDeclarationItem.Modifiers.Any())
-				{
-					header.Modifiers = fieldDeclarationItem.Modifiers.Select(x => x.ValueText).ToArray();
-				}
+                                 return
+                                    dicItem
+                                    .NewFieldDeclaration
+                                    .WithLeadingTrivia(dicItem.FirstOldFieldDeclarations.GetLeadingTrivia())
+                                    .WithTrailingTrivia(dicItem.FirstOldFieldDeclarations.GetTrailingTrivia());
+                             }
 
-				return header;
-			}
+                             return null;
+                         }
+                    );
 
-			string GetSystemTypeOfTypeNode(VariableDeclarationSyntax d)
-			{
-				if (d.Type is PredefinedTypeSyntax)
-					return TypesMapItem.GetAllPredefinedTypesDic()[(d.Type as PredefinedTypeSyntax).Keyword.ValueText].BuiltInName.Trim();
+                if (replaceList.Any() && IsReportOnlyMode)
+                {
+                    var lineSpan = classDescriptionNode.GetFileLinePosSpan();
 
-				return (d.Type.ToFullString().Trim());
-			}
+                    AddReport(new ChangesReport(classDescriptionNode)
+                    {
+                        LineNumber = lineSpan.StartLinePosition.Line,
+                        Column = lineSpan.StartLinePosition.Character,
+                        Message = "Field initialize can be in one line",
+                        Generator = nameof(SimplifyClassFieldDeclarations)
+                    });
+                }
 
-			struct NewFieldDeclarationDicKey : IEquatable<NewFieldDeclarationDicKey>
-			{
+                return newClassDescriptionNode;
+            }
 
-				public string TypeName { get; set; }
-				public string[] Modifiers { get; set; }
+            NewFieldDeclarationDicKey GetKey(FieldDeclarationSyntax fieldDeclarationItem)
+            {
+                var header = new NewFieldDeclarationDicKey
+                {
+                    TypeName = GetSystemTypeOfTypeNode(fieldDeclarationItem.Declaration),
+                };
 
-				public bool Equals(NewFieldDeclarationDicKey other)
-				{
-					return this == other;
-				}
+                if (fieldDeclarationItem.Modifiers.Any())
+                {
+                    header.Modifiers = fieldDeclarationItem.Modifiers.Select(x => x.ValueText).ToArray();
+                }
 
-				public static bool operator ==(NewFieldDeclarationDicKey left, NewFieldDeclarationDicKey right)
-				{
-					if (string.Compare(left.TypeName, right.TypeName) != 0) return false;
-					if (left.Modifiers == null && right.Modifiers == null) return true;
-					if (left.Modifiers == null || right.Modifiers == null) return false;
-					if (left.Modifiers.Length != right.Modifiers.Length) return false;
-					foreach (var item in left.Modifiers)
-					{
-						if (right.Modifiers.Any(m => string.Compare(m, item) == 0) == false) return false;
-					}
+                return header;
+            }
 
-					return true;
-				}
-				public static bool operator !=(NewFieldDeclarationDicKey left, NewFieldDeclarationDicKey right)
-				{
-					return !(left == right);
-				}
-			}
-			class NewFieldDeclarationDicItem
-			{
-				public List<VariableDeclaratorSyntax> VariablesWithoutInitializer { get; set; }
-				public List<VariableDeclaratorSyntax> VariablesWithInitializer { get; set; }
-				public FieldDeclarationSyntax FirstOldFieldDeclarations => OldFieldDeclarations.FirstOrDefault();
-				public List<FieldDeclarationSyntax> OldFieldDeclarations { get; set; }
-				public FieldDeclarationSyntax NewFieldDeclaration { get; set; }
-			}
-		}
-	}
+            string GetSystemTypeOfTypeNode(VariableDeclarationSyntax d)
+            {
+                if (d.Type is PredefinedTypeSyntax)
+                    return TypesMapItem.GetAllPredefinedTypesDic()[(d.Type as PredefinedTypeSyntax).Keyword.ValueText].BuiltInName.Trim();
+
+                return (d.Type.ToFullString().Trim());
+            }
+
+            struct NewFieldDeclarationDicKey : IEquatable<NewFieldDeclarationDicKey>
+            {
+
+                public string TypeName { get; set; }
+                public string[] Modifiers { get; set; }
+
+                public bool Equals(NewFieldDeclarationDicKey other)
+                {
+                    return this == other;
+                }
+
+                public static bool operator ==(NewFieldDeclarationDicKey left, NewFieldDeclarationDicKey right)
+                {
+                    if (string.Compare(left.TypeName, right.TypeName) != 0) return false;
+                    if (left.Modifiers == null && right.Modifiers == null) return true;
+                    if (left.Modifiers == null || right.Modifiers == null) return false;
+                    if (left.Modifiers.Length != right.Modifiers.Length) return false;
+
+                    foreach (var item in left.Modifiers)
+                    {
+                        if (right.Modifiers.Any(m => string.Compare(m, item) == 0) == false) return false;
+                    }
+
+                    return true;
+                }
+                public static bool operator !=(NewFieldDeclarationDicKey left, NewFieldDeclarationDicKey right)
+                {
+                    return !(left == right);
+                }
+            }
+            class NewFieldDeclarationDicItem
+            {
+                public List<VariableDeclaratorSyntax> VariablesWithoutInitializer { get; set; }
+                public List<VariableDeclaratorSyntax> VariablesWithInitializer { get; set; }
+                public FieldDeclarationSyntax FirstOldFieldDeclarations => OldFieldDeclarations.FirstOrDefault();
+                public List<FieldDeclarationSyntax> OldFieldDeclarations { get; set; }
+                public FieldDeclarationSyntax NewFieldDeclaration { get; set; }
+            }
+        }
+    }
 }

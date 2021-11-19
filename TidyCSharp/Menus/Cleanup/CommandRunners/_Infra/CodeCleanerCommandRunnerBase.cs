@@ -1,19 +1,13 @@
 using EnvDTE;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
+using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.FindSymbols;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using RoslynDocument = Microsoft.CodeAnalysis.Document;
-using System.IO;
 using System.Xml;
-using System.Text;
-using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeTypeConverter;
-using Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors;
-using System;
+using RoslynDocument = Microsoft.CodeAnalysis.Document;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
@@ -21,6 +15,11 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
     {
         static IList<ChangesReport> ChangesReports;
         public bool IsReportOnlyMode { get; set; }
+
+        static CodeCleanerCommandRunnerBase()
+        {
+            ChangesReports = ChangesReports ?? new List<ChangesReport>();
+        }
         public void Run(ProjectItem item) => AsyncRun(item);
 
         public ProjectItemDetailsType ProjectItemDetails { get; protected set; }
@@ -34,6 +33,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             {
                 RefreshResult(item.ToSyntaxNode());
             }
+
             UnModifiedProjectItemDetails = ProjectItemDetails;
 
             var initialSourceNode = CleanUp(ProjectItemDetails.InitialSourceNode);
@@ -61,7 +61,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             return ProjectItemDetails.InitialSourceNode;
         }
 
-
         protected virtual async Task SaveResult(SyntaxNode initialSourceNode)
         {
             if (initialSourceNode == null || initialSourceNode == ProjectItemDetails.InitialSourceNode) return;
@@ -80,10 +79,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
         }
 
-        public virtual async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
-        {
-            return null;
-        }
+        public virtual async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode) => null;
 
         public bool IsEquivalentToUnModified(SyntaxNode initialSourceNode)
         {
@@ -96,18 +92,17 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 ChangesReports.Add(report);
         }
 
-        static CodeCleanerCommandRunnerBase()
-        {
-            ChangesReports = ChangesReports ?? new List<ChangesReport>();
-        }
         public static void GenerateMessages()
         {
-            XmlWriterSettings xmlWriterSettings = new XmlWriterSettings();
+            var xmlWriterSettings = new XmlWriterSettings();
             xmlWriterSettings.Indent = true;
-            XmlWriter textWriter = XmlWriter.Create(Path.GetDirectoryName(App.DTE.Solution.FullName)
+
+            var textWriter = XmlWriter.Create(Path.GetDirectoryName(App.DTE.Solution.FullName)
                 + "\\Tidy.log", xmlWriterSettings);
+
             textWriter.WriteStartDocument();
             textWriter.WriteStartElement("Reports");
+
             foreach (var change in ChangesReports)
             {
                 textWriter.WriteStartElement("Report");
@@ -118,12 +113,14 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 textWriter.WriteElementString("Message", change.Message);
                 textWriter.WriteEndElement();
             }
+
             textWriter.WriteEndElement();
             textWriter.WriteEndDocument();
             textWriter.Flush();
             textWriter.Close();
             ChangesReports.Clear();
         }
+
         public ICleanupOption Options { get; set; }
 
         public bool CheckOption(int? optionItem) => Options.Should(optionItem);
@@ -137,10 +134,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             {
                 get
                 {
-                    //if (_projectItemDocument == null)
-                    //{
+                    // if (_projectItemDocument == null)
+                    // {
                     _projectItemDocument = GetRoslynDomuentByProjectItem(ProjectItem);
-                    //}
+                    // }
 
                     return _projectItemDocument;
                 }
@@ -153,8 +150,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 {
                     if (_semanticModel == null && ProjectItemDocument != null)
                     {
-
-                        Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async delegate
+                        Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory
+                            .Run(async delegate
                         {
                             _semanticModel = await ProjectItemDocument.GetSemanticModelAsync();
                         });
@@ -172,7 +169,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 FilePath = item.ToFullPathPropertyValue();
                 ProjectItem = item;
 
-                Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async delegate
+                Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory
+                    .Run(async delegate
                 {
                     InitialSourceNode = ProjectItemDocument != null ? await ProjectItemDocument.GetSyntaxRootAsync() : item.ToSyntaxNode();
                 });
@@ -186,6 +184,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                         .CleanupWorkingSolution
                         .Projects.FirstOrDefault(p => p.Name == projectItem.ContainingProject.Name)
                         ?.Documents.FirstOrDefault(d => d.FilePath == path);
+
                 if (document == null)
                 {
                     return
@@ -195,6 +194,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                            .CleanupWorkingSolution.GetDocumentIdsWithFilePath(path)
                            .FirstOrDefault());
                 }
+
                 return document;
             }
         }

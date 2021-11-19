@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,7 +19,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
         public Renamer(Document document)
         {
             WorkingDocument = document;
-            Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async delegate
+
+            Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory
+                .Run(async delegate
             {
                 _semanticModel = await WorkingDocument.GetSemanticModelAsync();
             });
@@ -32,6 +33,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             var newNode = containerNode;
             RenameResult renamingResult = null;
             RenameResult workingRenamingResult = null;
+
             do
             {
                 currentNode = newNode;
@@ -40,6 +42,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 if (workingRenamingResult != null)
                 {
                     renamingResult = workingRenamingResult;
+
                     if (workingRenamingResult.Node != null)
                     {
                         newNode = renamingResult.Node;
@@ -49,6 +52,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 }
             }
             while (workingRenamingResult != null && newNode != currentNode);
+
             return renamingResult;
         }
 
@@ -79,10 +83,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
                 VisitedTokens.Add(selectedName);
 
-                if (result != null)
-                {
-                    return result;
-                }
+                if (result != null) return result;
             }
 
             return null;
@@ -95,25 +96,18 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             var currentName = identifierToRename.ValueText;
             var selectedName = currentName;
 
-
             if (string.Compare(newVarName, currentName, false) == 0) return null;
             if (ValidateNewName(newVarName) == false) return null;
 
-
             var identifierDeclarationNode = identifierToRename.Parent;
-
 
             var identifierSymbol = _semanticModel.GetDeclaredSymbol(identifierDeclarationNode);
 
-
             var validateNameResult = await RenameHelper.IsValidNewMemberNameAsync(_semanticModel, identifierSymbol, newVarName);
-
 
             if (validateNameResult == false) return null;
 
-
             result = await RenameSymbol(WorkingDocument, await WorkingDocument.GetSyntaxRootAsync(), containerNode, identifierDeclarationNode, newVarName);
-
 
             if (result != null) selectedName = newVarName;
 
@@ -132,7 +126,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         protected virtual bool ValidateNewName(string newVarName)
         {
-            bool isValid = true;
+            var isValid = true;
             isValid &= SyntaxFacts.IsValidIdentifier(newVarName);
             isValid &= !keywords.Value.Contains(newVarName);
             return isValid;
@@ -144,7 +138,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         protected static string GetCamelCased(string variableName)
         {
-
             var noneLetterCount = variableName.TakeWhile(x => char.IsLetter(x) == false).Count();
 
             if (noneLetterCount >= variableName.Length) return variableName;
@@ -161,7 +154,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         protected static string GetPascalCased(string variableName)
         {
-
             var noneLetterCount = variableName.TakeWhile(x => char.IsLetter(x) == false).Count();
 
             if (noneLetterCount >= variableName.Length) return variableName;
@@ -192,7 +184,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
         const string SELECTED_METHOD_ANNOTATION = "SELECTED_METHOD_ANNOTATION";
         static async Task<RenameResult> RenameSymbol(Document document, SyntaxNode root, SyntaxNode startNode, ParameterSyntax declarationNode, string newName)
         {
-
             var identifierToken = declarationNode.Identifier;
 
             var methodAnnotation = new SyntaxAnnotation(SELECTED_METHOD_ANNOTATION);
@@ -200,13 +191,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             if (startNode != null)
             {
-
                 changeDic.Add(startNode, startNode.WithAdditionalAnnotations(methodAnnotation));
             }
 
-
             changeDic.Add(declarationNode, declarationNode.WithIdentifier(identifierToken.WithAdditionalAnnotations(RenameAnnotation.Create())));
-
 
             var annotatedRoot = root.ReplaceNodes(changeDic.Keys, (x, y) => changeDic[x]);
 
@@ -217,7 +205,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         static async Task<RenameResult> RenameSymbol(Document document, SyntaxNode root, SyntaxNode startNode, VariableDeclaratorSyntax declarationNode, string newName)
         {
-
             var identifierToken = declarationNode.Identifier;
 
             var methodAnnotation = new SyntaxAnnotation(SELECTED_METHOD_ANNOTATION);
@@ -227,7 +214,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             {
                 changeDic.Add(startNode, startNode.WithAdditionalAnnotations(methodAnnotation));
             }
-
 
             changeDic.Add(declarationNode, declarationNode.WithIdentifier(identifierToken.WithAdditionalAnnotations(RenameAnnotation.Create())));
 
@@ -240,7 +226,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         static async Task<RenameResult> GetNewStartNode(Solution newSolution, Document document, SyntaxAnnotation methodAnnotation, SyntaxNode startNode)
         {
-
             var newDocument =
                newSolution.Projects.FirstOrDefault(x => x.Name == document.Project.Name)
                .Documents.FirstOrDefault(x => x.FilePath == document.FilePath);
@@ -257,24 +242,20 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             };
         }
 
-        public static async Task<RenameResult> RenameSymbol(Document document, SyntaxNode root, SyntaxNode startNode, SyntaxToken identifierToken, string newName)
+        public static Task<RenameResult> RenameSymbol(Document document, SyntaxNode root, SyntaxNode startNode, SyntaxToken identifierToken, string newName)
         {
-
-            return await RenameSymbol(document, root, startNode, identifierToken.Parent, newName);
+            return RenameSymbol(document, root, startNode, identifierToken.Parent, newName);
         }
 
         public static async Task<RenameResult> RenameSymbol(Document document, SyntaxNode root, SyntaxNode startNode, SyntaxNode declarationNode, string newName)
         {
-
             if (declarationNode is VariableDeclaratorSyntax variableNode)
             {
-
                 return await RenameSymbol(document, root, startNode, variableNode, newName);
             }
 
             if (declarationNode is ParameterSyntax parameterNode)
             {
-
                 return await RenameSymbol(document, root, startNode, parameterNode, newName);
             }
 
@@ -283,7 +264,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         static async Task<Solution> RenameSymbol(Document document, SyntaxNode annotatedRoot, SyntaxToken identifierNode, SyntaxAnnotation methodAnnotation, string newName, CancellationToken cancellationToken = default(CancellationToken))
         {
-
             var annotatedSolution = document.Project.Solution.WithDocumentSyntaxRoot(document.Id, annotatedRoot);
 
             var annotatedDocument = annotatedSolution.GetDocument(document.Id);
@@ -296,7 +276,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             var symbol = semanticModel.GetDeclaredSymbol(annotatedToken.Parent, cancellationToken);
 
-            //await Microsoft.CodeAnalysis.Rename.Renamer.RenameSymbolAsync(annotatedSolution, symbol, newName, annotatedSolution.Workspace.Options, cancellationToken);
+            // await Microsoft.CodeAnalysis.Rename.Renamer.RenameSymbolAsync(annotatedSolution, symbol, newName, annotatedSolution.Workspace.Options, cancellationToken);
             var renamingresult = await Microsoft.CodeAnalysis.Rename.Renamer.RenameSymbolAsync(annotatedSolution, symbol, newName, annotatedSolution.Workspace.Options);
 
             return renamingresult;

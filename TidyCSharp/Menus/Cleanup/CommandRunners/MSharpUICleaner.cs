@@ -22,6 +22,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         {
             if (ProjectItemDetails.ProjectItem.ContainingProject.Name == "#UI")
                 return ChangeMethodHelper(initialSourceNode);
+
             return initialSourceNode;
         }
 
@@ -29,75 +30,75 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         {
             var sendItemIdRewriter = new SendItemIdRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             var modifiedSourceNode = sendItemIdRewriter.Visit(initialSourceNode);
-            modifiedSourceNode = this.RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = RefreshResult(modifiedSourceNode);
 
             var ifWorkFlowRewriter = new IfWorkFlowRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = ifWorkFlowRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = this.RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = RefreshResult(modifiedSourceNode);
 
             var customColumnRewriter = new CustomColumnRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = customColumnRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = this.RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = RefreshResult(modifiedSourceNode);
 
             var elementsNewSyntaxRewriter = new ElementsNewSyntaxRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = elementsNewSyntaxRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = this.RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = RefreshResult(modifiedSourceNode);
 
             var formModuleWorkFlow = new FormModuleWorkFlowRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = formModuleWorkFlow.Visit(modifiedSourceNode);
-            modifiedSourceNode = this.RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = RefreshResult(modifiedSourceNode);
 
             var generalWorkFlowRewriter = new GeneralWorkFlowRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = generalWorkFlowRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = this.RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = RefreshResult(modifiedSourceNode);
 
             var combinedExpressionsFormRewriter = new CombinedExpressionsFormRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = combinedExpressionsFormRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = this.RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = RefreshResult(modifiedSourceNode);
 
             var listModuleWorkFlowRewriter = new ListModuleWorkFlowRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = listModuleWorkFlowRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = this.RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = RefreshResult(modifiedSourceNode);
 
             var fullSearchRewriter = new FullSearchRewriter(ProjectItemDetails.SemanticModel
                 , ProjectItemDetails.ProjectItemDocument.Project.Solution
                 , ProjectItemDetails.ProjectItemDocument, IsReportOnlyMode, Options);
+
             modifiedSourceNode = fullSearchRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = this.RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = RefreshResult(modifiedSourceNode);
 
             var customFieldRewriter = new CustomFieldRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = customFieldRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = this.RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = RefreshResult(modifiedSourceNode);
 
             var onClickGoWorkFlowRewriter = new OnClickGoWorkFlowRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = onClickGoWorkFlowRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = this.RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = RefreshResult(modifiedSourceNode);
 
             var mergedUpRewriter = new MergedUpRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = mergedUpRewriter.Visit(modifiedSourceNode);
 
             if (IsReportOnlyMode)
             {
-                this.CollectMessages(sendItemIdRewriter.GetReport());
-                this.CollectMessages(ifWorkFlowRewriter.GetReport());
-                this.CollectMessages(customColumnRewriter.GetReport());
-                this.CollectMessages(elementsNewSyntaxRewriter.GetReport());
-                this.CollectMessages(formModuleWorkFlow.GetReport());
-                this.CollectMessages(generalWorkFlowRewriter.GetReport());
-                this.CollectMessages(combinedExpressionsFormRewriter.GetReport());
-                this.CollectMessages(listModuleWorkFlowRewriter.GetReport());
-                this.CollectMessages(fullSearchRewriter.GetReport());
-                this.CollectMessages(customFieldRewriter.GetReport());
-                this.CollectMessages(onClickGoWorkFlowRewriter.GetReport());
-                this.CollectMessages(mergedUpRewriter.GetReport());
+                CollectMessages(sendItemIdRewriter.GetReport());
+                CollectMessages(ifWorkFlowRewriter.GetReport());
+                CollectMessages(customColumnRewriter.GetReport());
+                CollectMessages(elementsNewSyntaxRewriter.GetReport());
+                CollectMessages(formModuleWorkFlow.GetReport());
+                CollectMessages(generalWorkFlowRewriter.GetReport());
+                CollectMessages(combinedExpressionsFormRewriter.GetReport());
+                CollectMessages(listModuleWorkFlowRewriter.GetReport());
+                CollectMessages(fullSearchRewriter.GetReport());
+                CollectMessages(customFieldRewriter.GetReport());
+                CollectMessages(onClickGoWorkFlowRewriter.GetReport());
+                CollectMessages(mergedUpRewriter.GetReport());
                 return initialSourceNode;
             }
-
 
             return modifiedSourceNode;
         }
 
-        //cancelsave,deletecancelsave
+        // cancelsave,deletecancelsave
         class CombinedExpressionsFormRewriter : CleanupCSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
@@ -111,7 +112,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 public List<int> RemovedIndexPositions { get; set; }
             }
 
-            private IEnumerable<StatementType> GetStatementTypesContainMethodName(
+            IEnumerable<StatementType> GetStatementTypesContainMethodName(
                 IEnumerable<StatementType> statementTypes, string methodName)
             {
                 return statementTypes.Where(x => x.MethodName == methodName)
@@ -119,6 +120,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     .Where(x => x.Row.IdentifierShouldBe("button"))
                     .Where(x => x.Row.MethodNameShouldBe(methodName));
             }
+
             public override SyntaxNode VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
             {
                 var t = node.DescendantNodesOfType<ExpressionStatementSyntax>()
@@ -133,24 +135,29 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 var cancelMethods = GetStatementTypesContainMethodName(t, "Cancel");
                 var saveMethods = GetStatementTypesContainMethodName(t, "Save");
 
-                int deleteIndex = -1;
+                var deleteIndex = -1;
 
                 if (deleteMethods.Any())
                 {
                     deleteIndex = deleteMethods.FirstOrDefault().Index;
                 }
+
                 if (!cancelMethods.Any() || !saveMethods.Any())
                 {
                     return base.VisitConstructorDeclaration(node);
                 }
 
-                List<int> statementsToRemove = new List<int>();
-                cancelMethods.Union(saveMethods).Union(deleteMethods).OrderByDescending(x => x.Index)
+                var statementsToRemove = new List<int>();
+
+                cancelMethods.Union(saveMethods)
+                    .Union(deleteMethods)
+                    .OrderByDescending(x => x.Index)
                     .Aggregate((arg1, arg2) =>
                     {
                         if (arg1.MethodName == "Save" && arg2.MethodName == "Cancel")
                         {
                             statementsToRemove.Add(arg1.Index);
+
                             return new StatementType
                             {
                                 Index = arg2.Index,
@@ -165,10 +172,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 RemovedIndexPositions = new List<int>() { arg1.Index }
                             };
                         }
+
                         if (arg1.MethodName == "CancelSave" && arg2.MethodName == "Delete")
                         {
                             statementsToRemove.AddRange(arg1.RemovedIndexPositions);
                             statementsToRemove.Add(arg1.Index);
+
                             return new StatementType
                             {
                                 Index = arg2.Index,
@@ -183,13 +192,17 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 RemovedIndexPositions = new List<int>(arg1.RemovedIndexPositions) { arg1.Index }
                             };
                         }
+
                         return arg2;
                     });
+
                 if (!statementsToRemove.Any())
                     return base.VisitConstructorDeclaration(node);
+
                 var newNode = node.RemoveNodes(cancelMethods.Union(saveMethods).Union(deleteMethods)
                     .Where(x => statementsToRemove.Contains(x.Index)).Select(x => x.Row),
                     SyntaxRemoveOptions.KeepEndOfLine);
+
                 t = newNode.DescendantNodesOfType<ExpressionStatementSyntax>()
                     .Select((r, i) => new StatementType
                     {
@@ -216,6 +229,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                                     SyntaxFactory.IdentifierName("DeleteCancelSave")),
                                                 SyntaxFactory.ArgumentList()));
                             }
+
                             if (arg1.MethodNameShouldBe("Cancel"))
                             {
                                 return SyntaxFactory.ExpressionStatement(
@@ -226,10 +240,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                                     SyntaxFactory.IdentifierName("CancelSave")),
                                                 SyntaxFactory.ArgumentList()));
                             }
+
                             return arg2;
                         });
 
                 var lineSpan = node.GetFileLinePosSpan();
+
                 AddReport(new ChangesReport(node)
                 {
                     LineNumber = lineSpan.StartLinePosition.Line,
@@ -240,12 +256,14 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 return newNode;
             }
+
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
                 if (node.ClassShouldHaveBase() &&
                     node.ClassShouldHaveGenericBase() &&
                     node.GenericClassShouldInheritFrom("FormModule"))
                     return base.VisitClassDeclaration(node);
+
                 return node;
             }
         }
@@ -262,6 +280,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         x.MethodNameShouldBe("If") &&
                         x.LeftSideShouldBeIdentifier(false))
                     .FirstOrDefault();
+
                 if (ifNode != null)
                 {
                     var newNode = node.ReplaceNodes(ifNode.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>(),
@@ -277,6 +296,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             {
                                 return nde2;
                             }
+
                             if (nde1.LeftSideShouldBeIdentifier())
                             {
                                 return SyntaxFactory.InvocationExpression(
@@ -292,6 +312,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             }
 
                             var lineSpan = node.GetFileLinePosSpan();
+
                             AddReport(new ChangesReport(node)
                             {
                                 LineNumber = lineSpan.StartLinePosition.Line,
@@ -302,8 +323,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                             return nde2;
                         });
+
                     return VisitSimpleLambdaExpression(newNode);
                 }
+
                 return node;
             }
         }
@@ -328,8 +351,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             if (nde1.Expression.As<IdentifierNameSyntax>()?.Identifier.ValueText == "CustomColumn")
                             {
                                 SeparatedSyntaxList<ArgumentSyntax> args = new SeparatedSyntaxList<ArgumentSyntax>();
+
                                 var argsLabelText = node.GetArgumentsOfMethod("LabelText")
                                     ?? node.GetArgumentsOfMethod("HeaderTemplate");
+
                                 var argsDisplayExpr = node.GetArgumentsOfMethod("DisplayExpression");
 
                                 if (argsLabelText?.Arguments.Count == 1)
@@ -356,6 +381,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         });
 
                     var lineSpan = node.GetFileLinePosSpan();
+
                     AddReport(new ChangesReport(node)
                     {
                         LineNumber = lineSpan.StartLinePosition.Line,
@@ -366,14 +392,17 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                     return newNode;
                 }
+
                 return base.VisitInvocationExpression(node);
             }
+
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
                 if (node.ClassShouldHaveBase() &&
                    node.ClassShouldHaveGenericBase() &&
                    node.GenericClassShouldInheritFrom("ListModule"))
                     return base.VisitClassDeclaration(node);
+
                 return node;
             }
         }
@@ -386,6 +415,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 var methodSymbol = semanticModel.GetSymbolInfo(node).Symbol as IMethodSymbol;
                 var methodName = methodSymbol?.Name;
+
                 if (methodName == "Send")
                 {
                     if (node.ArgumentsCountShouldBe(2) &&
@@ -393,10 +423,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         node.LastArgumentShouldBe("\"item.ID\""))
                     {
                         var member = node.FirstDescendantNode<InvocationExpressionSyntax>();
+
                         member = member
                             .WithTrailingTrivia(member.GetTrailingTrivia().Union(node.GetLeadingTrivia()));
 
                         var lineSpan = node.GetFileLinePosSpan();
+
                         AddReport(new ChangesReport(node)
                         {
                             LineNumber = lineSpan.StartLinePosition.Line,
@@ -411,10 +443,11 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             SyntaxFactory.ArgumentList());
                     }
                 }
+
                 return base.VisitInvocationExpression(node);
             }
         }
-        //column.search.field.
+        // column.search.field.
         class ElementsNewSyntaxRewriter : CleanupCSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
@@ -438,6 +471,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     "MSharp.BinaryFormElement",
                     "MSharp.CommonFilterElement<TEntity>"
                 };
+
                 var methodDefNames = new string[] { "Field", "Column", "Search" };
 
                 if (methodDefTypes.Contains(methodType) && methodDefNames.Contains(methodName))
@@ -453,6 +487,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             .Body.As<MemberAccessExpressionSyntax>()?.Name;
 
                         var lineSpan = node.GetFileLinePosSpan();
+
                         AddReport(new ChangesReport(node)
                         {
                             LineNumber = lineSpan.StartLinePosition.Line,
@@ -477,6 +512,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 if (methodType == "MSharp.ListButton<TEntity>" || methodType == "MSharp.ModuleButton")
                 {
                     SyntaxNode newNode = null;
+
                     switch (methodName)
                     {
                         case "ButtonColumn":
@@ -492,9 +528,11 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 .WithLeadingTrivia(node.GetLeadingTrivia());
                             break;
                     }
+
                     if (newNode != null)
                     {
                         var lineSpan = node.GetFileLinePosSpan();
+
                         AddReport(new ChangesReport(node)
                         {
                             LineNumber = lineSpan.StartLinePosition.Line,
@@ -502,13 +540,15 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             Message = "use new syntax of elements",
                             Generator = nameof(ElementsNewSyntaxRewriter)
                         });
+
                         return newNode;
                     }
                 }
+
                 return base.VisitInvocationExpression(node);
             }
         }
-        //cancel/save/delete
+        // cancel/save/delete
         class FormModuleWorkFlowRewriter : CleanupCSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
@@ -518,8 +558,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 var s = node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
                         .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnClick").FirstOrDefault();
+
                 if (s == null)
                     return base.VisitInvocationExpression(node);
+
                 var methodSymbol = (semanticModel.GetSymbolInfo(s).Symbol as IMethodSymbol);
 
                 if (s.DescendantNodesOfType<SimpleLambdaExpressionSyntax>().Count() == 1 &&
@@ -535,12 +577,14 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                     var lambdaExpressionArgument = s.FirstDescendantNode<SimpleLambdaExpressionSyntax>();
                     var invocations = lambdaExpressionArgument.DescendantNodesOfType<InvocationExpressionSyntax>();
+
                     if (invocations.Count() == 1 &&
                         (invocations.All(x => cancelMethods.Any(y => x.ToString().Contains(y))) ||
                      (invocations.All(x => cancelModalMethods.Any(y => x.ToString().Contains(y))))))
                     {
                         var m = node;
                         var methodSelector = invocations.Any(x => x.ToString().Contains("ReturnToPreviousPage"));
+
                         var newExpression = SyntaxFactory.InvocationExpression(
                             SyntaxFactory.MemberAccessExpression(
                                 SyntaxKind.SimpleMemberAccessExpression,
@@ -551,11 +595,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         while (m != null && m.ChildNodes().Any())
                         {
                             var m2 = m.ChildNodes();
+
                             if (m2.FirstOrDefault() is MemberAccessExpressionSyntax &&
                                 m2.LastOrDefault() is ArgumentListSyntax)
                             {
                                 var methodName = m2.FirstOrDefault().As<MemberAccessExpressionSyntax>();
                                 var arguments = m2.LastOrDefault().As<ArgumentListSyntax>();
+
                                 if (methodName.MethodNameShouldBe("Icon") && (!arguments.ArgumentsCountShouldBe(1)
                                     || !arguments.FirstArgumentShouldBe("FA.Backward")))
                                 {
@@ -582,6 +628,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                             SyntaxFactory.MemberAccessExpression(
                                                 SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
                                 }
+
                                 m = m2.FirstOrDefault().As<MemberAccessExpressionSyntax>()?.Expression
                                     .As<InvocationExpressionSyntax>();
                             }
@@ -590,17 +637,20 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             {
                                 var methodName = m2.FirstOrDefault().As<IdentifierNameSyntax>();
                                 var arguments = m2.LastOrDefault().As<ArgumentListSyntax>();
+
                                 if (methodName.ToString() == "Button" && (!arguments.ArgumentsCountShouldBe(1)
                                         || !arguments.FirstArgumentShouldBe("\"Cancel\"")))
                                 {
                                     return base.VisitInvocationExpression(node);
                                 }
+
                                 m = m2.FirstOrDefault().As<InvocationExpressionSyntax>();
                             }
                             else return node;
                         }
 
                         var lineSpan = node.GetFileLinePosSpan();
+
                         AddReport(new ChangesReport(node)
                         {
                             LineNumber = lineSpan.StartLinePosition.Line,
@@ -621,6 +671,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     {
                         var m = node;
                         var methodSelector = invocations.Any(x => x.ToString().Contains("ReturnToPreviousPage"));
+
                         var newExpression = SyntaxFactory.InvocationExpression(
                             SyntaxFactory.MemberAccessExpression(
                                 SyntaxKind.SimpleMemberAccessExpression,
@@ -631,11 +682,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         while (m != null && m.ChildNodes().Any())
                         {
                             var m2 = m.ChildNodes();
+
                             if (m2.FirstOrDefault() is MemberAccessExpressionSyntax &&
                                 m2.LastOrDefault() is ArgumentListSyntax)
                             {
                                 var methodName = m2.FirstOrDefault().As<MemberAccessExpressionSyntax>();
                                 var arguments = m2.LastOrDefault().As<ArgumentListSyntax>();
+
                                 if (methodName.MethodNameShouldBe("Icon") && (!arguments.ArgumentsCountShouldBe(1)
                                     || !arguments.FirstArgumentShouldBe("FA.Check")))
                                 {
@@ -664,6 +717,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                             SyntaxFactory.MemberAccessExpression(
                                                 SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
                                 }
+
                                 m = m2.FirstOrDefault().As<MemberAccessExpressionSyntax>()?.Expression
                                      .As<InvocationExpressionSyntax>();
                             }
@@ -672,17 +726,20 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             {
                                 var methodName = m2.FirstOrDefault().As<IdentifierNameSyntax>();
                                 var arguments = m2.LastOrDefault().As<ArgumentListSyntax>();
+
                                 if (methodName.ToString() == "Button" && (!arguments.ArgumentsCountShouldBe(1)
                                         || !arguments.FirstArgumentShouldBe("\"Save\"")))
                                 {
                                     return base.VisitInvocationExpression(node);
                                 }
+
                                 m = m2.FirstOrDefault().As<InvocationExpressionSyntax>();
                             }
                             else return node;
                         }
 
                         var lineSpan = node.GetFileLinePosSpan();
+
                         AddReport(new ChangesReport(node)
                         {
                             LineNumber = lineSpan.StartLinePosition.Line,
@@ -703,6 +760,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     {
                         var m = node;
                         var methodSelector = invocations.Any(x => x.ToString().Contains("ReturnToPreviousPage"));
+
                         var newExpression = SyntaxFactory.InvocationExpression(
                             SyntaxFactory.MemberAccessExpression(
                                 SyntaxKind.SimpleMemberAccessExpression,
@@ -713,11 +771,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         while (m != null && m.ChildNodes().Any())
                         {
                             var m2 = m.ChildNodes();
+
                             if (m2.FirstOrDefault() is MemberAccessExpressionSyntax &&
                                 m2.LastOrDefault() is ArgumentListSyntax)
                             {
                                 var methodName = m2.FirstOrDefault().As<MemberAccessExpressionSyntax>();
                                 var arguments = m2.LastOrDefault().As<ArgumentListSyntax>();
+
                                 if (methodName.MethodNameShouldBe("VisibleIf") && (!arguments.ArgumentsCountShouldBe(1)
                                     || !arguments.FirstArgumentShouldBe("CommonCriterion.IsEditMode_Item_IsNew")))
                                 {
@@ -754,6 +814,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                             SyntaxFactory.MemberAccessExpression(
                                                 SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
                                 }
+
                                 m = m2.FirstOrDefault().As<MemberAccessExpressionSyntax>()?.Expression
                                      .As<InvocationExpressionSyntax>();
                             }
@@ -762,17 +823,20 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             {
                                 var methodName = m2.FirstOrDefault().As<IdentifierNameSyntax>();
                                 var arguments = m2.LastOrDefault().As<ArgumentListSyntax>();
+
                                 if (methodName.ToString() == "Button" && (!arguments.ArgumentsCountShouldBe(1)
                                         || !arguments.FirstArgumentShouldBe("\"Delete\"")))
                                 {
                                     return base.VisitInvocationExpression(node);
                                 }
+
                                 m = m2.FirstOrDefault().As<InvocationExpressionSyntax>();
                             }
                             else return node;
                         }
 
                         var lineSpan = node.GetFileLinePosSpan();
+
                         AddReport(new ChangesReport(node)
                         {
                             LineNumber = lineSpan.StartLinePosition.Line,
@@ -785,9 +849,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             .WithLeadingTrivia(node.GetLeadingTrivia())
                             .WithTrailingTrivia(node.GetTrailingTrivia());
                     }
-
-
                 }
+
                 return base.VisitInvocationExpression(node);
             }
 
@@ -797,10 +860,11 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                    node.ClassShouldHaveGenericBase() &&
                    node.GenericClassShouldInheritFrom("FormModule"))
                     return base.VisitClassDeclaration(node);
+
                 return node;
             }
         }
-        //onlick-go -> go
+        // onlick-go -> go
         class GeneralWorkFlowRewriter : CleanupCSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
@@ -811,8 +875,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 var s = node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
                         .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnClick").FirstOrDefault();
+
                 if (s == null)
                     return base.VisitInvocationExpression(node);
+
                 var methodSymbol = (semanticModel.GetSymbolInfo(s).Symbol as IMethodSymbol);
 
                 if (s.ArgumentsCountShouldBe(1) &&
@@ -824,7 +890,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     s.FirstArgument()
                     .DescendantNodesOfType<GenericNameSyntax>().Any(x => x.Identifier.ToString() == "Go"))
                 {
-                    GenericNameSyntax goIdentifier = s.FirstArgument()
+                    var goIdentifier = s.FirstArgument()
                         .DescendantNodesOfType<GenericNameSyntax>()
                         .FirstOrDefault(x => x.Identifier.ToString() == "Go");
 
@@ -842,6 +908,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                     return nde2.FirstDescendantNode<IdentifierNameSyntax>();
                                 else return SyntaxFactory.ParseExpression("");
                             }
+
                             return nde2;
                         });
 
@@ -852,6 +919,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     var argument = newNode.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
                         .FirstOrDefault(x => x.MethodNameShouldBe("Go"))
                         .FirstArgument().Expression.As<SimpleLambdaExpressionSyntax>();
+
                     if (argument != null && argument.Body.IsKind(SyntaxKind.IdentifierName))
                     {
                         newNode = newNode.ReplaceNode(newNode.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
@@ -859,6 +927,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     }
 
                     var lineSpan = node.GetFileLinePosSpan();
+
                     AddReport(new ChangesReport(node)
                     {
                         LineNumber = lineSpan.StartLinePosition.Line,
@@ -869,6 +938,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                     return newNode;
                 }
+
                 return base.VisitInvocationExpression(node);
             }
         }
@@ -884,8 +954,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             x.FirstAncestorOrSelf<ArgumentSyntax>() == null) ||
                         (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "OnClick" ||
                         (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "Link").FirstOrDefault();
+
                 if (s == null)
                     return base.VisitInvocationExpression(node);
+
                 var editRequiredArguments = new string[] { "SendItemId", "SendReturnUrl" };
                 var newRequiredArguments = new string[] { "SendReturnUrl" };
                 var methodSymbol = (semanticModel.GetSymbolInfo(s).Symbol as IMethodSymbol);
@@ -906,6 +978,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                        x.FirstArgumentShouldBe("\"Edit\"")).Count() == 1)
                 {
                     var m = node;
+
                     var newExpression = SyntaxFactory.InvocationExpression(
                             SyntaxFactory.MemberAccessExpression(
                                 SyntaxKind.SimpleMemberAccessExpression,
@@ -913,14 +986,17 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 SyntaxFactory.GenericName(SyntaxFactory.Identifier("Edit"),
                                 s.Expression.As<MemberAccessExpressionSyntax>()?.Name.As<GenericNameSyntax>()?.TypeArgumentList)),
                             SyntaxFactory.ArgumentList());
+
                     while (m != null && m.ChildNodes().Any())
                     {
                         var m2 = m.ChildNodes();
+
                         if (m2.FirstOrDefault() is MemberAccessExpressionSyntax &&
                             m2.LastOrDefault() is ArgumentListSyntax)
                         {
                             var methodName = m2.FirstOrDefault().As<MemberAccessExpressionSyntax>();
                             var arguments = m2.LastOrDefault().As<ArgumentListSyntax>();
+
                             if (methodName.MethodNameShouldBe("Go") && ((!arguments.ArgumentsCountShouldBe(1)) ||
                                    !(editRequiredArguments.All(x => arguments.FirstArgument()
                                    .Expression.DescendantNodesOfType<InvocationExpressionSyntax>()
@@ -971,6 +1047,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                         SyntaxFactory.MemberAccessExpression(
                                             SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
                             }
+
                             m = m2.FirstOrDefault().As<MemberAccessExpressionSyntax>()?.Expression
                                 .As<InvocationExpressionSyntax>();
                         }
@@ -978,6 +1055,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     }
 
                     var lineSpan = node.GetFileLinePosSpan();
+
                     AddReport(new ChangesReport(node)
                     {
                         LineNumber = lineSpan.StartLinePosition.Line,
@@ -1006,6 +1084,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                        x.FirstArgumentShouldBe("\"New\"")).Count() == 1)
                 {
                     var m = node;
+
                     var newExpression = SyntaxFactory.InvocationExpression(
                             SyntaxFactory.MemberAccessExpression(
                                 SyntaxKind.SimpleMemberAccessExpression,
@@ -1013,14 +1092,17 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 SyntaxFactory.GenericName(SyntaxFactory.Identifier("New"),
                                 s.Expression.As<MemberAccessExpressionSyntax>()?.Name.As<GenericNameSyntax>()?.TypeArgumentList)),
                             SyntaxFactory.ArgumentList());
+
                     while (m != null && m.ChildNodes().Any())
                     {
                         var m2 = m.ChildNodes();
+
                         if (m2.FirstOrDefault() is MemberAccessExpressionSyntax &&
                             m2.LastOrDefault() is ArgumentListSyntax)
                         {
                             var methodName = m2.FirstOrDefault().As<MemberAccessExpressionSyntax>();
                             var arguments = m2.LastOrDefault().As<ArgumentListSyntax>();
+
                             if (methodName.Name.Identifier.ToString() == "Go" && ((!arguments.ArgumentsCountShouldBe(1)) ||
                                    !(newRequiredArguments.All(x => arguments.FirstArgument()
                                    .Expression.DescendantNodesOfType<InvocationExpressionSyntax>()
@@ -1041,6 +1123,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                         SyntaxFactory.MemberAccessExpression(
                                             SyntaxKind.SimpleMemberAccessExpression, newExpression, methodName.Name), arguments);
                             }
+
                             m = m2.FirstOrDefault().As<MemberAccessExpressionSyntax>()?.Expression
                                 .As<InvocationExpressionSyntax>();
                         }
@@ -1049,18 +1132,20 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         {
                             var methodName = m2.FirstOrDefault().As<IdentifierNameSyntax>();
                             var arguments = m2.LastOrDefault().As<ArgumentListSyntax>();
+
                             if (methodName.ToString() == "Button" && (!arguments.ArgumentsCountShouldBe(1)
                                     || !arguments.FirstArgumentShouldBe("\"New\"")))
                             {
                                 return base.VisitInvocationExpression(node);
                             }
+
                             m = m2.FirstOrDefault().As<InvocationExpressionSyntax>();
                         }
                         else return node;
                     }
 
-
                     var lineSpan = node.GetFileLinePosSpan();
+
                     AddReport(new ChangesReport(node)
                     {
                         LineNumber = lineSpan.StartLinePosition.Line,
@@ -1084,10 +1169,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         x.ArgumentsCountShouldBe(1) &&
                         x.FirstArgumentShouldBe("\"Export\"")).Count() == 1)
                 {
-                    InvocationExpressionSyntax exportInvocation = s.DescendantNodesOfType<InvocationExpressionSyntax>()
+                    var exportInvocation = s.DescendantNodesOfType<InvocationExpressionSyntax>()
                         .FirstOrDefault(x => x.Expression is MemberAccessExpressionSyntax &&
                             x.MethodNameShouldBe("Export"));
+
                     var neededArguments = exportInvocation.ArgumentList;
+
                     var newNode = node.ReplaceNodes(s.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>(),
                         (nde1, nde2) =>
                         {
@@ -1115,8 +1202,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             return nde2;
                         });
 
-
                     var lineSpan = node.GetFileLinePosSpan();
+
                     AddReport(new ChangesReport(node)
                     {
                         LineNumber = lineSpan.StartLinePosition.Line,
@@ -1143,10 +1230,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         x.ArgumentsCountShouldBe(1) &&
                         x.FirstArgumentShouldBe("FA.Search")).Count() == 1)
                 {
-                    InvocationExpressionSyntax iconInvocation = s.DescendantNodesOfType<InvocationExpressionSyntax>()
+                    var iconInvocation = s.DescendantNodesOfType<InvocationExpressionSyntax>()
                             .FirstOrDefault(x => x.Expression is MemberAccessExpressionSyntax &&
                             x.MethodNameShouldBe("Icon"));
+
                     var neededArguments = iconInvocation != null ? iconInvocation.ArgumentList : null;
+
                     var newNode = node.ReplaceNodes(s.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>(),
                         (nde1, nde2) =>
                         {
@@ -1184,6 +1273,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             {
                                 SeparatedSyntaxList<ArgumentSyntax> args = new SeparatedSyntaxList<ArgumentSyntax>();
                                 args = args.AddRange(neededArguments.Arguments.Where(x => x.Expression.ToString() != "FA.Search"));
+
                                 return SyntaxFactory.InvocationExpression(SyntaxFactory.MemberAccessExpression(
                                     SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.ParseExpression("search"),
                                     SyntaxFactory.IdentifierName("Icon")), SyntaxFactory.ArgumentList(args))
@@ -1194,8 +1284,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             return nde2;
                         });
 
-
                     var lineSpan = node.GetFileLinePosSpan();
+
                     AddReport(new ChangesReport(node)
                     {
                         LineNumber = lineSpan.StartLinePosition.Line,
@@ -1228,7 +1318,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         .Contains("item." + headerTextMethod.ArgumentList.Arguments.FirstOrDefault()
                         .ToString().Trim('"')))
                     {
-                        SeparatedSyntaxList<ArgumentSyntax> args = new SeparatedSyntaxList<ArgumentSyntax>();
+                        var args = new SeparatedSyntaxList<ArgumentSyntax>();
+
                         args = args.Add(SyntaxFactory.Argument(
                                 SyntaxFactory.SimpleLambdaExpression(SyntaxFactory.Parameter(
                                     SyntaxFactory.ParseToken("x")), null,
@@ -1236,6 +1327,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                                 (SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.ParseExpression("x"),
                                                 SyntaxFactory.IdentifierName(headerTextMethod.ArgumentList.Arguments.FirstOrDefault()
                                     .ToString().Trim('"'))))));
+
                         var newNode = node.ReplaceNodes(node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>(),
                        (nde1, nde2) =>
                        {
@@ -1264,8 +1356,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                            return nde2;
                        });
 
-
                         var lineSpan = node.GetFileLinePosSpan();
+
                         AddReport(new ChangesReport(node)
                         {
                             LineNumber = lineSpan.StartLinePosition.Line,
@@ -1273,17 +1365,21 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             Message = "use column.Link method instead",
                             Generator = nameof(ListModuleWorkFlowRewriter)
                         });
+
                         return newNode;
                     }
                 }
+
                 return base.VisitInvocationExpression(node);
             }
+
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
                 if (node.ClassShouldHaveBase() &&
                    node.ClassShouldHaveGenericBase() &&
                    node.GenericClassShouldInheritFrom("ListModule"))
                     return base.VisitClassDeclaration(node);
+
                 return node;
             }
         }
@@ -1308,6 +1404,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 var declarationSymbol = semanticModel.GetSymbolInfo(node.Type).Symbol;
                 var identifierName = semanticModel.GetDeclaredSymbol(node.Variables.FirstOrDefault());
+
                 if (declarationSymbol?.Name == "ModuleButton" && node.Variables.Count() == 1)
                 {
                     if (node.Variables.FirstOrDefault().Initializer.Value is InvocationExpressionSyntax &&
@@ -1319,25 +1416,29 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                         IEnumerable<ReferencedSymbol> result = null;
 
-                        Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async delegate
+                        Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory
+                            .Run(async delegate
                         {
                             result = await GetReferencedSymbolsAsync(identifierName);
                         });
 
                         if (result.Count() == 1 && invocation.ArgumentsCountShouldBe(0))
                         {
-                            SyntaxNode nextNode = node.SyntaxTree.GetRoot().FindNode(result.FirstOrDefault().Locations
+                            var nextNode = node.SyntaxTree.GetRoot().FindNode(result.FirstOrDefault().Locations
                                 .FirstOrDefault().Location.SourceSpan);
+
                             if (nextNode.Ancestors().OfType<InvocationExpressionSyntax>().Any())
                             {
                                 var isNextInvocOk = CheckNextInvocationExpression(nextNode.Ancestors()
                                     .OfType<InvocationExpressionSyntax>().FirstOrDefault(),
                                     identifierName.ToString());
+
                                 if (isNextInvocOk)
                                 {
                                     shouldConvertToFullSearch = true;
 
                                     var lineSpan = node.GetFileLinePosSpan();
+
                                     AddReport(new ChangesReport(node)
                                     {
                                         LineNumber = lineSpan.StartLinePosition.Line,
@@ -1359,6 +1460,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         }
                     }
                 }
+
                 return base.VisitVariableDeclaration(node);
             }
 
@@ -1367,11 +1469,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 if (node.Declaration is VariableDeclarationSyntax)
                 {
                     var t = VisitVariableDeclaration(node.Declaration);
+
                     if (t.IsKind(SyntaxKind.InvocationExpression))
                         return SyntaxFactory.ExpressionStatement(t.As<InvocationExpressionSyntax>())
                             .WithTrailingTrivia(node.GetTrailingTrivia())
                             .WithLeadingTrivia(node.GetLeadingTrivia());
                 }
+
                 return base.VisitLocalDeclarationStatement(node);
             }
 
@@ -1379,16 +1483,19 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 return base.VisitVariableDeclarator(node);
             }
+
             public bool CheckNextInvocationExpression(InvocationExpressionSyntax node
                 , string identifierString)
             {
                 var s = node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
                         .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "AfterControlAddon").FirstOrDefault();
+
                 while (s.Expression != null)
                 {
                     if (s.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression))
                     {
                         var memberExpression = s.Expression.As<MemberAccessExpressionSyntax>();
+
                         if (memberExpression.MethodNameShouldBe("AfterControlAddon") &&
                             s.ArgumentsCountShouldBe(1) &&
                             s.FirstArgumentShouldBe($"{identifierString}.Ref"))
@@ -1400,6 +1507,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     else if (s.Expression.IsKind(SyntaxKind.IdentifierName))
                     {
                         var identifierExpression = s.Expression.As<IdentifierNameSyntax>();
+
                         if (identifierExpression.Identifier.ToString() == "Search" &&
                             s.ArgumentsCountShouldBe(1) &&
                             s.FirstArgumentShouldBe("GeneralSearch.AllFields"))
@@ -1407,43 +1515,48 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             return true;
                         }
                     }
+
                     return false;
                 }
+
                 return false;
             }
+
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
                 if (node.ClassShouldHaveBase() &&
                    node.ClassShouldHaveGenericBase() &&
                    node.GenericClassShouldInheritFrom("ListModule"))
                     return base.VisitClassDeclaration(node);
+
                 return node;
             }
 
-            public async Task<IEnumerable<ReferencedSymbol>> GetReferencedSymbolsAsync(ISymbol symbol)
+            public Task<IEnumerable<ReferencedSymbol>> GetReferencedSymbolsAsync(ISymbol symbol)
             {
-                return await SymbolFinder.FindReferencesAsync(symbol,
+                return SymbolFinder.FindReferencesAsync(symbol,
                     solution, documents:
-                    ImmutableHashSet.Create(this.roslynDocument));
+                    ImmutableHashSet.Create(roslynDocument));
             }
 
             public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
             {
                 var s = node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
                         .Where(x => (semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol)?.Name == "AfterControlAddon").FirstOrDefault();
+
                 if (s != null && shouldConvertToFullSearch)
                 {
                     shouldConvertToFullSearch = false;
                     return SyntaxFactory.ParseExpression("");
                 }
+
                 return base.VisitInvocationExpression(node);
             }
 
             public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
             {
                 var result = base.VisitExpressionStatement(node);
-                if (result.ToString() == ";")
-                    return null;
+                if (result.ToString() == ";") return null;
                 return result;
             }
         }
@@ -1467,6 +1580,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             if (nde1.ToString() == "CustomField()")
                             {
                                 SeparatedSyntaxList<ArgumentSyntax> args = new SeparatedSyntaxList<ArgumentSyntax>();
+
                                 var argsLabel =
                                 node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
                                     .Any(x =>
@@ -1476,6 +1590,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
                                     .Where(x => x.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
                                     x.MethodNameShouldBe("Label")).FirstOrDefault().ArgumentList : null;
+
                                 var argsControlType =
                                 node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
                                     .Any(x =>
@@ -1487,6 +1602,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                     x.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
                                      x.MethodNameShouldBe("Control")).FirstOrDefault().ArgumentList
                                     : null;
+
                                 var argsPropertyType =
                                      node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
                                      .Any(x =>
@@ -1567,8 +1683,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             return nde2;
                         });
 
-
                     var lineSpan = node.GetFileLinePosSpan();
+
                     AddReport(new ChangesReport(node)
                     {
                         LineNumber = lineSpan.StartLinePosition.Line,
@@ -1579,18 +1695,21 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                     return newNode;
                 }
+
                 return base.VisitInvocationExpression(node);
             }
+
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
                 if (node.ClassShouldHaveBase() &&
                    node.ClassShouldHaveGenericBase() &&
                    node.GenericClassShouldInheritFrom("FormModule"))
                     return base.VisitClassDeclaration(node);
+
                 return node;
             }
         }
-        //onclick,go method should be last invocation
+        // onclick,go method should be last invocation
         class OnClickGoWorkFlowRewriter : CleanupCSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
@@ -1601,8 +1720,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 var listInvocations = new string[] { "OnClick" };
                 var listInvocationsWithGo = new string[] { "OnClick", "Go" };
-                if (node == null)
-                    return node;
+                if (node == null) return node;
+
                 var invocation = node.DescendantNodesOfType<InvocationExpressionSyntax>()
                     .Where(x =>
                         //x.Expression.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
@@ -1634,10 +1753,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 invocation.GetRightSideNameSyntax().WithoutTrailingTrivia()),
                                 invocation.ArgumentList.WithoutTrailingTrivia());
                             }
+
                             return nde2;
                         });
 
                     var lineSpan = node.GetFileLinePosSpan();
+
                     AddReport(new ChangesReport(node)
                     {
                         LineNumber = lineSpan.StartLinePosition.Line,
@@ -1648,6 +1769,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                     return newNode;
                 }
+
                 return base.VisitInvocationExpression(node);
             }
         }
@@ -1661,19 +1783,23 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                    node.ClassShouldHaveGenericBase() &&
                    node.GenericClassShouldInheritFrom("ListModule"))
                     return base.VisitClassDeclaration(node);
+
                 return node;
             }
+
             public MergedUpRewriter(SemanticModel semanticModel, bool isReportOnlyMode, ICleanupOption options) :
                 base(isReportOnlyMode, options) => this.semanticModel = semanticModel;
             public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
             {
                 var listInvocations = new string[] { "NeedsMerging", "SeperatorTemplate" };
+
                 if (node == null)
                     return base.VisitInvocationExpression(node);
 
                 var hasBothIdentification =
                     listInvocations.All(a => node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
                     .Select(x => x.GetRightSideNameSyntax()?.Identifier.Text).Contains(a));
+
                 if (hasBothIdentification &&
                     node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()
                     .Any(x => x.MethodNameShouldBe("NeedsMerging") &&
@@ -1689,11 +1815,14 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         {
                             return invoc2.GetLeftSideExpression();
                         }
+
                         return invoc2;
                     });
+
                     if (IsReportOnlyMode)
                     {
                         var lineSpan = node.GetFileLinePosSpan();
+
                         AddReport(new ChangesReport(node)
                         {
                             LineNumber = lineSpan.StartLinePosition.Line,
@@ -1702,12 +1831,14 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             Generator = nameof(MergedUpRewriter)
                         });
                     }
+
                     return
                         SyntaxFactory.InvocationExpression(
                             SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
                             newNode, SyntaxFactory.IdentifierName("MergeUp")),
                             node.GetArgumentsOfMethod("SeperatorTemplate"));
                 }
+
                 return base.VisitInvocationExpression(node);
             }
         }

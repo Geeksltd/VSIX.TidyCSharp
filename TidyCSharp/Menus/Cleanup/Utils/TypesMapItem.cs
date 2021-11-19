@@ -64,7 +64,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             return SyntaxFactory.PredefinedType(SyntaxFactory.Token(keyword));
         }
 
-        static Dictionary<string, TypesMapItem> BuiltInTypesDic;
+        static Dictionary<string, TypesMapItem> BuiltInTypesDic, _predefinedTypesDic;
         public static Dictionary<string, TypesMapItem> GetBuiltInTypesDic()
         {
             if (BuiltInTypesDic != null) return BuiltInTypesDic;
@@ -102,7 +102,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             }
         }
 
-        static Dictionary<string, TypesMapItem> _predefinedTypesDic;
         internal static Dictionary<string, TypesMapItem> GetAllPredefinedTypesDic()
         {
             if (_predefinedTypesDic != null) return _predefinedTypesDic;
@@ -112,6 +111,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             using (var provider = new CSharpCodeProvider())
             {
                 var oldValues = output.Values.GroupBy(x => x.BuiltInName).ToList();
+
                 foreach (var item0 in oldValues)
                 {
                     var item = item0.FirstOrDefault();

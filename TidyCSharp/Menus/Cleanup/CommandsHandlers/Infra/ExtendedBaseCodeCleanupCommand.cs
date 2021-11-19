@@ -41,6 +41,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                         //ActionTypes = new[] { CleanerType }
                     }
                 );
+
                 TidyCSharpPackage.Instance.SaveSolutionChanges();
             }
             else return;

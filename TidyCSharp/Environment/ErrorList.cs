@@ -1,15 +1,14 @@
 using Microsoft.VisualStudio.Shell;
-using System.Collections.Generic;
 
 namespace Geeks.GeeksProductivityTools
 {
     public static class ErrorList
     {
         static ErrorListProvider _errorListProvider;
-        //static Dictionary<string, Microsoft.VisualStudio.Shell.Task> ListOfErrors = new Dictionary<string, Microsoft.VisualStudio.Shell.Task>();
+        // static Dictionary<string, Microsoft.VisualStudio.Shell.Task> ListOfErrors = new Dictionary<string, Microsoft.VisualStudio.Shell.Task>();
 
-        //public static void AddOrOverrideError(string key, Microsoft.VisualStudio.Shell.Task task)
-        //{
+        // public static void AddOrOverrideError(string key, Microsoft.VisualStudio.Shell.Task task)
+        // {
         //    if (ListOfErrors.ContainsKey(key))
         //    {
         //        ListOfErrors[key] = task;
@@ -23,10 +22,10 @@ namespace Geeks.GeeksProductivityTools
         //    {
         //        WriteVisualStudioErrorList(task as ErrorTask);
         //    }
-        //}
+        // }
 
-        //public static void RemoveError(string key)
-        //{
+        // public static void RemoveError(string key)
+        // {
         //    if (string.IsNullOrEmpty(key))
         //        return;
 
@@ -43,13 +42,13 @@ namespace Geeks.GeeksProductivityTools
 
         //        ListOfErrors.Remove(key);
         //    }
-        //}
+        // }
 
         /// <summary>
         /// Write an entry to the Visual Studio Error List.
         /// </summary>
-        //static void WriteVisualStudioErrorList(ErrorTask errorTask)
-        //{
+        // static void WriteVisualStudioErrorList(ErrorTask errorTask)
+        // {
         //    if (_errorListProvider == null)
         //    {
         //        _errorListProvider = new ErrorListProvider(TidyCSharpPackage.Instance);
@@ -75,6 +74,6 @@ namespace Geeks.GeeksProductivityTools
         //        // Add error to task list
         //        _errorListProvider.Tasks.Add(errorTask);
         //    }
-        //}
+        // }
     }
 }

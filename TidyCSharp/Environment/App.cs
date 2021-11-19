@@ -1,9 +1,8 @@
-using EnvDTE80;
 using EnvDTE;
+using EnvDTE80;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
-using System.IO;
-using Microsoft.VisualStudio.Shell;
 
 namespace Geeks.GeeksProductivityTools
 {
@@ -16,8 +15,8 @@ namespace Geeks.GeeksProductivityTools
 
         public static void Initialize(OptionsPage optionsPage)
         {
-
-            ThreadHelper.JoinableTaskFactory.Run(async delegate
+            ThreadHelper.JoinableTaskFactory
+                .Run(async delegate
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             });

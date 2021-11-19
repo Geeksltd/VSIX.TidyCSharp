@@ -6,6 +6,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using System.Reflection;
+
     internal struct LocalFunctionStatementSyntaxWrapper : ISyntaxWrapper<StatementSyntax>
     {
         const string LocalFunctionStatementSyntaxTypeName = "Microsoft.CodeAnalysis.CSharp.Syntax.LocalFunctionStatementSyntax";

@@ -20,7 +20,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
         {
             InitializeComponent();
             mainPanel.Padding = new Padding(5, 5, 5, 0);
-            this.MaximumSize = new Size(1000, Screen.PrimaryScreen.WorkingArea.Height);
+            MaximumSize = new Size(1000, Screen.PrimaryScreen.WorkingArea.Height);
             base.ShowInTaskbar = false;
             base.WindowState = FormWindowState.Normal;
             StartPosition = FormStartPosition.CenterScreen;
@@ -33,9 +33,11 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
         void CreateControls()
         {
             CleanupItemUserControl.CreateControls(typeof(CodeCleanerType), cleanupTypeItem => CreateCleanupTypeItemControl(cleanupTypeItem), true);
+
             foreach (var itemControl in AllControls.OrderByDescending(x => x.Height))
             {
                 itemControl.TabIndex = TAB_INDEX_START++;
+
                 if (rightTableLayoutPanel.Height + itemControl.Height >= leftTableLayoutPanel.Height)
                 {
                     leftTableLayoutPanel.Controls.Add(itemControl);
@@ -60,18 +62,18 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             newControl.Init((CodeCleanerType)cleanupTypeItem.CleanerType);
             AllControls.Add(newControl);
 
-            //if ((leftTableLayoutPanel.Height <= rightTableLayoutPanel.Height) &&
+            // if ((leftTableLayoutPanel.Height <= rightTableLayoutPanel.Height) &&
             //    (leftTableLayoutPanel.Height + newControl.Height <= mainPanel.Height ||
             //    rightTableLayoutPanel.Height >= mainPanel.Height))
-            //{
+            // {
             //    leftTableLayoutPanel.Controls.Add(newControl);
-            //}
-            //else
-            //{
+            // }
+            // else
+            // {
             //    rightTableLayoutPanel.Controls.Add(newControl);
-            //}
+            // }
 
-            //mainPanel.Controls.Add(newControl);
+            // mainPanel.Controls.Add(newControl);
             // this.Height += newSubControl.Height;
         }
 
@@ -128,6 +130,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
                 CleanupOptions.Accept(item);
 
             Settings.Default.CleanupChoices = CleanupOptions.SerializeValues();
+
             if (string.IsNullOrEmpty(Settings.Default.CleanupChoices))
             {
                 Settings.Default.CleanupChoices = "null";
@@ -142,6 +145,5 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
             DialogResult = DialogResult.OK;
             Close();
         }
-
     }
 }

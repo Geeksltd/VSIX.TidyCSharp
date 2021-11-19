@@ -1,11 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Text;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors
 {
@@ -36,9 +33,6 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.SyntaxNodeExtractors
             return Path.GetFileName(node.SyntaxTree.FilePath);
         }
 
-        public static string GetFilePath(this SyntaxNode node)
-        {
-            return node.SyntaxTree.FilePath;
-        }
+        public static string GetFilePath(this SyntaxNode node) => node.SyntaxTree.FilePath;
     }
 }

@@ -1,5 +1,5 @@
-using System;
 using EnvDTE;
+using System;
 
 namespace Geeks.GeeksProductivityTools.Extensions
 {

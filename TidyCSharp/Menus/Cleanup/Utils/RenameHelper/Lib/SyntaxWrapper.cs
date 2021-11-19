@@ -7,6 +7,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+
     internal abstract class SyntaxWrapper<TNode>
     {
         public static SyntaxWrapper<TNode> Default { get; } = FindDefaultSyntaxWrapper();
@@ -43,8 +44,10 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 
                 var explicitOperator = typeof(TNode).GetTypeInfo().GetDeclaredMethods("op_Explicit")
                     .Single(m => m.ReturnType == typeof(TNode) && m.GetParameters()[0].ParameterType == typeof(SyntaxNode));
+
                 var syntaxParameter = Expression.Parameter(typeof(SyntaxNode), "syntax");
-                Expression<Func<SyntaxNode, TNode>> wrapAccessorExpression =
+
+                var wrapAccessorExpression =
                     Expression.Lambda<Func<SyntaxNode, TNode>>(
                         Expression.Call(explicitOperator, syntaxParameter),
                         syntaxParameter);

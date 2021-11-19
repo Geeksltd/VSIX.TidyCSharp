@@ -44,6 +44,7 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
 
                 for (int i = 0; i < customCheckListBox1.Controls.Count; i++)
                     Height += customCheckListBox1.Controls[i].Height;
+
                 return;
             }
 
@@ -127,13 +128,13 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
         {
             foreach (var item in Enum.GetValues(subItemType))
                 yield return ExtractCleannerItemAttribute(subItemType, item);
-
         }
 
         static KeyValuePair<int, CleanupItemAttribute> ExtractCleannerItemAttribute(Type subItemType, object item)
         {
             var memInfo = subItemType.GetMember(item.ToString());
             var attributes = memInfo[0].GetCustomAttributes(typeof(CleanupItemAttribute), false);
+
             return new KeyValuePair<int, CleanupItemAttribute>((int)item,
                 (CleanupItemAttribute)attributes.FirstOrDefault()
                 ??

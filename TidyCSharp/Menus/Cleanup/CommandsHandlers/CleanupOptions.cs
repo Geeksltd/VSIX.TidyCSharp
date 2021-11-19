@@ -9,8 +9,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers
     {
         List<ICleanupOption> optionItems = new List<ICleanupOption>();
 
-        public const string TO_STRING_SEPRATOR2 = ":";
-        public const string TO_STRING_SEPRATOR = ";";
+        public const string TO_STRING_SEPRATOR2 = ":", TO_STRING_SEPRATOR = ";";
         public List<CodeCleanerType> ActionTypes { get; private set; } = new List<CodeCleanerType>();
 
         public CleanupOptions()
@@ -29,7 +28,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers
         {
             foreach (var item in optionItems)
                 item.Accept(mainCleanup);
-
 
             if (mainCleanup.IsMainObjectSelected)
             {

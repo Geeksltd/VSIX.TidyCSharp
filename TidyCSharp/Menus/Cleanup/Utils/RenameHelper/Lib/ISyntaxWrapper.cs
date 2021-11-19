@@ -1,6 +1,7 @@
 ﻿namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
 {
     using Microsoft.CodeAnalysis;
+
     internal interface ISyntaxWrapper<T>
     where T : SyntaxNode
     {

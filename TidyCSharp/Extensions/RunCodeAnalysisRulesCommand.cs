@@ -1,25 +1,21 @@
 ﻿using EnvDTE;
 using EnvDTE80;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
-using VSOLEInterop = Microsoft.VisualStudio.OLE.Interop;
 
 namespace Geeks.VSIX.TidyCSharp.Extensions
 {
     public class RunCodeAnalysisRulesCommand
     {
-        private bool _overallBuildSuccess;
-        private bool _customBuildInProgress;
+        bool _overallBuildSuccess, _customBuildInProgress;
 
-        private void CustomBuild_MenuItemCallback(object sender, EventArgs e)
+        void CustomBuild_MenuItemCallback(object sender, EventArgs e)
         {
             // Listen to the necessary build events.
-            DTE2 dte = (DTE2)Package.GetGlobalService(typeof(SDTE));
+            var dte = (DTE2)Package.GetGlobalService(typeof(SDTE));
             dte.Events.BuildEvents.OnBuildDone += BuildEvents_OnBuildDone;
             dte.Events.BuildEvents.OnBuildProjConfigDone += BuildEvents_OnBuildProjConfigDone;
 
@@ -36,7 +32,7 @@ namespace Geeks.VSIX.TidyCSharp.Extensions
             }
         }
 
-        private void BuildEvents_OnBuildProjConfigDone(string project, string projectConfig, string platform, string solutionConfig, bool success)
+        void BuildEvents_OnBuildProjConfigDone(string project, string projectConfig, string platform, string solutionConfig, bool success)
         {
             // Ignore this build event if we didn't start it.
             if (!_customBuildInProgress)
@@ -48,7 +44,7 @@ namespace Geeks.VSIX.TidyCSharp.Extensions
             _overallBuildSuccess = success;
         }
 
-        private void BuildEvents_OnBuildDone(EnvDTE.vsBuildScope scope, EnvDTE.vsBuildAction action)
+        void BuildEvents_OnBuildDone(EnvDTE.vsBuildScope scope, EnvDTE.vsBuildAction action)
         {
             // Ignore this build event if we didn't start it.
             if (!_customBuildInProgress)
@@ -61,7 +57,7 @@ namespace Geeks.VSIX.TidyCSharp.Extensions
             if (_overallBuildSuccess)
             {
                 // Launch the debugger.
-                DTE2 dte = (DTE2)Package.GetGlobalService(typeof(SDTE));
+                var dte = (DTE2)Package.GetGlobalService(typeof(SDTE));
                 dte.ExecuteCommand("Debug.Start");
             }
             else
@@ -70,14 +66,14 @@ namespace Geeks.VSIX.TidyCSharp.Extensions
             }
         }
 
-        private void WriteToOutputWindow(string paneName, string message)
+        void WriteToOutputWindow(string paneName, string message)
         {
-            DTE2 dte = (DTE2)Package.GetGlobalService(typeof(SDTE));
+            var dte = (DTE2)Package.GetGlobalService(typeof(SDTE));
 
-            Window window = dte.Windows.Item(EnvDTE.Constants.vsWindowKindOutput);
-            OutputWindow outputWindow = (OutputWindow)window.Object;
+            var window = dte.Windows.Item(EnvDTE.Constants.vsWindowKindOutput);
+            var outputWindow = (OutputWindow)window.Object;
 
-            OutputWindowPane targetPane = outputWindow.OutputWindowPanes.Cast<OutputWindowPane>()
+            var targetPane = outputWindow.OutputWindowPanes.Cast<OutputWindowPane>()
                 .FirstOrDefault(x => x.Name.Equals(paneName, StringComparison.OrdinalIgnoreCase));
 
             if (targetPane == null)

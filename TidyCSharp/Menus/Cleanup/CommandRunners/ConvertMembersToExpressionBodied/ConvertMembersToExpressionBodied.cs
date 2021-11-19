@@ -12,274 +12,285 @@ using System.Threading.Tasks;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
-	public class ConvertMembersToExpressionBodied : CodeCleanerCommandRunnerBase, ICodeCleaner
-	{
-		public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
-		{
-			return ConvertMembersToExpressionBodiedHelper(initialSourceNode, Options);
-		}
+    public class ConvertMembersToExpressionBodied : CodeCleanerCommandRunnerBase, ICodeCleaner
+    {
+        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        {
+            return ConvertMembersToExpressionBodiedHelper(initialSourceNode, Options);
+        }
 
-		class Rewriter : CleanupCSharpSyntaxRewriter
-		{
-			public Rewriter(bool isReportOnlyMode, ICleanupOption options) :
-				base(isReportOnlyMode, options)
-			{ }
-			public override SyntaxNode Visit(SyntaxNode node)
-			{
-				if (node == null) return base.Visit(node);
+        class Rewriter : CleanupCSharpSyntaxRewriter
+        {
+            public Rewriter(bool isReportOnlyMode, ICleanupOption options) :
+                base(isReportOnlyMode, options)
+            { }
+            public override SyntaxNode Visit(SyntaxNode node)
+            {
+                if (node == null) return base.Visit(node);
 
-				string Message = "";
-				if (node is MethodDeclarationSyntax && node.Parent is ClassDeclarationSyntax)
-				{
-					if (CheckOption((int)CleanupTypes.Convert_Methods))
-					{
-						node = ConvertToExpressionBodiedHelper(node as MethodDeclarationSyntax);
-						Message = "Method Declaration should be Converted to expression bodied";
-					}
-				}
-				else if (node is PropertyDeclarationSyntax)
-				{
-					if (CheckOption((int)CleanupTypes.Convert_ReadOnly_Property))
-					{
-						node = ConvertToExpressionBodiedHelper(node as PropertyDeclarationSyntax);
-						Message = "Property Declaration should be Converted to expression bodied";
-					}
-				}
-				else if (node is ConstructorDeclarationSyntax)
-				{
-					if (CheckOption((int)CleanupTypes.Convert_Constructors))
-					{
-						node = ConvertToExpressionBodiedHelper(node as ConstructorDeclarationSyntax);
-						Message = "Constructor should be Converted to expression bodied";
-					}
-				}
+                var Message = "";
 
-				if (!string.IsNullOrEmpty(Message))
-				{
-					var lineSpan = node.GetFileLinePosSpan();
-					AddReport(new ChangesReport(node)
-					{
-						LineNumber = lineSpan.StartLinePosition.Line,
-						Column = lineSpan.StartLinePosition.Character,
-						Message = Message,
-						Generator = nameof(ConvertMembersToExpressionBodied)
-					});
-				}
-				return base.Visit(node);
-			}
-		}
+                if (node is MethodDeclarationSyntax && node.Parent is ClassDeclarationSyntax)
+                {
+                    if (CheckOption((int)CleanupTypes.Convert_Methods))
+                    {
+                        node = ConvertToExpressionBodiedHelper(node as MethodDeclarationSyntax);
+                        Message = "Method Declaration should be Converted to expression bodied";
+                    }
+                }
+                else if (node is PropertyDeclarationSyntax)
+                {
+                    if (CheckOption((int)CleanupTypes.Convert_ReadOnly_Property))
+                    {
+                        node = ConvertToExpressionBodiedHelper(node as PropertyDeclarationSyntax);
+                        Message = "Property Declaration should be Converted to expression bodied";
+                    }
+                }
+                else if (node is ConstructorDeclarationSyntax)
+                {
+                    if (CheckOption((int)CleanupTypes.Convert_Constructors))
+                    {
+                        node = ConvertToExpressionBodiedHelper(node as ConstructorDeclarationSyntax);
+                        Message = "Constructor should be Converted to expression bodied";
+                    }
+                }
 
-		static SyntaxTrivia[] _spaceTrivia = { SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, " ") };
-		public SyntaxNode ConvertMembersToExpressionBodiedHelper(SyntaxNode initialSourceNode, ICleanupOption Options)
-		{
-			var rewriter = new Rewriter(IsReportOnlyMode, Options);
-			var modifiedSourceNode = rewriter.Visit(initialSourceNode);
+                if (!string.IsNullOrEmpty(Message))
+                {
+                    var lineSpan = node.GetFileLinePosSpan();
 
-			if (IsReportOnlyMode)
-			{
-				this.CollectMessages(rewriter.GetReport());
-				return initialSourceNode;
-			}
-			return modifiedSourceNode;
-		}
+                    AddReport(new ChangesReport(node)
+                    {
+                        LineNumber = lineSpan.StartLinePosition.Line,
+                        Column = lineSpan.StartLinePosition.Character,
+                        Message = Message,
+                        Generator = nameof(ConvertMembersToExpressionBodied)
+                    });
+                }
 
-		public static MethodDeclarationSyntax ConvertToExpressionBodiedHelper(MethodDeclarationSyntax methodDeclaration)
-		{
-			var expression = AnalyzeMethods(methodDeclaration);
+                return base.Visit(node);
+            }
+        }
 
-			if (expression == null) return methodDeclaration;
+        static SyntaxTrivia[] _spaceTrivia = { SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, " ") };
+        public SyntaxNode ConvertMembersToExpressionBodiedHelper(SyntaxNode initialSourceNode, ICleanupOption Options)
+        {
+            var rewriter = new Rewriter(IsReportOnlyMode, Options);
+            var modifiedSourceNode = rewriter.Visit(initialSourceNode);
 
-			var closeParen = methodDeclaration.DescendantTokens()
-				.FirstOrDefault(x => x.IsKind(SyntaxKind.CloseParenToken));
-			if (closeParen != null)
-			{
-				methodDeclaration =
-					methodDeclaration.ReplaceToken(closeParen, closeParen.WithTrailingTrivia(_spaceTrivia));
-			}
+            if (IsReportOnlyMode)
+            {
+                CollectMessages(rewriter.GetReport());
+                return initialSourceNode;
+            }
 
-			var newMethod =
-				methodDeclaration
-					.WithLeadingTrivia(methodDeclaration.GetLeadingTrivia())
-					.WithExpressionBody(
-						SyntaxFactory.ArrowExpressionClause(expression.WithLeadingTrivia(_spaceTrivia)))
-					.WithBody(null)
-					.WithSemicolonToken(GetSemicolon(methodDeclaration.Body))
-					.WithAdditionalAnnotations(Formatter.Annotation);
+            return modifiedSourceNode;
+        }
 
-			return newMethod;
-		}
+        public static MethodDeclarationSyntax ConvertToExpressionBodiedHelper(MethodDeclarationSyntax methodDeclaration)
+        {
+            var expression = AnalyzeMethods(methodDeclaration);
 
-		static ExpressionSyntax AnalyzeMethods(MethodDeclarationSyntax method)
-		{
-			if ((method.Parent is ClassDeclarationSyntax) == false) return null;
-			if (method.Body == null) return null;
-			if (method.Body.Statements.Count != 1) return null;
-			if (method.Body.ContainsDirectives) return null;
+            if (expression == null) return methodDeclaration;
 
-			var singleStatement = method.Body.Statements.FirstOrDefault();
-			if (singleStatement is IfStatementSyntax) return null;
-			if (singleStatement is ThrowStatementSyntax) return null;
-			if (singleStatement is YieldStatementSyntax) return null;
-			if (singleStatement is ReturnStatementSyntax == false && singleStatement is ExpressionStatementSyntax == false) return null;
-			if (singleStatement.HasLeadingTrivia)
-			{
-				if (HasNoneWhitespaceTrivia(singleStatement.GetLeadingTrivia()) == false) return null;
-			}
+            var closeParen = methodDeclaration.DescendantTokens()
+                .FirstOrDefault(x => x.IsKind(SyntaxKind.CloseParenToken));
 
-			if (singleStatement.HasTrailingTrivia)
-			{
-				if (HasNoneWhitespaceTrivia(singleStatement.GetTrailingTrivia()) == false) return null;
-			}
+            if (closeParen != null)
+            {
+                methodDeclaration =
+                    methodDeclaration.ReplaceToken(closeParen, closeParen.WithTrailingTrivia(_spaceTrivia));
+            }
 
-			if (method.Body.CloseBraceToken.HasLeadingTrivia)
-			{
-				if (HasNoneWhitespaceTrivia(method.Body.CloseBraceToken.LeadingTrivia) == false) return null;
-			}
+            var newMethod =
+                methodDeclaration
+                    .WithLeadingTrivia(methodDeclaration.GetLeadingTrivia())
+                    .WithExpressionBody(
+                        SyntaxFactory.ArrowExpressionClause(expression.WithLeadingTrivia(_spaceTrivia)))
+                    .WithBody(null)
+                    .WithSemicolonToken(GetSemicolon(methodDeclaration.Body))
+                    .WithAdditionalAnnotations(Formatter.Annotation);
 
-			if (method.Body.OpenBraceToken.HasLeadingTrivia)
-			{
-				if (HasNoneWhitespaceTrivia(method.Body.OpenBraceToken.LeadingTrivia) == false) return null;
-			}
+            return newMethod;
+        }
 
-			var expression =
-				(
-					(singleStatement is ReturnStatementSyntax)
-						? (singleStatement as ReturnStatementSyntax).Expression
-						: (singleStatement as ExpressionStatementSyntax).Expression
-				)
-				.WithoutLeadingTrivia();
+        static ExpressionSyntax AnalyzeMethods(MethodDeclarationSyntax method)
+        {
+            if ((method.Parent is ClassDeclarationSyntax) == false) return null;
+            if (method.Body == null) return null;
+            if (method.Body.Statements.Count != 1) return null;
+            if (method.Body.ContainsDirectives) return null;
 
-			var length = expression.WithoutTrivia().Span.Length + method.Span.Length - method.Body.FullSpan.Length;
-			if (length > MembersToExpressionBodied.Options.MAX_EXPRESSION_BODIED_MEMBER_LENGTH) return null;
-			if (method.Body.ChildNodes().OfType<UsingStatementSyntax>().Any()) return null;
+            var singleStatement = method.Body.Statements.FirstOrDefault();
+            if (singleStatement is IfStatementSyntax) return null;
+            if (singleStatement is ThrowStatementSyntax) return null;
+            if (singleStatement is YieldStatementSyntax) return null;
+            if (singleStatement is ReturnStatementSyntax == false && singleStatement is ExpressionStatementSyntax == false) return null;
 
-			return expression;
-		}
+            if (singleStatement.HasLeadingTrivia)
+            {
+                if (HasNoneWhitespaceTrivia(singleStatement.GetLeadingTrivia()) == false) return null;
+            }
 
-		static bool HasNoneWhitespaceTrivia(SyntaxTriviaList getLeadingTrivia)
-		{
-			return getLeadingTrivia.All(t => t.IsKind(SyntaxKind.EndOfLineTrivia) || t.IsKind(SyntaxKind.WhitespaceTrivia));
-		}
+            if (singleStatement.HasTrailingTrivia)
+            {
+                if (HasNoneWhitespaceTrivia(singleStatement.GetTrailingTrivia()) == false) return null;
+            }
 
-		public static PropertyDeclarationSyntax ConvertToExpressionBodiedHelper(PropertyDeclarationSyntax propertyDeclaration)
-		{
-			if (propertyDeclaration.AccessorList == null) return propertyDeclaration;
-			var getNode =
-				propertyDeclaration.AccessorList.Accessors.FirstOrDefault(
-					x => x.Keyword.IsKind(SyntaxKind.GetKeyword));
-			var setNode =
-				propertyDeclaration.AccessorList.Accessors.FirstOrDefault(
-					x => x.Keyword.IsKind(SyntaxKind.SetKeyword));
-			if (setNode != null || getNode.Body == null) return propertyDeclaration;
-			if (getNode.Body == null) return propertyDeclaration;
-			if (getNode.Body.Statements.Count > 1) return propertyDeclaration;
-			if (getNode.Body.ContainsDirectives) return propertyDeclaration;
+            if (method.Body.CloseBraceToken.HasLeadingTrivia)
+            {
+                if (HasNoneWhitespaceTrivia(method.Body.CloseBraceToken.LeadingTrivia) == false) return null;
+            }
 
-			var returnStatements = getNode.Body.Statements.OfType<ReturnStatementSyntax>().ToList();
-			if (returnStatements.Count() != 1) return propertyDeclaration;
-			var expression = returnStatements.FirstOrDefault().Expression.WithoutTrivia();
+            if (method.Body.OpenBraceToken.HasLeadingTrivia)
+            {
+                if (HasNoneWhitespaceTrivia(method.Body.OpenBraceToken.LeadingTrivia) == false) return null;
+            }
 
-			var length =
-				expression.Span.Length +
-				propertyDeclaration.Span.Length -
-				propertyDeclaration.AccessorList.FullSpan.Length;
+            var expression =
+                (
+                    (singleStatement is ReturnStatementSyntax)
+                        ? (singleStatement as ReturnStatementSyntax).Expression
+                        : (singleStatement as ExpressionStatementSyntax).Expression
+                )
+                .WithoutLeadingTrivia();
 
-			if (length >= 100) return propertyDeclaration;
+            var length = expression.WithoutTrivia().Span.Length + method.Span.Length - method.Body.FullSpan.Length;
+            if (length > MembersToExpressionBodied.Options.MAX_EXPRESSION_BODIED_MEMBER_LENGTH) return null;
+            if (method.Body.ChildNodes().OfType<UsingStatementSyntax>().Any()) return null;
 
-			propertyDeclaration =
-				propertyDeclaration
-					.WithIdentifier(propertyDeclaration.Identifier.WithTrailingTrivia(_spaceTrivia))
-					.WithLeadingTrivia(propertyDeclaration.GetLeadingTrivia())
-					.WithExpressionBody(
-						SyntaxFactory.ArrowExpressionClause(expression.WithLeadingTrivia(_spaceTrivia)))
-					.WithAccessorList(null)
-					.WithSemicolonToken(GetSemicolon(propertyDeclaration.AccessorList))
-					.WithAdditionalAnnotations(Formatter.Annotation);
+            return expression;
+        }
 
-			return propertyDeclaration;
-		}
+        static bool HasNoneWhitespaceTrivia(SyntaxTriviaList getLeadingTrivia)
+        {
+            return getLeadingTrivia.All(t => t.IsKind(SyntaxKind.EndOfLineTrivia) || t.IsKind(SyntaxKind.WhitespaceTrivia));
+        }
 
-		static SyntaxToken GetSemicolon(BlockSyntax block)
-		{
-			var statement = block.Statements.FirstOrDefault();
+        public static PropertyDeclarationSyntax ConvertToExpressionBodiedHelper(PropertyDeclarationSyntax propertyDeclaration)
+        {
+            if (propertyDeclaration.AccessorList == null) return propertyDeclaration;
 
-			var semicolon =
-				(statement is ExpressionStatementSyntax)
-					? (statement as ExpressionStatementSyntax).SemicolonToken
-					: (statement as ReturnStatementSyntax).SemicolonToken;
+            var getNode =
+                propertyDeclaration.AccessorList.Accessors.FirstOrDefault(
+                    x => x.Keyword.IsKind(SyntaxKind.GetKeyword));
 
-			var trivia = semicolon.TrailingTrivia.AsEnumerable();
-			trivia = trivia.Where(t => !t.IsKind(SyntaxKind.EndOfLineTrivia));
+            var setNode =
+                propertyDeclaration.AccessorList.Accessors.FirstOrDefault(
+                    x => x.Keyword.IsKind(SyntaxKind.SetKeyword));
 
-			var closeBraceTrivia = block.CloseBraceToken.TrailingTrivia.AsEnumerable();
-			trivia = trivia.Concat(closeBraceTrivia);
+            if (setNode != null || getNode.Body == null) return propertyDeclaration;
+            if (getNode.Body == null) return propertyDeclaration;
+            if (getNode.Body.Statements.Count > 1) return propertyDeclaration;
+            if (getNode.Body.ContainsDirectives) return propertyDeclaration;
 
-			return semicolon.WithTrailingTrivia(trivia);
-		}
+            var returnStatements = getNode.Body.Statements.OfType<ReturnStatementSyntax>().ToList();
+            if (returnStatements.Count() != 1) return propertyDeclaration;
+            var expression = returnStatements.FirstOrDefault().Expression.WithoutTrivia();
 
-		static SyntaxToken GetSemicolon(AccessorListSyntax accessorList)
-		{
-			var semicolon = ((ReturnStatementSyntax)accessorList.Accessors[0].Body.Statements[0]).SemicolonToken;
+            var length =
+                expression.Span.Length +
+                propertyDeclaration.Span.Length -
+                propertyDeclaration.AccessorList.FullSpan.Length;
 
-			var trivia = semicolon.TrailingTrivia.AsEnumerable();
-			trivia = trivia.Where(t => !t.IsKind(SyntaxKind.EndOfLineTrivia));
+            if (length >= 100) return propertyDeclaration;
 
-			var closeBraceTrivia = accessorList.CloseBraceToken.TrailingTrivia.AsEnumerable();
-			trivia = trivia.Concat(closeBraceTrivia);
+            propertyDeclaration =
+                propertyDeclaration
+                    .WithIdentifier(propertyDeclaration.Identifier.WithTrailingTrivia(_spaceTrivia))
+                    .WithLeadingTrivia(propertyDeclaration.GetLeadingTrivia())
+                    .WithExpressionBody(
+                        SyntaxFactory.ArrowExpressionClause(expression.WithLeadingTrivia(_spaceTrivia)))
+                    .WithAccessorList(null)
+                    .WithSemicolonToken(GetSemicolon(propertyDeclaration.AccessorList))
+                    .WithAdditionalAnnotations(Formatter.Annotation);
 
-			return semicolon.WithTrailingTrivia(trivia);
-		}
+            return propertyDeclaration;
+        }
 
-		public static ConstructorDeclarationSyntax ConvertToExpressionBodiedHelper(ConstructorDeclarationSyntax constructorDeclaration)
-		{
-			if (constructorDeclaration.Body == null) return constructorDeclaration;
-			if (constructorDeclaration.Body.Statements.Count != 1) return constructorDeclaration;
-			if (constructorDeclaration.Body.ContainsDirectives) return constructorDeclaration;
+        static SyntaxToken GetSemicolon(BlockSyntax block)
+        {
+            var statement = block.Statements.FirstOrDefault();
 
-			var singleStatement = constructorDeclaration.Body.Statements.FirstOrDefault();
-			if (singleStatement is IfStatementSyntax) return constructorDeclaration;
-			if (singleStatement is ThrowStatementSyntax) return constructorDeclaration;
-			if (singleStatement is YieldStatementSyntax) return constructorDeclaration;
-			if (singleStatement is ExpressionStatementSyntax == false) return constructorDeclaration;
-			if (singleStatement.HasLeadingTrivia)
-			{
-				if (HasNoneWhitespaceTrivia(singleStatement.GetLeadingTrivia()) == false) return constructorDeclaration;
-			}
+            var semicolon =
+                (statement is ExpressionStatementSyntax)
+                    ? (statement as ExpressionStatementSyntax).SemicolonToken
+                    : (statement as ReturnStatementSyntax).SemicolonToken;
 
-			if (singleStatement.HasTrailingTrivia)
-			{
-				if (HasNoneWhitespaceTrivia(singleStatement.GetTrailingTrivia()) == false) return constructorDeclaration;
-			}
+            var trivia = semicolon.TrailingTrivia.AsEnumerable();
+            trivia = trivia.Where(t => !t.IsKind(SyntaxKind.EndOfLineTrivia));
 
-			if (constructorDeclaration.Body.CloseBraceToken.HasLeadingTrivia)
-			{
-				if (HasNoneWhitespaceTrivia(constructorDeclaration.Body.CloseBraceToken.LeadingTrivia) == false) return constructorDeclaration;
-			}
+            var closeBraceTrivia = block.CloseBraceToken.TrailingTrivia.AsEnumerable();
+            trivia = trivia.Concat(closeBraceTrivia);
 
-			if (constructorDeclaration.Body.OpenBraceToken.HasLeadingTrivia)
-			{
-				if (HasNoneWhitespaceTrivia(constructorDeclaration.Body.OpenBraceToken.LeadingTrivia) == false) return constructorDeclaration;
-			}
+            return semicolon.WithTrailingTrivia(trivia);
+        }
 
-			var expression = (singleStatement as ExpressionStatementSyntax).Expression
-				.WithoutLeadingTrivia();
+        static SyntaxToken GetSemicolon(AccessorListSyntax accessorList)
+        {
+            var semicolon = ((ReturnStatementSyntax)accessorList.Accessors[0].Body.Statements[0]).SemicolonToken;
 
-			var length = expression.WithoutTrivia().Span.Length +
-					constructorDeclaration.Span.Length - constructorDeclaration.Body.FullSpan.Length;
-			if (length > MembersToExpressionBodied.Options.MAX_EXPRESSION_BODIED_MEMBER_LENGTH) return constructorDeclaration;
-			if (constructorDeclaration.Body.ChildNodes().OfType<UsingStatementSyntax>().Any()) return constructorDeclaration;
+            var trivia = semicolon.TrailingTrivia.AsEnumerable();
+            trivia = trivia.Where(t => !t.IsKind(SyntaxKind.EndOfLineTrivia));
 
-			var newconstructorDeclaration = constructorDeclaration
-								.WithIdentifier(constructorDeclaration.Identifier.WithTrailingTrivia(_spaceTrivia))
-								.WithBody(null)
-								.WithTrailingTrivia(_spaceTrivia)
-								.WithLeadingTrivia(constructorDeclaration.GetLeadingTrivia())
-								.WithExpressionBody(
-									SyntaxFactory.ArrowExpressionClause(expression.WithLeadingTrivia(_spaceTrivia)))
-								.WithSemicolonToken(GetSemicolon(constructorDeclaration.Body))
-								.WithAdditionalAnnotations(Formatter.Annotation);
+            var closeBraceTrivia = accessorList.CloseBraceToken.TrailingTrivia.AsEnumerable();
+            trivia = trivia.Concat(closeBraceTrivia);
 
-			return newconstructorDeclaration;
-		}
-	}
+            return semicolon.WithTrailingTrivia(trivia);
+        }
+
+        public static ConstructorDeclarationSyntax ConvertToExpressionBodiedHelper(ConstructorDeclarationSyntax constructorDeclaration)
+        {
+            if (constructorDeclaration.Body == null) return constructorDeclaration;
+            if (constructorDeclaration.Body.Statements.Count != 1) return constructorDeclaration;
+            if (constructorDeclaration.Body.ContainsDirectives) return constructorDeclaration;
+
+            var singleStatement = constructorDeclaration.Body.Statements.FirstOrDefault();
+            if (singleStatement is IfStatementSyntax) return constructorDeclaration;
+            if (singleStatement is ThrowStatementSyntax) return constructorDeclaration;
+            if (singleStatement is YieldStatementSyntax) return constructorDeclaration;
+            if (singleStatement is ExpressionStatementSyntax == false) return constructorDeclaration;
+
+            if (singleStatement.HasLeadingTrivia)
+            {
+                if (HasNoneWhitespaceTrivia(singleStatement.GetLeadingTrivia()) == false) return constructorDeclaration;
+            }
+
+            if (singleStatement.HasTrailingTrivia)
+            {
+                if (HasNoneWhitespaceTrivia(singleStatement.GetTrailingTrivia()) == false) return constructorDeclaration;
+            }
+
+            if (constructorDeclaration.Body.CloseBraceToken.HasLeadingTrivia)
+            {
+                if (HasNoneWhitespaceTrivia(constructorDeclaration.Body.CloseBraceToken.LeadingTrivia) == false) return constructorDeclaration;
+            }
+
+            if (constructorDeclaration.Body.OpenBraceToken.HasLeadingTrivia)
+            {
+                if (HasNoneWhitespaceTrivia(constructorDeclaration.Body.OpenBraceToken.LeadingTrivia) == false) return constructorDeclaration;
+            }
+
+            var expression = (singleStatement as ExpressionStatementSyntax).Expression
+                .WithoutLeadingTrivia();
+
+            var length = expression.WithoutTrivia().Span.Length +
+                    constructorDeclaration.Span.Length - constructorDeclaration.Body.FullSpan.Length;
+
+            if (length > MembersToExpressionBodied.Options.MAX_EXPRESSION_BODIED_MEMBER_LENGTH) return constructorDeclaration;
+            if (constructorDeclaration.Body.ChildNodes().OfType<UsingStatementSyntax>().Any()) return constructorDeclaration;
+
+            var newconstructorDeclaration = constructorDeclaration
+                                .WithIdentifier(constructorDeclaration.Identifier.WithTrailingTrivia(_spaceTrivia))
+                                .WithBody(null)
+                                .WithTrailingTrivia(_spaceTrivia)
+                                .WithLeadingTrivia(constructorDeclaration.GetLeadingTrivia())
+                                .WithExpressionBody(
+                                    SyntaxFactory.ArrowExpressionClause(expression.WithLeadingTrivia(_spaceTrivia)))
+                                .WithSemicolonToken(GetSemicolon(constructorDeclaration.Body))
+                                .WithAdditionalAnnotations(Formatter.Annotation);
+
+            return newconstructorDeclaration;
+        }
+    }
 }

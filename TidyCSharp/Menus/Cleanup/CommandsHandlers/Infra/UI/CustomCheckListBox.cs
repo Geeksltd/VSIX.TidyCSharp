@@ -20,6 +20,7 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers.Infra
                     AutoSize = true,
                     Dock = DockStyle.Top,
                 };
+
             Controls.Add(newControl);
         }
 
@@ -51,7 +52,6 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers.Infra
         {
             foreach (var item in Controls.OfType<CustomCheckBox>())
                 item.Checked = item.Info.ShouldBeSelectedByDefault;
-
         }
     }
 }
