@@ -29,10 +29,6 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 				var path = item.Properties.Item("FullPath").Value.ToString();
 				if (path.EndsWithAny(new[] { "AssemblyInfo.cs", "TheApplication.cs" })) return;
 
-				TextSpan span = new TextSpan();
-
-
-
 				var documentText = item.ToSyntaxNode().SyntaxTree.GetText().ToString();
 				if (documentText.Contains("[EscapeGCop(\"Auto generated code.\")]"))
 				{
@@ -112,7 +108,7 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 				{
 					await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 				});
-				
+
 				//Sometimes cannot find document's file
 				try
 				{
@@ -146,9 +142,9 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 						CodeCleanerHost.Run(item, actionTypeItem, cleanupOptions, true);
 						watch.Stop();
 
-						using(var tidyruntimelog = new StreamWriter( Path.Combine(Path.GetTempPath(), "TidyCurrentActionslog.txt"), true))
-                        {
-							tidyruntimelog.WriteLine("Phase1-" + actionTypeItem.ToString()+"-"+ watch.ElapsedMilliseconds+" ms");
+						using (var tidyruntimelog = new StreamWriter(Path.Combine(Path.GetTempPath(), "TidyCurrentActionslog.txt"), true))
+						{
+							tidyruntimelog.WriteLine("Phase1-" + actionTypeItem.ToString() + "-" + watch.ElapsedMilliseconds + " ms");
 						}
 					}
 				}

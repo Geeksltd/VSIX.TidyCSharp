@@ -1,6 +1,7 @@
 using EnvDTE;
 using EnvDTE80;
 using Geeks.GeeksProductivityTools;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,12 @@ namespace GeeksAddin
 
 		public static string[] FindSolutionDirectories(DTE2 app)
 		{
+
+			ThreadHelper.JoinableTaskFactory.Run(async delegate
+			{
+				await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+			});
+
 			var basePaths = new List<string>();
 
 			if (app.Solution != null)
@@ -33,7 +40,7 @@ namespace GeeksAddin
 			app.StatusBar.Text = "No solution or project is identified. app.Solution is " +
 				(app.Solution?.GetType().Name).Or("NULL");
 
-			App.DTE = (DTE2)TidyCSharpPackage.GetGlobalService(typeof(SDTE));
+			App.DTE = (DTE2)TidyCSharpPackage.GetGlobalService(typeof(DTE2));
 
 			return null;
 		}

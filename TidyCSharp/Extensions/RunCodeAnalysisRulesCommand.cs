@@ -11,7 +11,7 @@ using VSOLEInterop = Microsoft.VisualStudio.OLE.Interop;
 
 namespace Geeks.VSIX.TidyCSharp.Extensions
 {
-    class RunCodeAnalysisRulesCommand 
+    public class RunCodeAnalysisRulesCommand 
     {
         private bool _overallBuildSuccess;
         private bool _customBuildInProgress;

@@ -14,15 +14,15 @@ using System.Threading.Tasks;
 
 namespace Geeks.GeeksProductivityTools
 {
-	[ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F", PackageAutoLoadFlags.BackgroundLoad)]    // Microsoft.VisualStudio.VSConstants.UICONTEXT_NoSolution
-	[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+    [ProvideAutoLoad("adfc4e64-0397-11d1-9f4e-00a0c911004f", PackageAutoLoadFlags.BackgroundLoad)]    // Microsoft.VisualStudio.VSConstants.UICONTEXT_NoSolution
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
 	[ProvideService(typeof(IMenuCommandService), IsAsyncQueryable = true)]
-	[InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
-	[ProvideMenuResource("Menus.ctmenu", 1)]
-	[ProvideOptionPage(typeof(OptionsPage), "Geeks productivity tools", "General", 0, 0, true)]
-	[Guid(GuidList.GuidGeeksProductivityToolsPkgString)]
-	[ProvideAppCommandLine("TidyReportSwitch", typeof(TidyCSharpPackage), Arguments = "0", DemandLoad = 1)]
-	public sealed class TidyCSharpPackage : AsyncPackage
+    [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
+    [ProvideMenuResource("Menus.ctmenu", 1)]
+    [ProvideOptionPage(typeof(OptionsPage), "Geeks productivity tools", "General", 0, 0, true)]
+    [Guid(GuidList.GuidGeeksProductivityToolsPkgString)]
+    [ProvideAppCommandLine("TidyReportSwitch", typeof(TidyCSharpPackage), Arguments = "0", DemandLoad = 1)]
+    public sealed class TidyCSharpPackage : AsyncPackage
 	{
 		public TidyCSharpPackage() { }
 
@@ -167,20 +167,25 @@ namespace Geeks.GeeksProductivityTools
 
 			// Hook up event handlers
 			events = App.DTE.Events;
-			buildEvent = events.BuildEvents;
-			docEvents = events.DocumentEvents;
-			solEvents = events.SolutionEvents;
-			docEvents.DocumentSaved += DocumentEvents_DocumentSaved;
-			solEvents.Opened += delegate { App.Initialize(GetDialogPage(typeof(OptionsPage)) as OptionsPage); };
-			buildEvent.OnBuildBegin += BuildEvent_OnBuildBegin;
+            buildEvent = events.BuildEvents;
+            docEvents = events.DocumentEvents;
+            solEvents = events.SolutionEvents;
+            buildEvent.OnBuildBegin += BuildEvent_OnBuildBegin;
+            docEvents.DocumentSaved += DocEvents_DocumentSaved;
+            solEvents.Opened += delegate { App.Initialize(GetDialogPage(typeof(OptionsPage)) as OptionsPage); };
 
-			using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
+            using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
 			{
 				tidyLogWriter.WriteLine("Initialization has finished...");
 			}
 		}
 
-		private void BuildEvent_OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
+        private void BuildEvents_OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void BuildEvent_OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
 		{
 			if (File.Exists(Path.Combine(Path.GetTempPath(), "TidyCurrentfilelog.txt")))
 			{
@@ -276,24 +281,24 @@ namespace Geeks.GeeksProductivityTools
 			}
 		}
 
-		void DocumentEvents_DocumentSaved(EnvDTE.Document document)
-		{
-			ThreadHelper.ThrowIfNotOnUIThread();
-			try
-			{
-				if (document.Name.EndsWith(".cs") ||
-					document.Name.EndsWith(".css") ||
-					document.Name.EndsWith(".js") ||
-					document.Name.EndsWith(".ts"))
-				{
-					document.DTE.ExecuteCommand("Edit.FormatDocument");
-				}
+        void DocEvents_DocumentSaved(EnvDTE.Document document)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            try
+            {
+                if (document.Name.EndsWith(".cs") ||
+                    document.Name.EndsWith(".css") ||
+                    document.Name.EndsWith(".js") ||
+                    document.Name.EndsWith(".ts"))
+                {
+                    document.DTE.ExecuteCommand("Edit.FormatDocument");
+                }
 
-				if (!document.Saved) document.Save();
-			}
-			catch
-			{
-			}
-		}
-	}
+                if (!document.Saved) document.Save();
+            }
+            catch
+            {
+            }
+        }
+}
 }
