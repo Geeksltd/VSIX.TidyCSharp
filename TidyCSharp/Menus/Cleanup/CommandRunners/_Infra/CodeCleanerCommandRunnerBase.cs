@@ -2,6 +2,7 @@ using EnvDTE;
 using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -39,7 +40,17 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             var initialSourceNode = CleanUp(ProjectItemDetails.InitialSourceNode);
 
             if (!IsReportOnlyMode)
-                SaveResult(await initialSourceNode);
+            {
+                try
+                {
+                    var result = await initialSourceNode;
+                    await SaveResult(result);
+                }
+                catch (Exception ex)
+                {
+                    ErrorNotification.WriteErrorToFile(ex);
+                }
+            }
         }
 
         protected virtual SyntaxNode RefreshResult(SyntaxNode initialSourceNode)

@@ -47,6 +47,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         protected override async Task SaveResult(SyntaxNode initialSourceNode)
         {
+            if (WorkingDocument is null) return;
+
             var text = await WorkingDocument.GetTextAsync();
 
             if (string.Compare(text?.ToString(), ProjectItemDetails.InitialSourceNode.GetText().ToString(), false) != 0)

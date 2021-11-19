@@ -15,6 +15,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
     {
         public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
         {
+            if (ProjectItemDetails.SemanticModel is null) return initialSourceNode;
+
             var syntaxRewriter = new ReadOnlyRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             var modifiedSourceNode = syntaxRewriter.Visit(initialSourceNode);
 

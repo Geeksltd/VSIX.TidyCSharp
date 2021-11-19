@@ -285,8 +285,7 @@ namespace Geeks.GeeksProductivityTools
                     document.DTE.ExecuteCommand("Edit.FormatDocument");
                 }
 
-                // if (!document.Saved) document.Save();
-                document.Close(EnvDTE.vsSaveChanges.vsSaveChangesYes);
+                if (!document.Saved) document.Save();
             }
             catch
             {

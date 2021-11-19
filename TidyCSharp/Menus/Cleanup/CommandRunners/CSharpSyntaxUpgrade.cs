@@ -19,12 +19,14 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
         SyntaxNode ChangeMethodHelper(SyntaxNode initialSourceNode)
         {
-            if (initialSourceNode == null) return null;
+            if (initialSourceNode is null) return null;
+
+            if (ProjectItemDetails.SemanticModel is null) return null;
 
             var syntaxRewriter = new NewExpressionRewriter(ProjectItemDetails.SemanticModel
                 , IsReportOnlyMode, Options);
 
-            if (syntaxRewriter == null) return null;
+            if (syntaxRewriter is null) return null;
 
             var modifiedSyntaxNode = syntaxRewriter.Visit(initialSourceNode);
 
