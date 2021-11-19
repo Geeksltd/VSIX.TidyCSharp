@@ -72,7 +72,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 newNameBuilder.Append(c);
             }
 
-            if (string.Compare(currentName, currentName.ToUpper(), false) == 0) return null;
+            if ( string.Compare(currentName, currentName.ToUpper(), false) == 0) return null;
 
             return new[] { newNameBuilder.ToString().ToUpper() };
         }

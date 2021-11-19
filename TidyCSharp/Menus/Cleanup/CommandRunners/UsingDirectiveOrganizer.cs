@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.Threading.Tasks;
+using static Microsoft.VisualStudio.Threading.AsyncReaderWriterLock;
 
 namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
@@ -18,18 +19,27 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
     {
         public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
         {
+            var item = ProjectItemDetails.ProjectItem;
 
             try
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                var window = ProjectItemDetails.ProjectItem.Open(Constants.vsViewKindCode);
-                //window = ProjectItemDetails.ProjectItem.Document.DTE
-                //    .ItemOperations.OpenFile(ProjectItemDetails.ProjectItem.Document.Path
-                //    , Constants.vsViewKindCode);
-                //window.Activate();
-                ProjectItemDetails.ProjectItem.Document.Activate();
-                ProjectItemDetails.ProjectItem.Document.DTE.ExecuteCommand(UsingsCommands.REMOVE_AND_SORT_COMMAND_NAME);
-                EnvDTE.TextDocument doc = (EnvDTE.TextDocument)(ProjectItemDetails.ProjectItem.Document.Object("TextDocument"));
+
+                item.Open(Constants.vsViewKindCode);
+
+                var document = item.Document;
+                document.Activate();
+
+                try { document.DTE.ExecuteCommand(UsingsCommands.REMOVE_AND_SORT_COMMAND_NAME); }
+                catch (Exception ex)
+                {
+                    if (ex.Message != "Command \"Edit.RemoveAndSort\" is not available.") throw;
+
+                    document.Activate();
+                    document.DTE.ExecuteCommand(UsingsCommands.REMOVE_AND_SORT_COMMAND_NAME);
+                }
+
+                EnvDTE.TextDocument doc = (EnvDTE.TextDocument)(document.Object("TextDocument"));
                 var p = doc.StartPoint.CreateEditPoint();
                 string s = p.GetText(doc.EndPoint);
                 var modified = SyntaxFactory.ParseSyntaxTree(s);
@@ -44,11 +54,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         Message = "Your Using usage is not good",
                         Generator = nameof(UsingDirectiveOrganizer)
                     });
-                    ProjectItemDetails.ProjectItem.Document.Undo();
+                    document.Undo();
                     return initialSourceNode;
                 }
-                ProjectItemDetails.ProjectItem.Document.Save();
-                //window.Document.Save();
+                document.Save();
             }
             catch (Exception e)
             {
@@ -57,7 +66,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 ProcessActions.GeeksProductivityToolsProcess();
             }
 
-            return ProjectItemDetails.ProjectItem.ToSyntaxNode();
+            return item.ToSyntaxNode();
         }
     }
 }

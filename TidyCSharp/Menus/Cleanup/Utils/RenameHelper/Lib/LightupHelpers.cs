@@ -5,7 +5,6 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.Renaming
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using System.Collections.Concurrent;
-    using System.Collections.Immutable;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;

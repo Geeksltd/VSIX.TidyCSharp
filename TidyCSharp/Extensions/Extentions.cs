@@ -6,21 +6,6 @@ namespace System
 
     public static class Extensions
     {
-        public static string ZebblifyFileName(this string fileName) => fileName + ".zbl";
-
-        public static string WrapInQuatation(this string path) => "\"" + path + "\"";
-
-        public static string FormatWith(this string format, object arg, params object[] additionalArgs)
-        {
-            if (additionalArgs == null || additionalArgs.Length == 0)
-            {
-                return string.Format(format, arg);
-            }
-            else
-            {
-                return string.Format(format, new object[] { arg }.Concat(additionalArgs).ToArray());
-            }
-        }
 
         public static bool HasValue(this string text) => !string.IsNullOrEmpty(text);
 
@@ -79,39 +64,6 @@ namespace System
             return result;
         }
 
-        public static string ToString<T>(this IEnumerable<T> list, string seperator)
-        {
-            return ToString(list, seperator, seperator);
-        }
-
-        public static string ToString<T>(this IEnumerable<T> list, string seperator, string lastSeperator)
-        {
-            if (list == null || list.Any() == false) return string.Empty;
-
-            var castedItems = list as IEnumerable<object>;
-            if (castedItems == null || castedItems.Any() == false) return string.Empty;
-
-            var items = castedItems.ToArray();
-
-            var result = new StringBuilder();
-            for (var i = 0; i < items.Length; i++)
-            {
-                var item = items[i];
-
-                if (item == null) result.Append("{NULL}");
-                else result.Append(item.ToString());
-
-                if (i < items.Length - 2)
-                    result.Append(seperator);
-
-                if (i == items.Length - 2)
-                    result.Append(lastSeperator);
-            }
-
-            return result.ToString();
-        }
-
-        public static bool IsEmpty<T>(this IEnumerable<T> list) => list == null || list.Count() == 0;
 
         public static bool EndsWithAny(this string input, params string[] listOfEndings)
         {
@@ -121,27 +73,6 @@ namespace System
 
 
             return false;
-        }
-
-        public static bool Contains(this string text, string subString, bool caseSensitive)
-        {
-            if (text == null && subString == null)
-                return true;
-
-            if (text == null)
-                return false;
-
-            if (subString.IsEmpty())
-                return true;
-
-            if (caseSensitive)
-            {
-                return text.Contains(subString);
-            }
-            else
-            {
-                return text.ToUpper().Contains(subString.Get(s => s.ToUpper()));
-            }
         }
 
         /// <summary>
@@ -161,23 +92,6 @@ namespace System
                 {
                     return default(K);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Gets a specified member of this object. If this is null, null will be returned. Otherwise the specified expression will be returned.
-        /// </summary>
-        public static K? Get<T, K>(this T item, Func<T, K?> selector) where K : struct
-        {
-            if (item == null) return null;
-
-            try
-            {
-                return selector(item);
-            }
-            catch (NullReferenceException)
-            {
-                return default(K);
             }
         }
 

@@ -1,3 +1,4 @@
+using System;
 using EnvDTE;
 
 namespace Geeks.GeeksProductivityTools.Extensions
@@ -11,7 +12,8 @@ namespace Geeks.GeeksProductivityTools.Extensions
 
         public static bool IsCSharpDesignerFile(this ProjectItem projectItem)
         {
-            return projectItem.Kind == Constants.vsProjectItemKindPhysicalFile && projectItem.Name.ToLower().EndsWith(".designer.cs");
+            return projectItem.Kind == Constants.vsProjectItemKindPhysicalFile
+                && projectItem.Name.EndsWith(".designer.cs", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

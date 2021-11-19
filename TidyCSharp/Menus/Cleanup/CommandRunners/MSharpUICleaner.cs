@@ -1308,8 +1308,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 var declarationSymbol = semanticModel.GetSymbolInfo(node.Type).Symbol;
                 var identifierName = semanticModel.GetDeclaredSymbol(node.Variables.FirstOrDefault());
-                if (declarationSymbol?.Name == "ModuleButton" &&
-                    node.Variables.Count() == 1)
+                if (declarationSymbol?.Name == "ModuleButton" && node.Variables.Count() == 1)
                 {
                     if (node.Variables.FirstOrDefault().Initializer.Value is InvocationExpressionSyntax &&
                         node.Variables.FirstOrDefault()
@@ -1362,6 +1361,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 }
                 return base.VisitVariableDeclaration(node);
             }
+
             public override SyntaxNode VisitLocalDeclarationStatement(LocalDeclarationStatementSyntax node)
             {
                 if (node.Declaration is VariableDeclarationSyntax)
@@ -1426,6 +1426,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     solution, documents:
                     ImmutableHashSet.Create(this.roslynDocument));
             }
+
             public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
             {
                 var s = node.DescendantNodesAndSelfOfType<InvocationExpressionSyntax>()

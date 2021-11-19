@@ -5,7 +5,6 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Rename;
-    using System.Collections.Immutable;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -86,13 +85,7 @@
 
                 // The name can't be the same as the name of an other member of the same type. At this point no special
                 // consideration is given to overloaded methods.
-                ImmutableArray<ISymbol> siblings = containingNamespaceOrTypeSymbol.GetMembers(name);
-                if (!siblings.IsDefaultOrEmpty)
-                {
-                    return false;
-                }
-
-                return true;
+                return containingNamespaceOrTypeSymbol.GetMembers(name).IsDefaultOrEmpty;
             }
             else if (containingSymbol.Kind == SymbolKind.Method)
             {

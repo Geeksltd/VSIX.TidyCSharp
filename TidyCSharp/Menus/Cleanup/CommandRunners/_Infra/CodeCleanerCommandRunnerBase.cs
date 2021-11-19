@@ -3,7 +3,6 @@ using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.FindSymbols;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using RoslynDocument = Microsoft.CodeAnalysis.Document;
@@ -18,185 +17,186 @@ using System;
 
 namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
-	public abstract class CodeCleanerCommandRunnerBase : ICodeCleaner
-	{
-		static IList<ChangesReport> ChangesReports;
-		public bool IsReportOnlyMode { get; set; }
-		public void Run(ProjectItem item) => AsyncRun(item);
+    public abstract class CodeCleanerCommandRunnerBase : ICodeCleaner
+    {
+        static IList<ChangesReport> ChangesReports;
+        public bool IsReportOnlyMode { get; set; }
+        public void Run(ProjectItem item) => AsyncRun(item);
 
-		public ProjectItemDetailsType ProjectItemDetails { get; protected set; }
-		public ProjectItemDetailsType UnModifiedProjectItemDetails { get; protected set; }
+        public ProjectItemDetailsType ProjectItemDetails { get; protected set; }
+        public ProjectItemDetailsType UnModifiedProjectItemDetails { get; protected set; }
 
-		protected virtual async void AsyncRun(ProjectItem item)
-		{
-			ProjectItemDetails = new ProjectItemDetailsType(item);
+        protected virtual async void AsyncRun(ProjectItem item)
+        {
+            ProjectItemDetails = new ProjectItemDetailsType(item);
 
-			if (IsReportOnlyMode)
-			{
-				RefreshResult(item.ToSyntaxNode());
-			}
-			UnModifiedProjectItemDetails = ProjectItemDetails;
+            if (IsReportOnlyMode)
+            {
+                RefreshResult(item.ToSyntaxNode());
+            }
+            UnModifiedProjectItemDetails = ProjectItemDetails;
 
-			var initialSourceNode = CleanUp(ProjectItemDetails.InitialSourceNode);
+            var initialSourceNode = CleanUp(ProjectItemDetails.InitialSourceNode);
 
-			if (!IsReportOnlyMode)
-				SaveResult(await initialSourceNode);
-		}
+            if (!IsReportOnlyMode)
+                SaveResult(await initialSourceNode);
+        }
 
-		protected virtual SyntaxNode RefreshResult(SyntaxNode initialSourceNode)
-		{
-			if (UnModifiedProjectItemDetails != null && UnModifiedProjectItemDetails.InitialSourceNode.ToFullString().Replace("\r", "")
-				.Equals(initialSourceNode.ToFullString().Replace("\r", "")))
-			{
-				ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
-				return ProjectItemDetails.InitialSourceNode;
-			}
+        protected virtual SyntaxNode RefreshResult(SyntaxNode initialSourceNode)
+        {
+            if (UnModifiedProjectItemDetails != null && UnModifiedProjectItemDetails.InitialSourceNode.ToFullString().Replace("\r", "")
+                .Equals(initialSourceNode.ToFullString().Replace("\r", "")))
+            {
+                ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
+                return ProjectItemDetails.InitialSourceNode;
+            }
 
-			if (ProjectItemDetails.ProjectItemDocument != null)
-			{
-				var newDocument = ProjectItemDetails.ProjectItemDocument.WithSyntaxRoot(initialSourceNode);
-				TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
-			}
+            if (ProjectItemDetails.ProjectItemDocument != null)
+            {
+                var newDocument = ProjectItemDetails.ProjectItemDocument.WithSyntaxRoot(initialSourceNode);
+                TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
+            }
 
-			ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
-			return ProjectItemDetails.InitialSourceNode;
-		}
+            ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
+            return ProjectItemDetails.InitialSourceNode;
+        }
 
 
-		protected virtual async Task SaveResult(SyntaxNode initialSourceNode)
-		{
-			if (initialSourceNode == null || initialSourceNode == ProjectItemDetails.InitialSourceNode) return;
+        protected virtual async Task SaveResult(SyntaxNode initialSourceNode)
+        {
+            if (initialSourceNode == null || initialSourceNode == ProjectItemDetails.InitialSourceNode) return;
 
-			if (UnModifiedProjectItemDetails.InitialSourceNode.ToFullString().Replace("\r", "")
-				.Equals(initialSourceNode.ToFullString().Replace("\r", "")))
-				return;
+            if (UnModifiedProjectItemDetails.InitialSourceNode.ToFullString().Replace("\r", "")
+                .Equals(initialSourceNode.ToFullString().Replace("\r", "")))
+                return;
 
-			if (ProjectItemDetails.ProjectItemDocument == null)
-			{
-				initialSourceNode.WriteSourceTo(ProjectItemDetails.FilePath);
-				return;
-			}
+            if (ProjectItemDetails.ProjectItemDocument == null)
+            {
+                initialSourceNode.WriteSourceTo(ProjectItemDetails.FilePath);
+                return;
+            }
 
-			var newDocument = ProjectItemDetails.ProjectItemDocument.WithText(initialSourceNode.GetText());
-			TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
-		}
+            var newDocument = ProjectItemDetails.ProjectItemDocument.WithText(initialSourceNode.GetText());
+            TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
+        }
 
-		public virtual async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
-		{
-			return null;
-		}
+        public virtual async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        {
+            return null;
+        }
 
-		public bool IsEquivalentToUnModified(SyntaxNode initialSourceNode)
-		{
-			return initialSourceNode.IsEquivalentTo(UnModifiedProjectItemDetails.InitialSourceNode);
-		}
+        public bool IsEquivalentToUnModified(SyntaxNode initialSourceNode)
+        {
+            return initialSourceNode.IsEquivalentTo(UnModifiedProjectItemDetails.InitialSourceNode);
+        }
 
-		public void CollectMessages(params ChangesReport[] changesReports)
-		{
-			foreach (var report in changesReports)
-				ChangesReports.Add(report);
-		}
+        public void CollectMessages(params ChangesReport[] changesReports)
+        {
+            foreach (var report in changesReports)
+                ChangesReports.Add(report);
+        }
 
-		static CodeCleanerCommandRunnerBase()
-		{
-			ChangesReports = ChangesReports ?? new List<ChangesReport>();
-		}
-		public static void GenerateMessages()
-		{
-			XmlWriterSettings xmlWriterSettings = new XmlWriterSettings();
-			xmlWriterSettings.Indent = true;
-			XmlWriter textWriter = XmlWriter.Create(Path.GetDirectoryName(App.DTE.Solution.FullName)
-				+ "\\Tidy.log", xmlWriterSettings);
-			textWriter.WriteStartDocument();
-			textWriter.WriteStartElement("Reports");
-			foreach (var change in ChangesReports)
-			{
-				textWriter.WriteStartElement("Report");
-				textWriter.WriteAttributeString("Generator", change.Generator);
-				textWriter.WriteElementString("LineNumber", change.LineNumber.ToString());
-				textWriter.WriteElementString("Column", change.Column.ToString());
-				textWriter.WriteElementString("FileName", change.FileName);
-				textWriter.WriteElementString("Message", change.Message);
-				textWriter.WriteEndElement();
-			}
-			textWriter.WriteEndElement();
-			textWriter.WriteEndDocument();
-			textWriter.Flush();
-			textWriter.Close();
-			ChangesReports.Clear();
-		}
-		public ICleanupOption Options { get; set; }
+        static CodeCleanerCommandRunnerBase()
+        {
+            ChangesReports = ChangesReports ?? new List<ChangesReport>();
+        }
+        public static void GenerateMessages()
+        {
+            XmlWriterSettings xmlWriterSettings = new XmlWriterSettings();
+            xmlWriterSettings.Indent = true;
+            XmlWriter textWriter = XmlWriter.Create(Path.GetDirectoryName(App.DTE.Solution.FullName)
+                + "\\Tidy.log", xmlWriterSettings);
+            textWriter.WriteStartDocument();
+            textWriter.WriteStartElement("Reports");
+            foreach (var change in ChangesReports)
+            {
+                textWriter.WriteStartElement("Report");
+                textWriter.WriteAttributeString("Generator", change.Generator);
+                textWriter.WriteElementString("LineNumber", change.LineNumber.ToString());
+                textWriter.WriteElementString("Column", change.Column.ToString());
+                textWriter.WriteElementString("FileName", change.FileName);
+                textWriter.WriteElementString("Message", change.Message);
+                textWriter.WriteEndElement();
+            }
+            textWriter.WriteEndElement();
+            textWriter.WriteEndDocument();
+            textWriter.Flush();
+            textWriter.Close();
+            ChangesReports.Clear();
+        }
+        public ICleanupOption Options { get; set; }
 
-		public bool CheckOption(int? optionItem) => Options.Should(optionItem);
+        public bool CheckOption(int? optionItem) => Options.Should(optionItem);
 
-		public class ProjectItemDetailsType
-		{
-			public ProjectItem ProjectItem { get; private set; }
+        public class ProjectItemDetailsType
+        {
+            public ProjectItem ProjectItem { get; private set; }
 
-			RoslynDocument _projectItemDocument;
-			public RoslynDocument ProjectItemDocument
-			{
-				get
-				{
-					//if (_projectItemDocument == null)
-					//{
-					_projectItemDocument = GetRoslynDomuentByProjectItem(ProjectItem);
-					//}
+            RoslynDocument _projectItemDocument;
+            public RoslynDocument ProjectItemDocument
+            {
+                get
+                {
+                    //if (_projectItemDocument == null)
+                    //{
+                    _projectItemDocument = GetRoslynDomuentByProjectItem(ProjectItem);
+                    //}
 
-					return _projectItemDocument;
-				}
-			}
+                    return _projectItemDocument;
+                }
+            }
 
-			SemanticModel _semanticModel;
-			public SemanticModel SemanticModel
-			{
-				get
-				{
-					if (_semanticModel == null && ProjectItemDocument != null)
-					{
+            SemanticModel _semanticModel;
+            public SemanticModel SemanticModel
+            {
+                get
+                {
+                    if (_semanticModel == null && ProjectItemDocument != null)
+                    {
 
-						Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async delegate
-						{
-							_semanticModel = await ProjectItemDocument.GetSemanticModelAsync();
-						});
-					}
+                        Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async delegate
+                        {
+                            _semanticModel = await ProjectItemDocument.GetSemanticModelAsync();
+                        });
+                    }
 
-					return _semanticModel;
-				}
-			}
-			public SyntaxNode InitialSourceNode { get; private set; }
+                    return _semanticModel;
+                }
+            }
+            public SyntaxNode InitialSourceNode { get; private set; }
 
-			public string FilePath { get; private set; }
+            public string FilePath { get; private set; }
 
-			public ProjectItemDetailsType(ProjectItem item)
-			{
-				FilePath = item.ToFullPathPropertyValue();
-				ProjectItem = item;
+            public ProjectItemDetailsType(ProjectItem item)
+            {
+                FilePath = item.ToFullPathPropertyValue();
+                ProjectItem = item;
 
-				Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async delegate
-				{
-					InitialSourceNode = ProjectItemDocument != null ? await ProjectItemDocument.GetSyntaxRootAsync() : item.ToSyntaxNode();
-				});
-			}
-			static RoslynDocument GetRoslynDomuentByProjectItem(ProjectItem projectItem)
-			{
-				var document =
-					TidyCSharpPackage.Instance
-						.CleanupWorkingSolution
-						.Projects.FirstOrDefault(p => p.Name == projectItem.ContainingProject.Name)
-						?.Documents.FirstOrDefault(d => d.FilePath == projectItem.ToFullPathPropertyValue());
-				if (document == null)
-				{
-					var path = projectItem.ToFullPathPropertyValue();
-					return
-						TidyCSharpPackage.Instance
-					   .CleanupWorkingSolution.GetDocument(
-							TidyCSharpPackage.Instance
-						   .CleanupWorkingSolution.GetDocumentIdsWithFilePath(path)
-						   .FirstOrDefault());
-				}
-				return document;
-			}
-		}
-	}
+                Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async delegate
+                {
+                    InitialSourceNode = ProjectItemDocument != null ? await ProjectItemDocument.GetSyntaxRootAsync() : item.ToSyntaxNode();
+                });
+            }
+            static RoslynDocument GetRoslynDomuentByProjectItem(ProjectItem projectItem)
+            {
+                var path = projectItem.ToFullPathPropertyValue();
+
+                var document =
+                    TidyCSharpPackage.Instance
+                        .CleanupWorkingSolution
+                        .Projects.FirstOrDefault(p => p.Name == projectItem.ContainingProject.Name)
+                        ?.Documents.FirstOrDefault(d => d.FilePath == path);
+                if (document == null)
+                {
+                    return
+                        TidyCSharpPackage.Instance
+                       .CleanupWorkingSolution.GetDocument(
+                            TidyCSharpPackage.Instance
+                           .CleanupWorkingSolution.GetDocumentIdsWithFilePath(path)
+                           .FirstOrDefault());
+                }
+                return document;
+            }
+        }
+    }
 }

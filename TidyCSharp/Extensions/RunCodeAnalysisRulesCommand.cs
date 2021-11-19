@@ -11,7 +11,7 @@ using VSOLEInterop = Microsoft.VisualStudio.OLE.Interop;
 
 namespace Geeks.VSIX.TidyCSharp.Extensions
 {
-    public class RunCodeAnalysisRulesCommand 
+    public class RunCodeAnalysisRulesCommand
     {
         private bool _overallBuildSuccess;
         private bool _customBuildInProgress;
@@ -78,7 +78,7 @@ namespace Geeks.VSIX.TidyCSharp.Extensions
             OutputWindow outputWindow = (OutputWindow)window.Object;
 
             OutputWindowPane targetPane = outputWindow.OutputWindowPanes.Cast<OutputWindowPane>()
-                .FirstOrDefault(x => x.Name.ToLower() == paneName.ToLower());
+                .FirstOrDefault(x => x.Name.Equals(paneName, StringComparison.OrdinalIgnoreCase));
 
             if (targetPane == null)
             {
