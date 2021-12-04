@@ -53,7 +53,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             }
         }
 
-        protected virtual SyntaxNode RefreshResult(SyntaxNode initialSourceNode)
+        protected async virtual Task<SyntaxNode> RefreshResult(SyntaxNode initialSourceNode)
         {
             if (UnModifiedProjectItemDetails != null && UnModifiedProjectItemDetails.InitialSourceNode.ToFullString().Replace("\r", "")
                 .Equals(initialSourceNode.ToFullString().Replace("\r", "")))
@@ -65,7 +65,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             if (ProjectItemDetails.ProjectItemDocument != null)
             {
                 var newDocument = ProjectItemDetails.ProjectItemDocument.WithSyntaxRoot(initialSourceNode);
-                TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
+               await TidyCSharpPackage.Instance.RefreshSolutionAsync(newDocument.Project.Solution);
             }
 
             ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
@@ -87,7 +87,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             }
 
             var newDocument = ProjectItemDetails.ProjectItemDocument.WithText(initialSourceNode.GetText());
-            TidyCSharpPackage.Instance.RefreshSolution(newDocument.Project.Solution);
+            await TidyCSharpPackage.Instance.RefreshSolutionAsync(newDocument.Project.Solution);
         }
 
         public virtual async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode) => null;

@@ -6,8 +6,9 @@ using static Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp.CSharpActionDele
 
 namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 {
-    public class ActionCSharpOnAnyWhere
+    public class ActionCSharpOnAnywhere
     {
+        private ActionCSharpOnAnywhere() { }
         public static void Invoke(TargetAction action, CleanupOptions cleanupOptions)
         {
             try
@@ -22,7 +23,7 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 
                     if (selectedProjectItem != null)
                     {
-                        if (selectedProjectItem.ProjectItems == null || selectedProjectItem.ProjectItems.Count == 0)
+                        if (selectedProjectItem.ProjectItems == null || selectedProjectItem.ProjectItems.Count == 0 && action!=null)
                         {
                             action(selectedProjectItem, cleanupOptions, true);
                         }
@@ -49,13 +50,13 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
             }
         }
 
-        static void DoActionForItems(ProjectItems projectItems, TargetAction action, CleanupOptions cleanupOptions)
-        {
-            for (int subItemIndex = 1; subItemIndex <= projectItems.Count; subItemIndex++)
-            {
-                var subItem = projectItems.Item(subItemIndex);
-                ActionCSharpOnProjectItem.Action(subItem, action, cleanupOptions);
-            }
-        }
+        //static void DoActionForItems(ProjectItems projectItems, TargetAction action, CleanupOptions cleanupOptions)
+        //{
+        //    for (int subItemIndex = 1; subItemIndex <= projectItems.Count; subItemIndex++)
+        //    {
+        //        var subItem = projectItems.Item(subItemIndex);
+        //        ActionCSharpOnProjectItem.Action(subItem, action, cleanupOptions);
+        //    }
+        //}
     }
 }

@@ -16,24 +16,24 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
         {
             if (ProjectItemDetails.ProjectItem.ContainingProject.Name == "#Model")
-                return ChangeMethodHelper(initialSourceNode);
+                return await ChangeMethodHelper(initialSourceNode);
 
             return initialSourceNode;
         }
 
-        SyntaxNode ChangeMethodHelper(SyntaxNode initialSourceNode)
+        async Task<SyntaxNode> ChangeMethodHelper(SyntaxNode initialSourceNode)
         {
             var localTimeRewriter = new LocalTimeRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             var modifiedSourceNode = localTimeRewriter.Visit(initialSourceNode);
-            modifiedSourceNode = RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
 
             var cascadeDeleteRewriter = new CascadeDeleteRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = cascadeDeleteRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
 
             var calculatedGetterRewriter = new CalculatedGetterRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = calculatedGetterRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
 
             var transientDatabaseModeRewriter = new TransientDatabaseModeRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = transientDatabaseModeRewriter.Visit(modifiedSourceNode);

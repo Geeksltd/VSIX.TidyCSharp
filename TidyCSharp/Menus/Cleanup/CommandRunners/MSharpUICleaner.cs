@@ -21,59 +21,59 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
         {
             if (ProjectItemDetails.ProjectItem.ContainingProject.Name == "#UI")
-                return ChangeMethodHelper(initialSourceNode);
+                return await ChangeMethodHelperAsync(initialSourceNode);
 
             return initialSourceNode;
         }
 
-        SyntaxNode ChangeMethodHelper(SyntaxNode initialSourceNode)
+        async Task<SyntaxNode> ChangeMethodHelperAsync(SyntaxNode initialSourceNode)
         {
             var sendItemIdRewriter = new SendItemIdRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             var modifiedSourceNode = sendItemIdRewriter.Visit(initialSourceNode);
-            modifiedSourceNode = RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
 
             var ifWorkFlowRewriter = new IfWorkFlowRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = ifWorkFlowRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
 
             var customColumnRewriter = new CustomColumnRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = customColumnRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
 
             var elementsNewSyntaxRewriter = new ElementsNewSyntaxRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = elementsNewSyntaxRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
 
             var formModuleWorkFlow = new FormModuleWorkFlowRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = formModuleWorkFlow.Visit(modifiedSourceNode);
-            modifiedSourceNode = RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
 
             var generalWorkFlowRewriter = new GeneralWorkFlowRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = generalWorkFlowRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
 
             var combinedExpressionsFormRewriter = new CombinedExpressionsFormRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = combinedExpressionsFormRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
 
             var listModuleWorkFlowRewriter = new ListModuleWorkFlowRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = listModuleWorkFlowRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
 
             var fullSearchRewriter = new FullSearchRewriter(ProjectItemDetails.SemanticModel
                 , ProjectItemDetails.ProjectItemDocument.Project.Solution
                 , ProjectItemDetails.ProjectItemDocument, IsReportOnlyMode, Options);
 
             modifiedSourceNode = fullSearchRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
 
             var customFieldRewriter = new CustomFieldRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = customFieldRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
 
             var onClickGoWorkFlowRewriter = new OnClickGoWorkFlowRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = onClickGoWorkFlowRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
 
             var mergedUpRewriter = new MergedUpRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = mergedUpRewriter.Visit(modifiedSourceNode);
@@ -267,6 +267,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return node;
             }
         }
+
         class IfWorkFlowRewriter : CleanupCSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
@@ -330,6 +331,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return node;
             }
         }
+
         class CustomColumnRewriter : CleanupCSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
@@ -406,6 +408,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return node;
             }
         }
+
         class SendItemIdRewriter : CleanupCSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
@@ -447,6 +450,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return base.VisitInvocationExpression(node);
             }
         }
+
         // column.search.field.
         class ElementsNewSyntaxRewriter : CleanupCSharpSyntaxRewriter
         {
@@ -548,6 +552,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return base.VisitInvocationExpression(node);
             }
         }
+
         // cancel/save/delete
         class FormModuleWorkFlowRewriter : CleanupCSharpSyntaxRewriter
         {
@@ -864,6 +869,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return node;
             }
         }
+
         // onlick-go -> go
         class GeneralWorkFlowRewriter : CleanupCSharpSyntaxRewriter
         {
@@ -942,6 +948,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return base.VisitInvocationExpression(node);
             }
         }
+
         class ListModuleWorkFlowRewriter : CleanupCSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
@@ -1383,6 +1390,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return node;
             }
         }
+
         class FullSearchRewriter : CleanupCSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
@@ -1418,9 +1426,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                         Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory
                             .Run(async delegate
-                        {
-                            result = await GetReferencedSymbolsAsync(identifierName);
-                        });
+                            {
+                                result = await GetReferencedSymbolsAsync(identifierName);
+                            });
 
                         if (result.Count() == 1 && invocation.ArgumentsCountShouldBe(0))
                         {
@@ -1560,6 +1568,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return result;
             }
         }
+
         class CustomFieldRewriter : CleanupCSharpSyntaxRewriter
         {
             SemanticModel semanticModel;
@@ -1709,6 +1718,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 return node;
             }
         }
+
         // onclick,go method should be last invocation
         class OnClickGoWorkFlowRewriter : CleanupCSharpSyntaxRewriter
         {

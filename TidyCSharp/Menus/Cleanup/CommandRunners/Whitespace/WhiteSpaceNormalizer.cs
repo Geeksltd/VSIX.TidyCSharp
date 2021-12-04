@@ -11,12 +11,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
     {
         public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
         {
-            return NormalizeWhiteSpaceHelper(initialSourceNode, Options);
+            return await NormalizeWhiteSpaceHelper(initialSourceNode, Options);
         }
 
         public Options Options { get; set; }
 
-        public SyntaxNode NormalizeWhiteSpaceHelper(SyntaxNode initialSourceNode, Options options)
+        public async Task<SyntaxNode> NormalizeWhiteSpaceHelper(SyntaxNode initialSourceNode, Options options)
         {
             var modifiedSourceNode = initialSourceNode;
 
@@ -33,13 +33,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 CollectMessages(blockRewriter.GetReport());
             }
 
-            modifiedSourceNode = RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
 
             if (CheckOption((int)CleanupTypes.Use_slash_n_instead_of_slash_sr_slash_n))
             {
                 var endoflineRewriter = new EndOFLineRewriter(modifiedSourceNode, IsReportOnlyMode, options);
                 modifiedSourceNode = endoflineRewriter.Visit(modifiedSourceNode);
-                modifiedSourceNode = RefreshResult(modifiedSourceNode);
+                modifiedSourceNode = await RefreshResult(modifiedSourceNode);
 
                 if (IsReportOnlyMode)
                 {
@@ -57,7 +57,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             if (CheckOption((int)CleanupTypes.Add_blank_line_between_statements_more_than_one_line))
             {
-                modifiedSourceNode = RefreshResult(modifiedSourceNode);
+                modifiedSourceNode = await RefreshResult(modifiedSourceNode);
                 var blRewriter = new BlankLineRewriter(modifiedSourceNode, IsReportOnlyMode, ProjectItemDetails.SemanticModel);
                 modifiedSourceNode = blRewriter.Visit(modifiedSourceNode);
 

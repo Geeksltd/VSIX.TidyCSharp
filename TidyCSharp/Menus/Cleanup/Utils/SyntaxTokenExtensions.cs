@@ -149,18 +149,12 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         public static bool HasNoneWhitespaceTrivia(this SyntaxNode node, SyntaxKind[] exceptionList = null)
         {
-            if (node.ContainsDirectives) return true;
-            if (node.HasStructuredTrivia) return true;
-            if (node.DescendantTrivia(descendIntoTrivia: true).HasNoneWhitespaceTrivia(exceptionList)) return true;
-            return false;
+            return (node.ContainsDirectives || node.HasStructuredTrivia || node.DescendantTrivia(descendIntoTrivia: true).HasNoneWhitespaceTrivia(exceptionList));
         }
 
         public static bool HasNoneWhitespaceTrivia(this SyntaxToken token, SyntaxKind[] exceptionList = null)
         {
-            if (token.ContainsDirectives) return true;
-            if (token.HasStructuredTrivia) return true;
-            if (token.GetAllTrivia().HasNoneWhitespaceTrivia()) return true;
-            return false;
+            return (token.ContainsDirectives || token.HasStructuredTrivia || token.GetAllTrivia().HasNoneWhitespaceTrivia());
         }
 
         public static bool IsPrivate(this FieldDeclarationSyntax field) => IsPrivate(field.Modifiers);

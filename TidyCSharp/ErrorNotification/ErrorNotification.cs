@@ -11,6 +11,7 @@ namespace Geeks.GeeksProductivityTools
 
         internal static void EmailError(string message)
         {
+
         }
 
         static ErrorNotification()

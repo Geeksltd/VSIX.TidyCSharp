@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Geeks.GeeksProductivityTools
 {
@@ -53,7 +54,7 @@ namespace Geeks.GeeksProductivityTools
             }
         }
 
-        public void RefreshSolution(Solution newSolution)
+        public async Task RefreshSolutionAsync(Solution newSolution)
         {
             _CleanupWorkingSolution = ExtactChanges(_CleanupWorkingSolution, newSolution);
         }
@@ -72,7 +73,12 @@ namespace Geeks.GeeksProductivityTools
                     foreach (var changedDocumentId in docchanges)
                     {
                         var changedDocument = changedProject.OldProject.GetDocument(changedDocumentId);
-                        var documentRoot = changedDocument.GetSyntaxRootAsync().Result;
+                        SyntaxNode documentRoot = null;
+                        ThreadHelper.JoinableTaskFactory
+                        .Run(async delegate
+                        {
+                            documentRoot = await changedDocument.GetSyntaxRootAsync();
+                        });
                         documentRoot.WriteSourceTo(changedDocument.FilePath);
                         changedSolution = changedSolution.WithDocumentSyntaxRoot(changedDocumentId, documentRoot);
 
@@ -106,25 +112,25 @@ namespace Geeks.GeeksProductivityTools
         protected override async System.Threading.Tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, false))
-                tidyLogWriter.WriteLine("Initialization has begun...");
+               await tidyLogWriter.WriteLineAsync("Initialization has begun...");
 
 
             await base.InitializeAsync(cancellationToken, progress);
 
             using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
-                tidyLogWriter.WriteLine("Base has initialized");
+                await tidyLogWriter.WriteLineAsync("Base has initialized");
 
 
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
             using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
-                tidyLogWriter.WriteLine("Switched to main thread");
+                await tidyLogWriter.WriteLineAsync("Switched to main thread");
 
 
             App.Initialize(GetDialogPage(typeof(OptionsPage)) as OptionsPage);
 
             using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
-                tidyLogWriter.WriteLine("App initialized");
+                await tidyLogWriter.WriteLineAsync("App initialized");
 
 
             Instance = this;
@@ -137,9 +143,9 @@ namespace Geeks.GeeksProductivityTools
             using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
             {
                 if (componentModel == null)
-                    tidyLogWriter.WriteLine("component Model is null");
+                    await tidyLogWriter.WriteLineAsync("component Model is null");
                 else
-                    tidyLogWriter.WriteLine("component has value");
+                    await tidyLogWriter.WriteLineAsync("component has value");
             }
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
@@ -153,9 +159,9 @@ namespace Geeks.GeeksProductivityTools
             using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
             {
                 if (menuCommandService == null)
-                    tidyLogWriter.WriteLine("menu Command Service  is null");
+                    await tidyLogWriter.WriteLineAsync("menu Command Service  is null");
                 else
-                    tidyLogWriter.WriteLine("menu Command Service has value");
+                    await tidyLogWriter.WriteLineAsync("menu Command Service has value");
             }
 
             // Hook up event handlers
@@ -168,13 +174,8 @@ namespace Geeks.GeeksProductivityTools
             solEvents.Opened += delegate { App.Initialize(GetDialogPage(typeof(OptionsPage)) as OptionsPage); };
 
             using (var tidyLogWriter = new StreamWriter(TidyProcesLogsPath, true))
-                tidyLogWriter.WriteLine("Initialization has finished...");
+                await tidyLogWriter.WriteLineAsync("Initialization has finished...");
 
-        }
-
-        void BuildEvents_OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
-        {
-            throw new NotImplementedException();
         }
 
         void BuildEvent_OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)

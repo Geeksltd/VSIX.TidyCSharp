@@ -35,7 +35,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             if (commandGuid == GuidList.GuidCleanupCmdSet)
             {
-                ActionCSharpOnAnyWhere.Invoke(desiredAction,
+                ActionCSharpOnAnywhere.Invoke(desiredAction,
                     new VSIX.TidyCSharp.Cleanup.CommandsHandlers.CleanupOptions
                     {
                         //ActionTypes = new[] { CleanerType }

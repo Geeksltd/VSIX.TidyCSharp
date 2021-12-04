@@ -33,7 +33,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             if (CleanupOptionForm.Instance.CleanupOptions != null)
             {
-                ActionsOnCSharp.ActionCSharpOnAnyWhere.Invoke(desiredAction, CleanupOptionForm.Instance.CleanupOptions);
+                ActionsOnCSharp.ActionCSharpOnAnywhere.Invoke(desiredAction, CleanupOptionForm.Instance.CleanupOptions);
                 TidyCSharpPackage.Instance.SaveSolutionChanges();
             }
         }

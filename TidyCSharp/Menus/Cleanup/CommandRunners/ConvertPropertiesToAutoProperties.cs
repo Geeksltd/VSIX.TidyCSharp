@@ -94,7 +94,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             if (string.Compare(text?.ToString(), ProjectItemDetails.InitialSourceNode.GetText().ToString(), false) != 0)
             {
-                TidyCSharpPackage.Instance.RefreshSolution(WorkingDocument.Project.Solution);
+               await  TidyCSharpPackage.Instance.RefreshSolutionAsync(WorkingDocument.Project.Solution);
             }
         }
 
