@@ -13,7 +13,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class RemoveExtraThisQualification : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
             var rewriter = new Rewriter(ProjectItemDetails, IsReportOnlyMode, Options);
             var modifiedSourceNode = rewriter.Visit(initialSourceNode);
@@ -69,7 +69,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 {
                     classNode = classNode.ReplaceNodes(newItems.Keys, (node1, node2) =>
                     {
-                        if (IsReportOnlyMode)
+                        if (isReportOnlyMode)
                         {
                             var lineSpan = node1.GetFileLinePosSpan();
 

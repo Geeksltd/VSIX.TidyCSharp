@@ -165,7 +165,7 @@ namespace Geeks.GeeksProductivityTools
             }
 
             // Hook up event handlers
-            events = App.DTE.Events;
+            events = App.Dte.Events;
             buildEvent = events.BuildEvents;
             docEvents = events.DocumentEvents;
             solEvents = events.SolutionEvents;

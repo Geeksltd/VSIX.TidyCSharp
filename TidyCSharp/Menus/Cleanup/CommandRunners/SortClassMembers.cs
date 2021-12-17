@@ -10,12 +10,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class SortClassMembers : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
             var modifiedSourceNode = SortClassMembersHelper(initialSourceNode);
 
             if (IsReportOnlyMode &&
-                   !IsEquivalentToUnModified(modifiedSourceNode))
+                   !IsEquivalentToUNModified(modifiedSourceNode))
             {
                 CollectMessages(new ChangesReport(initialSourceNode)
                 {

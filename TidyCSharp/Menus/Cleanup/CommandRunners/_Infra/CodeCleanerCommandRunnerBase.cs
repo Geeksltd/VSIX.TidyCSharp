@@ -21,30 +21,34 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
         {
             ChangesReports = ChangesReports ?? new List<ChangesReport>();
         }
-        public void Run(ProjectItem item) => AsyncRun(item);
+        public void Run(ProjectItem item) => Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory
+                            .Run(async delegate
+                            {
+                                await RunAsync(item);
+                            }); 
 
         public ProjectItemDetailsType ProjectItemDetails { get; protected set; }
-        public ProjectItemDetailsType UnModifiedProjectItemDetails { get; protected set; }
+        public ProjectItemDetailsType UNModifiedProjectItemDetails { get; protected set; }
 
-        protected virtual async void AsyncRun(ProjectItem item)
+        protected virtual async Task RunAsync(ProjectItem item)
         {
             ProjectItemDetails = new ProjectItemDetailsType(item);
 
             if (IsReportOnlyMode)
             {
-                RefreshResult(item.ToSyntaxNode());
+                RefreshResultAsync(item.ToSyntaxNode());
             }
 
-            UnModifiedProjectItemDetails = ProjectItemDetails;
+            UNModifiedProjectItemDetails = ProjectItemDetails;
 
-            var initialSourceNode = CleanUp(ProjectItemDetails.InitialSourceNode);
+            var initialSourceNode = CleanUpAsync(ProjectItemDetails.InitialSourceNode);
 
             if (!IsReportOnlyMode)
             {
                 try
                 {
                     var result = await initialSourceNode;
-                    await SaveResult(result);
+                    await SaveResultAsync(result);
                 }
                 catch (Exception ex)
                 {
@@ -53,9 +57,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             }
         }
 
-        protected async virtual Task<SyntaxNode> RefreshResult(SyntaxNode initialSourceNode)
+        protected async virtual Task<SyntaxNode> RefreshResultAsync(SyntaxNode initialSourceNode)
         {
-            if (UnModifiedProjectItemDetails != null && UnModifiedProjectItemDetails.InitialSourceNode.ToFullString().Replace("\r", "")
+            if (UNModifiedProjectItemDetails != null && UNModifiedProjectItemDetails.InitialSourceNode.ToFullString().Replace("\r", "")
                 .Equals(initialSourceNode.ToFullString().Replace("\r", "")))
             {
                 ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
@@ -72,11 +76,11 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             return ProjectItemDetails.InitialSourceNode;
         }
 
-        protected virtual async Task SaveResult(SyntaxNode initialSourceNode)
+        protected virtual async Task SaveResultAsync(SyntaxNode initialSourceNode)
         {
             if (initialSourceNode == null || initialSourceNode == ProjectItemDetails.InitialSourceNode) return;
 
-            if (UnModifiedProjectItemDetails.InitialSourceNode.ToFullString().Replace("\r", "")
+            if (UNModifiedProjectItemDetails.InitialSourceNode.ToFullString().Replace("\r", "")
                 .Equals(initialSourceNode.ToFullString().Replace("\r", "")))
                 return;
 
@@ -90,11 +94,11 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             await TidyCSharpPackage.Instance.RefreshSolutionAsync(newDocument.Project.Solution);
         }
 
-        public virtual async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode) => null;
+        public virtual async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode) => null;
 
-        public bool IsEquivalentToUnModified(SyntaxNode initialSourceNode)
+        public bool IsEquivalentToUNModified(SyntaxNode initialSourceNode)
         {
-            return initialSourceNode.IsEquivalentTo(UnModifiedProjectItemDetails.InitialSourceNode);
+            return initialSourceNode.IsEquivalentTo(UNModifiedProjectItemDetails.InitialSourceNode);
         }
 
         public void CollectMessages(params ChangesReport[] changesReports)
@@ -108,7 +112,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             var xmlWriterSettings = new XmlWriterSettings();
             xmlWriterSettings.Indent = true;
 
-            var textWriter = XmlWriter.Create(Path.GetDirectoryName(App.DTE.Solution.FullName)
+            var textWriter = XmlWriter.Create(Path.GetDirectoryName(App.Dte.Solution.FullName)
                 + "\\Tidy.log", xmlWriterSettings);
 
             textWriter.WriteStartDocument();

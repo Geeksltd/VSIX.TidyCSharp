@@ -5,50 +5,50 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 {
     public class CodeCleanerFactory
     {
-        public static ICodeCleaner Create(CodeCleanerType type, CleanupOptions cleanupOptions, bool IsReportOnly = false)
+        public static ICodeCleaner Create(CodeCleanerType type, CleanupOptions cleanupOptions, bool isReportOnly = false)
         {
             switch (type)
             {
                 case CodeCleanerType.NormalizeWhiteSpaces:
-                    return new WhiteSpaceNormalizer() { Options = cleanupOptions.WhiteSpaceNormalizer, IsReportOnlyMode = IsReportOnly };
+                    return new WhiteSpaceNormalizer() { Options = cleanupOptions.WhiteSpaceNormalizer, IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.ConvertMembersToExpressionBodied:
-                    return new ConvertMembersToExpressionBodied() { Options = cleanupOptions.ConvertMembersToExpressionBodied, IsReportOnlyMode = IsReportOnly };
+                    return new ConvertMembersToExpressionBodied() { Options = cleanupOptions.ConvertMembersToExpressionBodied, IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.ConvertFullNameTypesToBuiltInTypes:
-                    return new ConvertFullNameTypesToBuiltInTypes() { IsReportOnlyMode = IsReportOnly };
+                    return new ConvertFullNameTypesToBuiltInTypes() { IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.SortClassMembers:
-                    return new SortClassMembers() { IsReportOnlyMode = IsReportOnly }; ;
+                    return new SortClassMembers() { IsReportOnlyMode = isReportOnly }; ;
                 case CodeCleanerType.SimplyAsyncCalls:
-                    return new SimplyAsyncCalls() { Options = cleanupOptions.SimplyAsyncCall, IsReportOnlyMode = IsReportOnly };
+                    return new SimplyAsyncCalls() { Options = cleanupOptions.SimplyAsyncCall, IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.SimplifyClassFieldDeclarations:
-                    return new SimplifyClassFieldDeclarations() { Options = cleanupOptions.SimplifyClassFieldDeclarations, IsReportOnlyMode = IsReportOnly };
+                    return new SimplifyClassFieldDeclarations() { Options = cleanupOptions.SimplifyClassFieldDeclarations, IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.RemoveAttributeKeywork:
-                    return new RemoveAttributeKeywork() { IsReportOnlyMode = IsReportOnly };
+                    return new RemoveAttributeKeywork() { IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.CompactSmallIfElseStatements:
-                    return new CompactSmallIfElseStatements() { IsReportOnlyMode = IsReportOnly };
+                    return new CompactSmallIfElseStatements() { IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.RemoveExtraThisQualification:
-                    return new RemoveExtraThisQualification() { Options = cleanupOptions.RemoveExtraThisQualification, IsReportOnlyMode = IsReportOnly };
+                    return new RemoveExtraThisQualification() { Options = cleanupOptions.RemoveExtraThisQualification, IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.CamelCasedMethodVariable:
-                    return new CamelCasedLocalVariable() { Options = cleanupOptions.CamelCasedLocalVariable, IsReportOnlyMode = IsReportOnly };
+                    return new CamelCasedLocalVariable() { Options = cleanupOptions.CamelCasedLocalVariable, IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.CamelCasedFields:
-                    return new CamelCasedFields() { Options = cleanupOptions.CamelCasedFields, IsReportOnlyMode = IsReportOnly };
+                    return new CamelCasedFields() { Options = cleanupOptions.CamelCasedFields, IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.PrivateAccessModifier:
-                    return new PrivateModifierRemover() { IsReportOnlyMode = IsReportOnly };
+                    return new PrivateModifierRemover() { IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.OrganizeUsingDirectives:
-                    return new UsingDirectiveOrganizer() { Options = cleanupOptions.PrivateModifierRemover, IsReportOnlyMode = IsReportOnly };
+                    return new UsingDirectiveOrganizer() { Options = cleanupOptions.PrivateModifierRemover, IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.SimplifyVariableDeclarations:
-                    return new SimplifyVariableDeclarations() { IsReportOnlyMode = IsReportOnly };
+                    return new SimplifyVariableDeclarations() { IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.ConvertPropertiesToAutoProperties:
-                    return new ConvertPropertiesToAutoProperties() { IsReportOnlyMode = IsReportOnly };
+                    return new ConvertPropertiesToAutoProperties() { IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.ConvertMsharpUIMethods:
-                    return new MSharpUICleaner() { IsReportOnlyMode = IsReportOnly };
+                    return new MSharpUICleaner() { IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.ConvertMsharpModelMethods:
-                    return new MSharpModelCleaner() { IsReportOnlyMode = IsReportOnly };
+                    return new MSharpModelCleaner() { IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.ConvertMsharpGeneralMethods:
-                    return new MSharpGeneralCleaner() { IsReportOnlyMode = IsReportOnly };
+                    return new MSharpGeneralCleaner() { IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.ConvertZebbleGeneralMethods:
-                    return new ZebbleCleaner() { IsReportOnlyMode = IsReportOnly };
+                    return new ZebbleCleaner() { IsReportOnlyMode = isReportOnly };
                 case CodeCleanerType.UpgradeCSharpSyntax:
-                    return new CSharpSyntaxUpgrade() { IsReportOnlyMode = IsReportOnly };
+                    return new CSharpSyntaxUpgrade() { IsReportOnlyMode = isReportOnly };
                 default: return null; // TODO
             }
         }

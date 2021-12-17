@@ -13,27 +13,27 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class MSharpModelCleaner : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
             if (ProjectItemDetails.ProjectItem.ContainingProject.Name == "#Model")
-                return await ChangeMethodHelper(initialSourceNode);
+                return await ChangeMethodHelperAsync(initialSourceNode);
 
             return initialSourceNode;
         }
 
-        async Task<SyntaxNode> ChangeMethodHelper(SyntaxNode initialSourceNode)
+        async Task<SyntaxNode> ChangeMethodHelperAsync(SyntaxNode initialSourceNode)
         {
             var localTimeRewriter = new LocalTimeRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             var modifiedSourceNode = localTimeRewriter.Visit(initialSourceNode);
-            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
 
             var cascadeDeleteRewriter = new CascadeDeleteRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = cascadeDeleteRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
 
             var calculatedGetterRewriter = new CalculatedGetterRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = calculatedGetterRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
 
             var transientDatabaseModeRewriter = new TransientDatabaseModeRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = transientDatabaseModeRewriter.Visit(modifiedSourceNode);

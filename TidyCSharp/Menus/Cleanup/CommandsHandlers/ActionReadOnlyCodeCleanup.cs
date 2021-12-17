@@ -162,9 +162,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 ReadOnlyMainCleanup(CodeCleanerType.CamelCasedMethodVariable, new CleanerItemUIInfo[] {
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)CamelCasedMethodCleanupTypes.Local_variable,
+                            CleanerType = (int)CamelCasedMethodCleanupTypes.Local_Variable,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(CamelCasedMethodCleanupTypes), CamelCasedMethodCleanupTypes.Local_variable).ToString()
+                            Name = Enum.GetName(typeof(CamelCasedMethodCleanupTypes), CamelCasedMethodCleanupTypes.Local_Variable).ToString()
                         },
                     new CleanerItemUIInfo
                         {
@@ -177,9 +177,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 ReadOnlyMainCleanup(CodeCleanerType.SimplifyClassFieldDeclarations, new CleanerItemUIInfo[] {
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)SimplifyClassFieldDeclarationCleanupTypes.Group_And_Merge_class_fields,
+                            CleanerType = (int)SimplifyClassFieldDeclarationCleanupTypes.Group_And_Merge_Class_Fields,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(SimplifyClassFieldDeclarationCleanupTypes), SimplifyClassFieldDeclarationCleanupTypes.Group_And_Merge_class_fields).ToString()
+                            Name = Enum.GetName(typeof(SimplifyClassFieldDeclarationCleanupTypes), SimplifyClassFieldDeclarationCleanupTypes.Group_And_Merge_Class_Fields).ToString()
                         },
                     new CleanerItemUIInfo
                         {
@@ -198,21 +198,21 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 ReadOnlyMainCleanup(CodeCleanerType.NormalizeWhiteSpaces, new CleanerItemUIInfo[] {
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Adding_Blank_after_Block_Close_Bracket,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Adding_Blank_After_Block_Close_Bracket,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Adding_Blank_after_Block_Close_Bracket).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Adding_Blank_After_Block_Close_Bracket).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Adding_Blank_after_Method_Close_Bracket,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Adding_Blank_After_Method_Close_Bracket,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Adding_Blank_after_Method_Close_Bracket).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Adding_Blank_After_Method_Close_Bracket).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Add_blank_line_between_statements_more_than_one_line,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Add_Blank_Line_Between_Statements_More_Than_One_Line,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Add_blank_line_between_statements_more_than_one_line).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Add_Blank_Line_Between_Statements_More_Than_One_Line).ToString()
                         },
                     new CleanerItemUIInfo
                         {
@@ -222,45 +222,45 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_BLs_after_Open_Bracket_and_Before_Close_Brackets,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_Blank_After_Open_Bracket_And_Before_Close_Brackets,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_BLs_after_Open_Bracket_and_Before_Close_Brackets).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_Blank_After_Open_Bracket_And_Before_Close_Brackets).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_Brackets_of_block_that_has_only_one_statement_with_length_shorter_than_80_chars,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_Brackets_Of_Block_That_Has_Only_One_Statement_With_Length_Shorter_Than_80_Chars,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_Brackets_of_block_that_has_only_one_statement_with_length_shorter_than_80_chars).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_Brackets_Of_Block_That_Has_Only_One_Statement_With_Length_Shorter_Than_80_Chars).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_DBL_Between_Class_Members,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Between_Class_Members,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_DBL_Between_Class_Members).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Between_Class_Members).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_DBL_Between_Methods_Statements,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Between_Methods_Statements,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_DBL_Between_Methods_Statements).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Between_Methods_Statements).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_DBL_Between_Namespace_Members,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Between_Namespace_Members,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_DBL_Between_Namespace_Members).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Between_Namespace_Members).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_DBL_Inside_Comments,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Inside_Comments,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_DBL_Inside_Comments).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Inside_Comments).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_DBL_Inside_Usings,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Inside_Usings,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_DBL_Inside_Usings).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Inside_Usings).ToString()
                         },
                     new CleanerItemUIInfo
                         {
@@ -270,15 +270,15 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Use_slash_n_instead_of_slash_sr_slash_n,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Use_Slash_Instead_Of_Slash_Slash,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Use_slash_n_instead_of_slash_sr_slash_n).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Use_Slash_Instead_Of_Slash_Slash).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Add_an_empty_line_after_using_statements,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Add_An_Empty_Line_After_Using_Statements,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Add_an_empty_line_after_using_statements).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Add_An_Empty_Line_After_Using_Statements).ToString()
                         },
                 }));
         }

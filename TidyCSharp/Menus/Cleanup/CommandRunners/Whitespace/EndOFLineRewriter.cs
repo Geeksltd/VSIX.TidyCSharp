@@ -16,7 +16,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
         {
             if (trivia.IsKind(SyntaxKind.EndOfLineTrivia) && trivia.ToFullString() == "\r\n")
             {
-                if (IsReportOnlyMode)
+                if (isReportOnlyMode)
                 {
                     var lineSpan = trivia.GetFileLinePosSpan();
 

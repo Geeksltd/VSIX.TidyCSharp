@@ -9,7 +9,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers
     {
         List<ICleanupOption> optionItems = new List<ICleanupOption>();
 
-        public const string TO_STRING_SEPRATOR2 = ":", TO_STRING_SEPRATOR = ";";
+        public const string To_String_Seprator2 = ":", To_String_Seprator = ";";
         public List<CodeCleanerType> ActionTypes { get; private set; } = new List<CodeCleanerType>();
 
         public CleanupOptions()
@@ -48,32 +48,32 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers
         {
             var values = System.Enum.GetValues(typeof(CodeCleanerType)).Cast<int>();
 
-            return string.Join(TO_STRING_SEPRATOR, values
+            return string.Join(To_String_Seprator, values
                 .Select(enumValueAsObject =>
                 {
                     var optionItem = optionItems.FirstOrDefault(o => (int)o.GetCodeCleanerType() == enumValueAsObject);
 
                     var IsParentSelected = ActionTypes.Contains((CodeCleanerType)enumValueAsObject);
 
-                    if (optionItem == null) return $"{enumValueAsObject}{TO_STRING_SEPRATOR2}{IsParentSelected}{TO_STRING_SEPRATOR2}{-1}";
+                    if (optionItem == null) return $"{enumValueAsObject}{To_String_Seprator2}{IsParentSelected}{To_String_Seprator2}{-1}";
 
                     if (optionItem.CleanupItemsInteger.HasValue == false)
-                        return $"{enumValueAsObject}{TO_STRING_SEPRATOR2}{IsParentSelected}{TO_STRING_SEPRATOR2}{0}";
+                        return $"{enumValueAsObject}{To_String_Seprator2}{IsParentSelected}{To_String_Seprator2}{0}";
 
-                    return $"{enumValueAsObject}{TO_STRING_SEPRATOR2}{IsParentSelected}{TO_STRING_SEPRATOR2}{optionItem.CleanupItemsInteger.Value}";
+                    return $"{enumValueAsObject}{To_String_Seprator2}{IsParentSelected}{To_String_Seprator2}{optionItem.CleanupItemsInteger.Value}";
                 })
             );
         }
 
         public override string ToString()
         {
-            return string.Join(TO_STRING_SEPRATOR, ActionTypes
+            return string.Join(To_String_Seprator, ActionTypes
                 .Select(x =>
                 {
                     var optionItem = optionItems.FirstOrDefault(o => o.GetCodeCleanerType() == x);
-                    if (optionItem == null) return $"{(int)x}{TO_STRING_SEPRATOR2}{-1}";
-                    if (optionItem.CleanupItemsInteger.HasValue == false) return $"{(int)x}{TO_STRING_SEPRATOR2}{0}";
-                    return $"{(int)x}{TO_STRING_SEPRATOR2}{optionItem.CleanupItemsInteger.Value}";
+                    if (optionItem == null) return $"{(int)x}{To_String_Seprator2}{-1}";
+                    if (optionItem.CleanupItemsInteger.HasValue == false) return $"{(int)x}{To_String_Seprator2}{0}";
+                    return $"{(int)x}{To_String_Seprator2}{optionItem.CleanupItemsInteger.Value}";
                 })
             );
         }

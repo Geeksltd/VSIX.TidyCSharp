@@ -11,7 +11,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class SimplifyVariableDeclarations : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
             var syntaxRewriter = new Rewriter(ProjectItemDetails.SemanticModel,
                 IsReportOnlyMode, Options);
@@ -64,7 +64,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 if (typeOfInitializer.Type?.Name == typeOfTypeDef.Type?.Name)
                 {
-                    if (IsReportOnlyMode)
+                    if (isReportOnlyMode)
                     {
                         var lineSpan = node.GetFileLinePosSpan();
 

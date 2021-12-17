@@ -13,7 +13,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
         {
             var properties = new PropertyExtractor().Extraxt(root, SyntaxKind.PrivateKeyword);
 
-            if (IsReportOnlyMode)
+            if (isReportOnlyMode)
             {
                 foreach (var prop in properties)
                 {

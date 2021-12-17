@@ -129,47 +129,47 @@
             }
         }
 
-        public static SyntaxNode GetParentDeclaration(SyntaxToken token)
-        {
-            var parent = token.Parent;
+        //public static SyntaxNode GetParentDeclaration(SyntaxToken token)
+        //{
+        //    var parent = token.Parent;
 
-            while (parent != null)
-            {
-                switch ((SyntaxKind)parent.RawKind)
-                {
-                    case SyntaxKind.VariableDeclarator:
-                    case SyntaxKind.Parameter:
-                    case SyntaxKind.TypeParameter:
-                    case SyntaxKind.CatchDeclaration:
-                    case SyntaxKind.ExternAliasDirective:
-                    case SyntaxKind.QueryContinuation:
-                    case SyntaxKind.FromClause:
-                    case SyntaxKind.LetClause:
-                    case SyntaxKind.JoinClause:
-                    case SyntaxKind.JoinIntoClause:
-                    case SyntaxKind.ForEachStatement:
-                    case SyntaxKind.UsingDirective:
-                    case SyntaxKind.LabeledStatement:
-                    case SyntaxKind.AnonymousObjectMemberDeclarator:
-                    case SyntaxKindEx.LocalFunctionStatement:
-                    case SyntaxKindEx.SingleVariableDesignation:
-                        return parent;
+        //    while (parent != null)
+        //    {
+        //        switch ((SyntaxKind)parent.RawKind)
+        //        {
+        //            case SyntaxKind.VariableDeclarator:
+        //            case SyntaxKind.Parameter:
+        //            case SyntaxKind.TypeParameter:
+        //            case SyntaxKind.CatchDeclaration:
+        //            case SyntaxKind.ExternAliasDirective:
+        //            case SyntaxKind.QueryContinuation:
+        //            case SyntaxKind.FromClause:
+        //            case SyntaxKind.LetClause:
+        //            case SyntaxKind.JoinClause:
+        //            case SyntaxKind.JoinIntoClause:
+        //            case SyntaxKind.ForEachStatement:
+        //            case SyntaxKind.UsingDirective:
+        //            case SyntaxKind.LabeledStatement:
+        //            case SyntaxKind.AnonymousObjectMemberDeclarator:
+        //            case SyntaxKindEx.LocalFunctionStatement:
+        //            case SyntaxKindEx.SingleVariableDesignation:
+        //                return parent;
 
-                    default:
-                        var declarationParent = parent as MemberDeclarationSyntax;
-                        if (declarationParent != null)
-                        {
-                            return declarationParent;
-                        }
+        //            default:
+        //                var declarationParent = parent as MemberDeclarationSyntax;
+        //                if (declarationParent != null)
+        //                {
+        //                    return declarationParent;
+        //                }
 
-                        break;
-                }
+        //                break;
+        //        }
 
-                parent = parent.Parent;
-            }
+        //        parent = parent.Parent;
+        //    }
 
-            return null;
-        }
+        //    return null;
+        //}
 
         class LocalNameFinder : CSharpSyntaxWalker
         {

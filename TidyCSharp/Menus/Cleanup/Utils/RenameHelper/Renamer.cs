@@ -27,7 +27,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             });
         }
 
-        public async Task<RenameResult> RenameDeclarations(SyntaxNode containerNode)
+        public async Task<RenameResult> RenameDeclarationsAsync(SyntaxNode containerNode)
         {
             SyntaxNode currentNode;
             var newNode = containerNode;
@@ -37,7 +37,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             do
             {
                 currentNode = newNode;
-                workingRenamingResult = await RenameDeclarationNodeOfContainerNode(currentNode);
+                workingRenamingResult = await RenameDeclarationNodeOfContainerNodeAsync(currentNode);
 
                 if (workingRenamingResult != null)
                 {
@@ -58,7 +58,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         IList<string> VisitedTokens = new List<string>();
 
-        async Task<RenameResult> RenameDeclarationNodeOfContainerNode(SyntaxNode containerNode)
+        async Task<RenameResult> RenameDeclarationNodeOfContainerNodeAsync(SyntaxNode containerNode)
         {
             var filteredItemsToRenmae = GetItemsToRename(containerNode).Where(i => VisitedTokens.Contains(i.ValueText) == false);
 
@@ -74,7 +74,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
                 foreach (var newName in newNames)
                 {
-                    var renameResult = await RenameIdentifierOfContainerNode(containerNode, identifierToRename, newName);
+                    var renameResult = await RenameIdentifierOfContainerNodeAsync(containerNode, identifierToRename, newName);
 
                     if (renameResult == null) continue;
                     result = renameResult.Value.Key;
@@ -89,7 +89,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             return null;
         }
 
-        async Task<KeyValuePair<RenameResult, string>?> RenameIdentifierOfContainerNode(SyntaxNode containerNode, SyntaxToken identifierToRename, string newVarName)
+        async Task<KeyValuePair<RenameResult, string>?> RenameIdentifierOfContainerNodeAsync(SyntaxNode containerNode, SyntaxToken identifierToRename, string newVarName)
         {
             RenameResult result = null;
 
@@ -107,7 +107,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             if (validateNameResult == false) return null;
 
-            result = await RenameSymbol(WorkingDocument, await WorkingDocument.GetSyntaxRootAsync(), containerNode, identifierDeclarationNode, newVarName);
+            result = await RenameSymbolAsync(WorkingDocument, await WorkingDocument.GetSyntaxRootAsync(), containerNode, identifierDeclarationNode, newVarName);
 
             if (result != null) selectedName = newVarName;
 
@@ -182,7 +182,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
         }
 
         const string SELECTED_METHOD_ANNOTATION = "SELECTED_METHOD_ANNOTATION";
-        static async Task<RenameResult> RenameSymbol(Document document, SyntaxNode root, SyntaxNode startNode, ParameterSyntax declarationNode, string newName)
+        static async Task<RenameResult> RenameSymbolAsync(Document document, SyntaxNode root, SyntaxNode startNode, ParameterSyntax declarationNode, string newName)
         {
             var identifierToken = declarationNode.Identifier;
 
@@ -198,12 +198,12 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             var annotatedRoot = root.ReplaceNodes(changeDic.Keys, (x, y) => changeDic[x]);
 
-            var newSolution = await RenameSymbol(document, annotatedRoot, identifierToken, methodAnnotation, newName);
+            var newSolution = await RenameSymbolAsync(document, annotatedRoot, identifierToken, methodAnnotation, newName);
 
-            return await GetNewStartNode(newSolution, document, methodAnnotation, startNode);
+            return await GetNewStartNodeAsync(newSolution, document, methodAnnotation, startNode);
         }
 
-        static async Task<RenameResult> RenameSymbol(Document document, SyntaxNode root, SyntaxNode startNode, VariableDeclaratorSyntax declarationNode, string newName)
+        static async Task<RenameResult> RenameSymbolAsync(Document document, SyntaxNode root, SyntaxNode startNode, VariableDeclaratorSyntax declarationNode, string newName)
         {
             var identifierToken = declarationNode.Identifier;
 
@@ -219,12 +219,12 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             var annotatedRoot = root.ReplaceNodes(changeDic.Keys, (x, y) => changeDic[x]);
 
-            var newSolution = await RenameSymbol(document, annotatedRoot, identifierToken, methodAnnotation, newName);
+            var newSolution = await RenameSymbolAsync(document, annotatedRoot, identifierToken, methodAnnotation, newName);
 
-            return await GetNewStartNode(newSolution, document, methodAnnotation, startNode);
+            return await GetNewStartNodeAsync(newSolution, document, methodAnnotation, startNode);
         }
 
-        static async Task<RenameResult> GetNewStartNode(Solution newSolution, Document document, SyntaxAnnotation methodAnnotation, SyntaxNode startNode)
+        static async Task<RenameResult> GetNewStartNodeAsync(Solution newSolution, Document document, SyntaxAnnotation methodAnnotation, SyntaxNode startNode)
         {
             var newDocument =
                newSolution.Projects.FirstOrDefault(x => x.Name == document.Project.Name)
@@ -242,27 +242,27 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             };
         }
 
-        public static Task<RenameResult> RenameSymbol(Document document, SyntaxNode root, SyntaxNode startNode, SyntaxToken identifierToken, string newName)
+        public static Task<RenameResult> RenameSymbolAsync(Document document, SyntaxNode root, SyntaxNode startNode, SyntaxToken identifierToken, string newName)
         {
-            return RenameSymbol(document, root, startNode, identifierToken.Parent, newName);
+            return RenameSymbolAsync(document, root, startNode, identifierToken.Parent, newName);
         }
 
-        public static async Task<RenameResult> RenameSymbol(Document document, SyntaxNode root, SyntaxNode startNode, SyntaxNode declarationNode, string newName)
+        public static async Task<RenameResult> RenameSymbolAsync(Document document, SyntaxNode root, SyntaxNode startNode, SyntaxNode declarationNode, string newName)
         {
             if (declarationNode is VariableDeclaratorSyntax variableNode)
             {
-                return await RenameSymbol(document, root, startNode, variableNode, newName);
+                return await RenameSymbolAsync(document, root, startNode, variableNode, newName);
             }
 
             if (declarationNode is ParameterSyntax parameterNode)
             {
-                return await RenameSymbol(document, root, startNode, parameterNode, newName);
+                return await RenameSymbolAsync(document, root, startNode, parameterNode, newName);
             }
 
             return null;
         }
 
-        static async Task<Solution> RenameSymbol(Document document, SyntaxNode annotatedRoot, SyntaxToken identifierNode, SyntaxAnnotation methodAnnotation, string newName, CancellationToken cancellationToken = default(CancellationToken))
+        static async Task<Solution> RenameSymbolAsync(Document document, SyntaxNode annotatedRoot, SyntaxToken identifierNode, SyntaxAnnotation methodAnnotation, string newName, CancellationToken cancellationToken = default(CancellationToken))
         {
             var annotatedSolution = document.Project.Solution.WithDocumentSyntaxRoot(document.Id, annotatedRoot);
 

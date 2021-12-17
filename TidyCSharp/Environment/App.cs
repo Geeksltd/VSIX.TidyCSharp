@@ -8,10 +8,8 @@ namespace Geeks.GeeksProductivityTools
 {
     public static class App
     {
-        public static DTE DTE;
-        public static EnvDTE80.Events2 Events;
-        public static GlobalSettings Settings;
-        public static OptionsPage OptionsPage;
+        public static DTE Dte { get;private set;}
+        public static GlobalSettings Settings { get;set;}
 
         public static void Initialize(OptionsPage optionsPage)
         {
@@ -23,11 +21,9 @@ namespace Geeks.GeeksProductivityTools
 
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(GlobalExceptionHandlerEvent);
 
-            DTE = (DTE2)TidyCSharpPackage.GetGlobalService(typeof(SDTE));
-            Events = (Events2)TidyCSharpPackage.GetGlobalService(typeof(Events2));
+            Dte = (DTE2)TidyCSharpPackage.GetGlobalService(typeof(SDTE));
             Settings = new GlobalSettings();
             Settings.Load();
-            OptionsPage = optionsPage;
         }
 
         static void GlobalExceptionHandlerEvent(object sender, UnhandledExceptionEventArgs args)

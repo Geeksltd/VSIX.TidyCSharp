@@ -10,6 +10,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CamelCasedMethodVariable
         Method_Parameter = 0x01,
 
         [CleanupItem(Title = "Local variable declarations")]
-        Local_variable = 0x02,
+        Local_Variable = 0x02,
     }
 }

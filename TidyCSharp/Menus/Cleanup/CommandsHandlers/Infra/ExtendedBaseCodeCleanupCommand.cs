@@ -12,13 +12,13 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
     {
         protected CodeCleanerType CleanerType { get; private set; }
 
-        protected ExtendedBaseCodeCleanupCommand(OleMenuCommandService menu, uint commandID, CodeCleanerType cleanerType)
-            : base(menu, commandID)
+        protected ExtendedBaseCodeCleanupCommand(OleMenuCommandService menu, uint commandId, CodeCleanerType cleanerType)
+            : base(menu, commandId)
         {
             CleanerType = cleanerType;
         }
 
-        protected override void CallBack(object sender, EventArgs e)
+        protected override void Callback(object sender, EventArgs e)
         {
             var messageBoxResult = MessageBoxDisplay.Show(new MessageBoxDisplay.MessageBoxArgs
             {

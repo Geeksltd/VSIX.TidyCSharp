@@ -12,7 +12,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class CSharpSyntaxUpgrade : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
             return ChangeMethodHelper(initialSourceNode);
         }
@@ -142,7 +142,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 if (nodeTypeinfo.ConvertedType.ToString() == nodeTypeinfo.Type.ToString())
                 {
-                    if (IsReportOnlyMode)
+                    if (isReportOnlyMode)
                     {
                         var lineSpan = node.GetFileLinePosSpan();
 

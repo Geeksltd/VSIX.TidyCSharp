@@ -81,14 +81,14 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
         {
             try
             {
-                var choices = strValue.Split(new string[] { CleanupOptions.TO_STRING_SEPRATOR }, System.StringSplitOptions.RemoveEmptyEntries);
+                var choices = strValue.Split(new string[] { CleanupOptions.To_String_Seprator }, System.StringSplitOptions.RemoveEmptyEntries);
 
                 var controls = rightTableLayoutPanel.Controls.OfType<CleanupItemUserControl>()
                     .Union(leftTableLayoutPanel.Controls.OfType<CleanupItemUserControl>());
 
                 foreach (var item in choices)
                 {
-                    var choiceItem = item.Split(new string[] { CleanupOptions.TO_STRING_SEPRATOR2 }, System.StringSplitOptions.RemoveEmptyEntries);
+                    var choiceItem = item.Split(new string[] { CleanupOptions.To_String_Seprator2 }, System.StringSplitOptions.RemoveEmptyEntries);
 
                     var cleanUpType = (CodeCleanerType)int.Parse(choiceItem[0]);
                     var isSelected = bool.Parse(choiceItem[1]);

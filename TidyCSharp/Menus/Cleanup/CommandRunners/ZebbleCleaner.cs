@@ -13,7 +13,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class ZebbleCleaner : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
             if (ProjectItemDetails.SemanticModel is null) return initialSourceNode;
 
@@ -37,7 +37,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 : base(isReportOnlyMode, options)
             {
                 this.semanticModel = semanticModel;
-                IsReportOnlyMode = isReportOnlyMode;
+                this.isReportOnlyMode = isReportOnlyMode;
             }
             public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
             {
@@ -49,7 +49,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     semanticModel.GetTypeInfo(node.Declaration.Type).Type.ContainingNamespace.Name != "Olive")
                     return node;
 
-                if (IsReportOnlyMode)
+                if (isReportOnlyMode)
                 {
                     var lineSpan = node.GetFileLinePosSpan();
 

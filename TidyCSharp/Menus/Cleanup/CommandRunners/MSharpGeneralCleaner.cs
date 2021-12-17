@@ -14,16 +14,16 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class MSharpGeneralCleaner : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
-            return await ChangeMethodHelper(initialSourceNode);
+            return await ChangeMethodHelperAsync(initialSourceNode);
         }
 
-        async Task<SyntaxNode> ChangeMethodHelper(SyntaxNode initialSourceNode)
+        async Task<SyntaxNode> ChangeMethodHelperAsync(SyntaxNode initialSourceNode)
         {
             var csSyntaxRewriter = new CsMethodStringRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             var modifiedSourceNode = csSyntaxRewriter.Visit(initialSourceNode);
-            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
             var multiLineSyntaxRewriter = new MultiLineExpressionRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = multiLineSyntaxRewriter.Visit(modifiedSourceNode);
 

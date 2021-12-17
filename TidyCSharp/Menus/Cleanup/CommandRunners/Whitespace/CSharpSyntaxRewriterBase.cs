@@ -121,7 +121,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                 {
                     if (itsForCloseBrace)
                     {
-                        if (CheckOption((int)CleanupTypes.Remove_BLs_after_Open_Bracket_and_Before_Close_Brackets))
+                        if (CheckOption((int)CleanupTypes.Remove_Blank_After_Open_Bracket_And_Before_Close_Brackets))
                         {
                             i += RemoveBlankDuplication(syntaxTrivias, SyntaxKind.EndOfLineTrivia, i) + 1;
 
@@ -172,7 +172,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                     continue;
                 }
 
-                if (CheckOption((int)CleanupTypes.Remove_DBL_Inside_Comments) == false)
+                if (CheckOption((int)CleanupTypes.Remove_Duplicate_Inside_Comments) == false)
                 {
                     outputTriviasList.Add(syntaxTrivias[i]);
 

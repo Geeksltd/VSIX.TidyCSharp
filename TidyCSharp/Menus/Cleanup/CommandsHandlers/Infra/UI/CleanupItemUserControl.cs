@@ -88,13 +88,13 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
 
         #endregion
 
-        public static void CreateControls(Type itemsEnumType, Action<CleanerItemUIInfo> action, bool sortDESC = false)
+        public static void CreateControls(Type itemsEnumType, Action<CleanerItemUIInfo> action, bool sortDesc = false)
         {
             try
             {
                 var cleannerItemsAttributes = ExtractCleannerItemsAttributes(itemsEnumType);
 
-                if (!sortDESC) cleannerItemsAttributes = cleannerItemsAttributes.OrderBy(x => x.Value.Order.GetValueOrDefault(x.Key));
+                if (!sortDesc) cleannerItemsAttributes = cleannerItemsAttributes.OrderBy(x => x.Value.Order.GetValueOrDefault(x.Key));
                 else cleannerItemsAttributes = cleannerItemsAttributes.OrderByDescending(x => x.Value.Order.GetValueOrDefault(x.Key));
 
                 foreach (var item in cleannerItemsAttributes)
@@ -119,7 +119,7 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
                     action(tempCheckBoxItemUiInfo);
                 }
             }
-            catch (System.Exception exp)
+            catch
             {
             }
         }

@@ -9,14 +9,14 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class WhiteSpaceNormalizer : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
-            return await NormalizeWhiteSpaceHelper(initialSourceNode, Options);
+            return await NormalizeWhiteSpaceHelperAsync(initialSourceNode, Options);
         }
 
         public Options Options { get; set; }
 
-        public async Task<SyntaxNode> NormalizeWhiteSpaceHelper(SyntaxNode initialSourceNode, Options options)
+        public async Task<SyntaxNode> NormalizeWhiteSpaceHelperAsync(SyntaxNode initialSourceNode, Options options)
         {
             var modifiedSourceNode = initialSourceNode;
 
@@ -33,13 +33,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 CollectMessages(blockRewriter.GetReport());
             }
 
-            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
 
-            if (CheckOption((int)CleanupTypes.Use_slash_n_instead_of_slash_sr_slash_n))
+            if (CheckOption((int)CleanupTypes.Use_Slash_Instead_Of_Slash_Slash))
             {
                 var endoflineRewriter = new EndOFLineRewriter(modifiedSourceNode, IsReportOnlyMode, options);
                 modifiedSourceNode = endoflineRewriter.Visit(modifiedSourceNode);
-                modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+                modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
 
                 if (IsReportOnlyMode)
                 {
@@ -55,9 +55,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 CollectMessages(whitespaceRewriter.GetReport());
             }
 
-            if (CheckOption((int)CleanupTypes.Add_blank_line_between_statements_more_than_one_line))
+            if (CheckOption((int)CleanupTypes.Add_Blank_Line_Between_Statements_More_Than_One_Line))
             {
-                modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+                modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
                 var blRewriter = new BlankLineRewriter(modifiedSourceNode, IsReportOnlyMode, ProjectItemDetails.SemanticModel);
                 modifiedSourceNode = blRewriter.Visit(modifiedSourceNode);
 

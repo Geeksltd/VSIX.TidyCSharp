@@ -4,7 +4,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.RemoveExtraThisKeyword
 {
     public class Options : OptionsBase, ICleanupOption
     {
-        public const int MAX_FIELD_DECLARATION_LENGTH = 80;
+        public const int Max_Field_Declaration_Length = 80;
 
         public CleanupTypes? CleanupItems => (CleanupTypes?)CleanupItemsInteger;
 

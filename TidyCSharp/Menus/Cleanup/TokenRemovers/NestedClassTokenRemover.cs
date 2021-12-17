@@ -13,7 +13,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
         {
             var nestedClasses = new NestedClassExtractor().Extraxt(root, SyntaxKind.PrivateKeyword);
 
-            if (IsReportOnlyMode)
+            if (isReportOnlyMode)
             {
                 foreach (var nestedClass in nestedClasses)
                 {

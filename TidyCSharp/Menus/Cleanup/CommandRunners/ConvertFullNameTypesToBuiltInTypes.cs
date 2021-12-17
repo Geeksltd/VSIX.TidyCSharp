@@ -11,7 +11,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class ConvertFullNameTypesToBuiltInTypes : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
             var syntaxRewriter = new Rewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode
                 , Options);

@@ -12,7 +12,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class RemoveAttributeKeywork : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
             return RemoveAttributeKeyworkHelper(initialSourceNode, ProjectItemDetails.SemanticModel);
         }
@@ -52,7 +52,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         {
                             var newName = newNameNode.Identifier.ValueText.TrimEnd(Attribute_Keywork);
 
-                            if (IsReportOnlyMode)
+                            if (isReportOnlyMode)
                             {
                                 var lineSpan = node.GetFileLinePosSpan();
 

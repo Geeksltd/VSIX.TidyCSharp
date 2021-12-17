@@ -7,7 +7,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class PrivateModifierRemover : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
             return RemoveExplicitPrivateModifiers(initialSourceNode);
         }
@@ -21,7 +21,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 var remover = new MethodTokenRemover(IsReportOnlyMode);
                 modifiedSourceNode = remover.Remove(modifiedSourceNode) ?? modifiedSourceNode;
 
-                if (IsReportOnlyMode && !IsEquivalentToUnModified(modifiedSourceNode))
+                if (IsReportOnlyMode && !IsEquivalentToUNModified(modifiedSourceNode))
                 {
                     CollectMessages(remover.GetReport());
                 }
@@ -32,7 +32,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 var remover = new FieldTokenRemover(IsReportOnlyMode);
                 modifiedSourceNode = remover.Remove(modifiedSourceNode) ?? modifiedSourceNode;
 
-                if (IsReportOnlyMode && !IsEquivalentToUnModified(modifiedSourceNode))
+                if (IsReportOnlyMode && !IsEquivalentToUNModified(modifiedSourceNode))
                 {
                     CollectMessages(remover.GetReport());
                 }
@@ -43,7 +43,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 var remover = new PropertyTokenRemover(IsReportOnlyMode);
                 modifiedSourceNode = remover.Remove(modifiedSourceNode) ?? modifiedSourceNode;
 
-                if (IsReportOnlyMode && !IsEquivalentToUnModified(modifiedSourceNode))
+                if (IsReportOnlyMode && !IsEquivalentToUNModified(modifiedSourceNode))
                 {
                     CollectMessages(remover.GetReport());
                 }
@@ -54,7 +54,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 var remover = new NestedClassTokenRemover(IsReportOnlyMode);
                 modifiedSourceNode = remover.Remove(modifiedSourceNode) ?? modifiedSourceNode;
 
-                if (IsReportOnlyMode && !IsEquivalentToUnModified(modifiedSourceNode))
+                if (IsReportOnlyMode && !IsEquivalentToUNModified(modifiedSourceNode))
                 {
                     CollectMessages(remover.GetReport());
                 }

@@ -63,7 +63,7 @@ namespace GeeksAddin
         ///<summary>Gets the Solution Items solution folder in the current solution, creating it if it doesn't exist.</summary>
         public static Project GetSolutionItemsProject()
         {
-            var solution = App.DTE.Solution as Solution2;
+            var solution = App.Dte.Solution as Solution2;
 
             return solution.Projects
                            .OfType<Project>()

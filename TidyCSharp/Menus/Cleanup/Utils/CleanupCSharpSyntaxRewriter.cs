@@ -12,13 +12,13 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils
     {
         protected ICleanupOption Options { get; private set; }
         protected IEnumerable<ChangesReport> ChangesReport;
-        protected bool IsReportOnlyMode;
+        protected bool isReportOnlyMode;
 
         protected bool CheckOption(int? o) => Options.Should(o);
 
         public CleanupCSharpSyntaxRewriter(bool isReportOnlyMode, ICleanupOption options)
         {
-            IsReportOnlyMode = isReportOnlyMode;
+            this.isReportOnlyMode = isReportOnlyMode;
             ChangesReport = new List<ChangesReport>();
             Options = options;
         }

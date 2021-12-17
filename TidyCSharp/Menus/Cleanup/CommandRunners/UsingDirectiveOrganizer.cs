@@ -15,7 +15,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class UsingDirectiveOrganizer : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
             var item = ProjectItemDetails.ProjectItem;
 
@@ -28,13 +28,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 var document = item.Document;
                 document.Activate();
 
-                try { document.DTE.ExecuteCommand(UsingsCommands.REMOVE_AND_SORT_COMMAND_NAME); }
+                try { document.DTE.ExecuteCommand(UsingsCommands.Remove_And_Sort_Command_Name); }
                 catch (Exception ex)
                 {
                     if (ex.Message != "Command \"Edit.RemoveAndSort\" is not available.") throw;
 
                     document.Activate();
-                    document.DTE.ExecuteCommand(UsingsCommands.REMOVE_AND_SORT_COMMAND_NAME);
+                    document.DTE.ExecuteCommand(UsingsCommands.Remove_And_Sort_Command_Name);
                 }
 
                 var doc = (EnvDTE.TextDocument)(document.Object("TextDocument"));
@@ -43,7 +43,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 var modified = SyntaxFactory.ParseSyntaxTree(s);
 
                 if (IsReportOnlyMode &&
-                    !IsEquivalentToUnModified(modified.GetRoot()))
+                    !IsEquivalentToUNModified(await modified.GetRootAsync()))
                 {
                     CollectMessages(new ChangesReport(initialSourceNode)
                     {

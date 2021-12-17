@@ -13,7 +13,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
         public override SyntaxNode Visit(SyntaxNode node)
         {
-            if (CheckOption((int)CleanupTypes.Remove_Brackets_of_block_that_has_only_one_statement_with_length_shorter_than_80_chars))
+            if (CheckOption((int)CleanupTypes.Remove_Brackets_Of_Block_That_Has_Only_One_Statement_With_Length_Shorter_Than_80_Chars))
             {
                 if (node is BlockSyntax)
                 {
@@ -41,7 +41,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             {
                 var newNode = blockSyntax.Statements.FirstOrDefault() as StatementSyntax;
 
-                if (IsReportOnlyMode)
+                if (isReportOnlyMode)
                 {
                     var lineSpan = lambdaNode.GetFileLinePosSpan();
 
@@ -109,9 +109,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             {
                 var singleStatement = blockNode.Statements.FirstOrDefault();
 
-                if (singleStatement.Span.Length <= NormalizeWhitespace.Options.BLOCK_SINGLE_STATEMENT_MAX_LENGTH)
+                if (singleStatement.Span.Length <= NormalizeWhitespace.Options.Block_Single_Statement_Max_Length)
                 {
-                    if (IsReportOnlyMode)
+                    if (isReportOnlyMode)
                     {
                         var lineSpan = singleStatement.GetFileLinePosSpan();
 

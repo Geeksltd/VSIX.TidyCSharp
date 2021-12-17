@@ -12,25 +12,25 @@ namespace Geeks.VSIX.TidyCSharp.Extensions
     {
         bool _overallBuildSuccess, _customBuildInProgress;
 
-        void CustomBuild_MenuItemCallback(object sender, EventArgs e)
-        {
-            // Listen to the necessary build events.
-            var dte = (DTE2)Package.GetGlobalService(typeof(SDTE));
-            dte.Events.BuildEvents.OnBuildDone += BuildEvents_OnBuildDone;
-            dte.Events.BuildEvents.OnBuildProjConfigDone += BuildEvents_OnBuildProjConfigDone;
+        //void CustomBuild_MenuItemCallback(object sender, EventArgs e)
+        //{
+        //    // Listen to the necessary build events.
+        //    var dte = (DTE2)Package.GetGlobalService(typeof(SDTE));
+        //    dte.Events.BuildEvents.OnBuildDone += BuildEvents_OnBuildDone;
+        //    dte.Events.BuildEvents.OnBuildProjConfigDone += BuildEvents_OnBuildProjConfigDone;
 
-            try
-            {
-                // Build the active project.
-                _customBuildInProgress = true;
-                dte.ExecuteCommand("Build.BuildSelection");
-            }
-            catch (COMException)
-            {
-                _customBuildInProgress = false;
-                WriteToOutputWindow("Build", "Could not determine project to build from selection");
-            }
-        }
+        //    try
+        //    {
+        //        // Build the active project.
+        //        _customBuildInProgress = true;
+        //        dte.ExecuteCommand("Build.BuildSelection");
+        //    }
+        //    catch (COMException)
+        //    {
+        //        _customBuildInProgress = false;
+        //        WriteToOutputWindow("Build", "Could not determine project to build from selection");
+        //    }
+        //}
 
         void BuildEvents_OnBuildProjConfigDone(string project, string projectConfig, string platform, string solutionConfig, bool success)
         {

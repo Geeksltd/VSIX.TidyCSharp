@@ -18,7 +18,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class MSharpUICleaner : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
             if (ProjectItemDetails.ProjectItem.ContainingProject.Name == "#UI")
                 return await ChangeMethodHelperAsync(initialSourceNode);
@@ -30,50 +30,50 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         {
             var sendItemIdRewriter = new SendItemIdRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             var modifiedSourceNode = sendItemIdRewriter.Visit(initialSourceNode);
-            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
 
             var ifWorkFlowRewriter = new IfWorkFlowRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = ifWorkFlowRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
 
             var customColumnRewriter = new CustomColumnRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = customColumnRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
 
             var elementsNewSyntaxRewriter = new ElementsNewSyntaxRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = elementsNewSyntaxRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
 
             var formModuleWorkFlow = new FormModuleWorkFlowRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = formModuleWorkFlow.Visit(modifiedSourceNode);
-            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
 
             var generalWorkFlowRewriter = new GeneralWorkFlowRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = generalWorkFlowRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
 
             var combinedExpressionsFormRewriter = new CombinedExpressionsFormRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = combinedExpressionsFormRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
 
             var listModuleWorkFlowRewriter = new ListModuleWorkFlowRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = listModuleWorkFlowRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
 
             var fullSearchRewriter = new FullSearchRewriter(ProjectItemDetails.SemanticModel
                 , ProjectItemDetails.ProjectItemDocument.Project.Solution
                 , ProjectItemDetails.ProjectItemDocument, IsReportOnlyMode, Options);
 
             modifiedSourceNode = fullSearchRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
 
             var customFieldRewriter = new CustomFieldRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = customFieldRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
 
             var onClickGoWorkFlowRewriter = new OnClickGoWorkFlowRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = onClickGoWorkFlowRewriter.Visit(modifiedSourceNode);
-            modifiedSourceNode = await RefreshResult(modifiedSourceNode);
+            modifiedSourceNode = await RefreshResultAsync(modifiedSourceNode);
 
             var mergedUpRewriter = new MergedUpRewriter(ProjectItemDetails.SemanticModel, IsReportOnlyMode, Options);
             modifiedSourceNode = mergedUpRewriter.Visit(modifiedSourceNode);
@@ -1829,7 +1829,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         return invoc2;
                     });
 
-                    if (IsReportOnlyMode)
+                    if (isReportOnlyMode)
                     {
                         var lineSpan = node.GetFileLinePosSpan();
 

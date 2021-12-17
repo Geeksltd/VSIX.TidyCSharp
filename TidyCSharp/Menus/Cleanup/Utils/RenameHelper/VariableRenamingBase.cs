@@ -12,7 +12,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         Document WorkingDocument, orginalDocument;
 
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
             var annotationForSelectedNode = new SyntaxAnnotation(SELECTED_METHOD_ANNOTATION);
             orginalDocument = ProjectItemDetails.ProjectItemDocument;
@@ -45,7 +45,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             return null;
         }
 
-        protected override async Task SaveResult(SyntaxNode initialSourceNode)
+        protected override async Task SaveResultAsync(SyntaxNode initialSourceNode)
         {
             if (WorkingDocument is null) return;
 

@@ -13,7 +13,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             : base(menu, PkgCmdIDList.CmdCustomUpAllActions)
         { }
 
-        protected override void CallBack(object sender, EventArgs e)
+        protected override void Callback(object sender, EventArgs e)
         {
             var messageBoxResult = MessageBoxDisplay.Show(new MessageBoxDisplay.MessageBoxArgs
             {

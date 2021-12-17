@@ -12,7 +12,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class SimplyAsyncCalls : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
             var rewriter = new Rewriter(IsReportOnlyMode, Options);
             var modifiedSourceNode = rewriter.Visit(initialSourceNode);
@@ -41,7 +41,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 var newNode = SimplyAsyncCallsHelper((MethodDeclarationSyntax)node, Options);
 
-                if (!newNode.IsEquivalentTo(node) && IsReportOnlyMode)
+                if (!newNode.IsEquivalentTo(node) && isReportOnlyMode)
                 {
                     var lineSpan = node.GetFileLinePosSpan();
 
@@ -59,18 +59,18 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             static SyntaxTrivia[] _spaceTrivia = { SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, " ") };
 
-            public SyntaxNode SimplyAsyncCallsHelper(SyntaxNode initialSource, ICleanupOption options)
-            {
-                return
-                    initialSource
-                        .ReplaceNodes
-                        (
-                            initialSource
-                                .DescendantNodes()
-                                .Where(node => node is MethodDeclarationSyntax && node.Parent is ClassDeclarationSyntax)
-                            , (node1, node2) => SimplyAsyncCallsHelper((MethodDeclarationSyntax)node1, options)
-                        );
-            }
+            //public SyntaxNode SimplyAsyncCallsHelper(SyntaxNode initialSource, ICleanupOption options)
+            //{
+            //    return
+            //        initialSource
+            //            .ReplaceNodes
+            //            (
+            //                initialSource
+            //                    .DescendantNodes()
+            //                    .Where(node => node is MethodDeclarationSyntax && node.Parent is ClassDeclarationSyntax)
+            //                , (node1, node2) => SimplyAsyncCallsHelper((MethodDeclarationSyntax)node1, options)
+            //            );
+            //}
 
             public MethodDeclarationSyntax SimplyAsyncCallsHelper(MethodDeclarationSyntax method, ICleanupOption options)
             {

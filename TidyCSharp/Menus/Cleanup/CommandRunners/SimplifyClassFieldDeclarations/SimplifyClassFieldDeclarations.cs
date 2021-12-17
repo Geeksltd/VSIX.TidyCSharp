@@ -14,7 +14,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class SimplifyClassFieldDeclarations : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
             return SimplifyClassFieldDeclarationsHelper(initialSourceNode, IsReportOnlyMode, Options);
         }
@@ -24,7 +24,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             var rewriter = new Rewriter(isReportOnlyMode, options);
             var modifiedSourceNode = rewriter.Visit(initialSourceNode);
 
-            if (IsReportOnlyMode)
+            if (isReportOnlyMode)
             {
                 CollectMessages(rewriter.GetReport());
                 return initialSourceNode;
@@ -42,7 +42,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                if (CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Group_And_Merge_class_fields))
+                if (CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Group_And_Merge_Class_Fields))
                 {
                     node = Apply(node) as ClassDeclarationSyntax;
                     return node;
@@ -87,7 +87,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                         if (valueObj != null) return base.VisitVariableDeclarator(node);
                     }
 
-                    if (IsReportOnlyMode)
+                    if (isReportOnlyMode)
                     {
                         var lineSpan = node.GetFileLinePosSpan();
 
@@ -173,7 +173,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 .WithVariables(SyntaxFactory.SeparatedList(finalList))
                         );
 
-                    if (newDelarationItem.Value.NewFieldDeclaration.Span.Length <= SimplifyClassFieldDeclaration.Options.MAX_FIELD_DECLARATION_LENGTH)
+                    if (newDelarationItem.Value.NewFieldDeclaration.Span.Length <= SimplifyClassFieldDeclaration.Options.Max_Field_Declaration_Length)
                     {
                         newDeclarationDic.Add(newDelarationItem.Key, newDelarationItem.Value);
                     }
@@ -208,7 +208,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                          }
                     );
 
-                if (replaceList.Any() && IsReportOnlyMode)
+                if (replaceList.Any() && isReportOnlyMode)
                 {
                     var lineSpan = classDescriptionNode.GetFileLinePosSpan();
 

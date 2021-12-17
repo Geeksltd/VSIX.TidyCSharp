@@ -36,17 +36,17 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory
                     .Run(async delegate
                 {
-                    classDeclarationSyntax = await RenameDeclarations(node);
+                    classDeclarationSyntax = await RenameDeclarationsAsync(node);
                 });
 
                 return base.VisitClassDeclaration(classDeclarationSyntax as ClassDeclarationSyntax);
             }
 
-            async Task<ClassDeclarationSyntax> RenameDeclarations(ClassDeclarationSyntax classNode)
+            async Task<ClassDeclarationSyntax> RenameDeclarationsAsync(ClassDeclarationSyntax classNode)
             {
                 if (CheckOption((int)CamelCasedClassFields.CleanupTypes.Normal_Fields))
                 {
-                    var renamingResult = await new FieldRenamer(WorkingDocument).RenameDeclarations(classNode);
+                    var renamingResult = await new FieldRenamer(WorkingDocument).RenameDeclarationsAsync(classNode);
 
                     if (renamingResult != null && renamingResult.Node != null)
                     {
@@ -70,7 +70,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 if (CheckOption((int)CamelCasedClassFields.CleanupTypes.Const_Fields))
                 {
-                    var renamingResult = await new CONSTRenamer(WorkingDocument).RenameDeclarations(classNode);
+                    var renamingResult = await new CONSTRenamer(WorkingDocument).RenameDeclarationsAsync(classNode);
 
                     if (renamingResult != null && renamingResult.Node != null)
                     {

@@ -35,17 +35,17 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory
                     .Run(async delegate
                 {
-                    methodDeclarationSyntax = await RenameDeclarations(node);
+                    methodDeclarationSyntax = await RenameDeclarationsAsync(node);
                 });
 
                 return base.VisitMethodDeclaration(methodDeclarationSyntax as MethodDeclarationSyntax);
             }
 
-            async Task<MethodDeclarationSyntax> RenameDeclarations(MethodDeclarationSyntax methodNode)
+            async Task<MethodDeclarationSyntax> RenameDeclarationsAsync(MethodDeclarationSyntax methodNode)
             {
-                if (CheckOption((int)CamelCasedMethodVariable.CleanupTypes.Local_variable))
+                if (CheckOption((int)CamelCasedMethodVariable.CleanupTypes.Local_Variable))
                 {
-                    var renamingResult = await new VariableRenamer(WorkingDocument).RenameDeclarations(methodNode);
+                    var renamingResult = await new VariableRenamer(WorkingDocument).RenameDeclarationsAsync(methodNode);
 
                     if (renamingResult != null && renamingResult.Node != null)
                     {
@@ -69,7 +69,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 if (CheckOption((int)CamelCasedMethodVariable.CleanupTypes.Method_Parameter))
                 {
-                    var renamingResult = await new ParameterRenamer(WorkingDocument).RenameDeclarations(methodNode);
+                    var renamingResult = await new ParameterRenamer(WorkingDocument).RenameDeclarationsAsync(methodNode);
 
                     if (renamingResult != null && renamingResult.Node != null)
                     {

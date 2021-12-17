@@ -15,34 +15,34 @@ namespace GeeksAddin
         //    return Path.GetFileNameWithoutExtension(app.Solution.FullName);
         // }
 
-        public static string[] FindSolutionDirectories(DTE2 app)
-        {
-            ThreadHelper.JoinableTaskFactory
-                .Run(async delegate
-            {
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-            });
+        //public static string[] FindSolutionDirectories(DTE2 app)
+        //{
+        //    ThreadHelper.JoinableTaskFactory
+        //        .Run(async delegate
+        //    {
+        //        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+        //    });
 
-            var basePaths = new List<string>();
+        //    var basePaths = new List<string>();
 
-            if (app.Solution != null)
-            {
-                for (var i = 1; i <= app.Solution.Projects.Count; i++)
-                {
-                    var projectItem = app.Solution.Projects.Item(i);
-                    AddPathFromProjectItem(basePaths, projectItem);
-                }
+        //    if (app.Solution != null)
+        //    {
+        //        for (var i = 1; i <= app.Solution.Projects.Count; i++)
+        //        {
+        //            var projectItem = app.Solution.Projects.Item(i);
+        //            AddPathFromProjectItem(basePaths, projectItem);
+        //        }
 
-                return basePaths.ToArray();
-            }
+        //        return basePaths.ToArray();
+        //    }
 
-            app.StatusBar.Text = "No solution or project is identified. app.Solution is " +
-                (app.Solution?.GetType().Name).Or("NULL");
+        //    app.StatusBar.Text = "No solution or project is identified. app.Solution is " +
+        //        (app.Solution?.GetType().Name).Or("NULL");
 
-            App.DTE = (DTE2)TidyCSharpPackage.GetGlobalService(typeof(DTE2));
+        //    App.DTE = (DTE2)TidyCSharpPackage.GetGlobalService(typeof(DTE2));
 
-            return null;
-        }
+        //    return null;
+        //}
 
         static void AddPathFromProjectItem(List<string> basePaths, Project projectItem)
         {

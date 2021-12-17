@@ -15,7 +15,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class CompactSmallIfElseStatements : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
             var syntaxRewriter = new Rewriter(initialSourceNode, IsReportOnlyMode, Options);
             var modifiedSourceNode = syntaxRewriter.Visit(initialSourceNode);
@@ -202,7 +202,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 if (block.HasNoneWhitespaceTrivia()) return null;
                 var firstStatement = block.Statements.FirstOrDefault();
                 if (firstStatement is IfStatementSyntax) return firstStatement;
-                if (firstStatement.Span.Length <= NormalizeWhitespace.Options.BLOCK_SINGLE_STATEMENT_MAX_LENGTH) return firstStatement;
+                if (firstStatement.Span.Length <= NormalizeWhitespace.Options.Block_Single_Statement_Max_Length) return firstStatement;
                 return null;
             }
 

@@ -26,7 +26,7 @@ namespace Geeks.GeeksProductivityTools
 
         string GetSolutionFilePath()
         {
-            var solution = App.DTE.Solution;
+            var solution = App.Dte.Solution;
 
             if (solution == null || string.IsNullOrEmpty(solution.FullName))
                 return null;

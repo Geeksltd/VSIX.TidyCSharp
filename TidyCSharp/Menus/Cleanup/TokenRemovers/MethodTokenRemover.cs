@@ -13,7 +13,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
         {
             var methods = new MethodExtractor().Extraxt(root, SyntaxKind.PrivateKeyword);
 
-            if (IsReportOnlyMode)
+            if (isReportOnlyMode)
             {
                 foreach (var method in methods)
                 {

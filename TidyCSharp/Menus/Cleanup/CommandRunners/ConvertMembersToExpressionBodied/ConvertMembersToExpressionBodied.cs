@@ -14,7 +14,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 {
     public class ConvertMembersToExpressionBodied : CodeCleanerCommandRunnerBase, ICodeCleaner
     {
-        public override async Task<SyntaxNode> CleanUp(SyntaxNode initialSourceNode)
+        public override async Task<SyntaxNode> CleanUpAsync(SyntaxNode initialSourceNode)
         {
             return ConvertMembersToExpressionBodiedHelper(initialSourceNode, Options);
         }
@@ -73,9 +73,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         }
 
         static SyntaxTrivia[] _spaceTrivia = { SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, " ") };
-        public SyntaxNode ConvertMembersToExpressionBodiedHelper(SyntaxNode initialSourceNode, ICleanupOption Options)
+        public SyntaxNode ConvertMembersToExpressionBodiedHelper(SyntaxNode initialSourceNode, ICleanupOption options)
         {
-            var rewriter = new Rewriter(IsReportOnlyMode, Options);
+            var rewriter = new Rewriter(IsReportOnlyMode, options);
             var modifiedSourceNode = rewriter.Visit(initialSourceNode);
 
             if (IsReportOnlyMode)
@@ -156,7 +156,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 .WithoutLeadingTrivia();
 
             var length = expression.WithoutTrivia().Span.Length + method.Span.Length - method.Body.FullSpan.Length;
-            if (length > MembersToExpressionBodied.Options.MAX_EXPRESSION_BODIED_MEMBER_LENGTH) return null;
+            if (length > MembersToExpressionBodied.Options.Max_Expression_Bodied_Member_Length) return null;
             if (method.Body.ChildNodes().OfType<UsingStatementSyntax>().Any()) return null;
 
             return expression;
@@ -277,7 +277,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             var length = expression.WithoutTrivia().Span.Length +
                     constructorDeclaration.Span.Length - constructorDeclaration.Body.FullSpan.Length;
 
-            if (length > MembersToExpressionBodied.Options.MAX_EXPRESSION_BODIED_MEMBER_LENGTH) return constructorDeclaration;
+            if (length > MembersToExpressionBodied.Options.Max_Expression_Bodied_Member_Length) return constructorDeclaration;
             if (constructorDeclaration.Body.ChildNodes().OfType<UsingStatementSyntax>().Any()) return constructorDeclaration;
 
             var newconstructorDeclaration = constructorDeclaration

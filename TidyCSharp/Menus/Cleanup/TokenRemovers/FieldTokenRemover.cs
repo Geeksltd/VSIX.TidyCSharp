@@ -13,7 +13,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
         {
             var fields = new FieldExtractor().Extraxt(root, SyntaxKind.PrivateKeyword);
 
-            if (IsReportOnlyMode)
+            if (isReportOnlyMode)
             {
                 foreach (var field in fields)
                 {
