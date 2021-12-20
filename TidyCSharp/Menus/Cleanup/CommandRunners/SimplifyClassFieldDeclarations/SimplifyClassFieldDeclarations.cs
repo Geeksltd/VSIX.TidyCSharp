@@ -42,7 +42,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                if (CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Group_And_Merge_Class_Fields))
+                if (CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.GroupAndMergeClassFields))
                 {
                     node = Apply(node) as ClassDeclarationSyntax;
                     return node;
@@ -62,8 +62,8 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 if
                 (
-                    !CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Null) &&
-                    !CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Literal)
+                    !CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.RemoveClassFieldsInitializerNull) &&
+                    !CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.RemoveClassFieldsInitializerLiteral)
                 )
                     return base.VisitVariableDeclarator(node);
 
@@ -74,7 +74,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                     if (TypesMapItem.GetAllPredefinedTypesDic().ContainsKey(variableTypeNode))
                     {
-                        if (CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Literal) == false) return base.VisitVariableDeclarator(node);
+                        if (CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.RemoveClassFieldsInitializerLiteral) == false) return base.VisitVariableDeclarator(node);
 
                         var typeItem = TypesMapItem.GetAllPredefinedTypesDic()[variableTypeNode];
 
@@ -83,7 +83,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     }
                     else
                     {
-                        if (CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.Remove_Class_Fields_Initializer_Null) == false) return base.VisitVariableDeclarator(node);
+                        if (CheckOption((int)SimplifyClassFieldDeclaration.CleanupTypes.RemoveClassFieldsInitializerNull) == false) return base.VisitVariableDeclarator(node);
                         if (valueObj != null) return base.VisitVariableDeclarator(node);
                     }
 
@@ -173,7 +173,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                                 .WithVariables(SyntaxFactory.SeparatedList(finalList))
                         );
 
-                    if (newDelarationItem.Value.NewFieldDeclaration.Span.Length <= SimplifyClassFieldDeclaration.Options.Max_Field_Declaration_Length)
+                    if (newDelarationItem.Value.NewFieldDeclaration.Span.Length <= SimplifyClassFieldDeclaration.Options.MaxFieldDeclarationLength)
                     {
                         newDeclarationDic.Add(newDelarationItem.Key, newDelarationItem.Value);
                     }

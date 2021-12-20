@@ -108,7 +108,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 var newStatement = singleStatement;
 
-                if (options.Should((int)SimplyAsyncCall.CleanupTypes.Single_Expression))
+                if (options.Should((int)SimplyAsyncCall.CleanupTypes.SingleExpression))
                 {
                     if (singleStatement is ReturnStatementSyntax rss)
                     {

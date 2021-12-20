@@ -9,19 +9,19 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         [CleanupItem(Title = "Remove and sort Usings", FirstOrder = 0)]
         OrganizeUsingDirectives = 0x04,
 
-        [CleanupItem(Title = "Normalize white spaces", FirstOrder = 1, SubItemType = typeof(NormalizeWhitespace.CleanupTypes))]
+        [CleanupItem(Title = "Normalize white spaces", FirstOrder = 1, SubitemType = typeof(NormalizeWhiteSpace.CleanupTypes))]
         NormalizeWhiteSpaces = 0x01,
 
-        [CleanupItem(Title = "Remove unnecessary explicit 'private' where it's the default", FirstOrder = 2, SubItemType = typeof(RemovePrivateModifier.CleanupTypes))]
+        [CleanupItem(Title = "Remove unnecessary explicit 'private' where it's the default", FirstOrder = 2, SubitemType = typeof(RemovePrivateModifier.CleanupTypes))]
         PrivateAccessModifier = 0x02,
 
-        [CleanupItem(Title = "Small methods properties -> Expression bodied", FirstOrder = 3, SubItemType = typeof(MembersToExpressionBodied.CleanupTypes))]
+        [CleanupItem(Title = "Small methods properties -> Expression bodied", FirstOrder = 3, SubitemType = typeof(MembersToExpressionBodied.CleanupTypes))]
         ConvertMembersToExpressionBodied = 0x08,
 
-        [CleanupItem(Title = "Simplify async calls", FirstOrder = 4, SubItemType = typeof(SimplyAsyncCall.CleanupTypes))]
+        [CleanupItem(Title = "Simplify async calls", FirstOrder = 4, SubitemType = typeof(SimplyAsyncCall.CleanupTypes))]
         SimplyAsyncCalls = 0x20,
 
-        [CleanupItem(Title = "Compact multiple class field declarations into one line", FirstOrder = 5, SubItemType = typeof(SimplifyClassFieldDeclaration.CleanupTypes))]
+        [CleanupItem(Title = "Compact multiple class field declarations into one line", FirstOrder = 5, SubitemType = typeof(SimplifyClassFieldDeclaration.CleanupTypes))]
         SimplifyClassFieldDeclarations = 0x80,
 
         [CleanupItem(Title = "Use 'var' for variable declarations", FirstOrder = 5)]
@@ -30,13 +30,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         [CleanupItem(Title = "Convert traditional properties to auto-properties", FirstOrder = 5)]
         ConvertPropertiesToAutoProperties = 0x10000,
 
-        [CleanupItem(Title = "Remove unnecessary \"this.\"", FirstOrder = 6, SubItemType = typeof(RemoveExtraThisKeyword.CleanupTypes))]
+        [CleanupItem(Title = "Remove unnecessary \"this.\"", FirstOrder = 6, SubitemType = typeof(RemoveExtraThisKeyword.CleanupTypes))]
         RemoveExtraThisQualification = 0x400,
 
-        [CleanupItem(Title = "Use camelCase for...", FirstOrder = 7, SubItemType = typeof(CamelCasedMethodVariable.CleanupTypes))]
+        [CleanupItem(Title = "Use camelCase for...", FirstOrder = 7, SubitemType = typeof(CamelCasedMethodVariable.CleanupTypes))]
         CamelCasedMethodVariable = 0x800,
 
-        [CleanupItem(Title = "Class field and const casing...", FirstOrder = 8, SubItemType = typeof(CamelCasedClassFields.CleanupTypes))]
+        [CleanupItem(Title = "Class field and const casing...", FirstOrder = 8, SubitemType = typeof(CamelCasedClassFields.CleanupTypes))]
         CamelCasedFields = 0x1000,
 
         [CleanupItem(Title = "Move constructors before methods", FirstOrder = 9)]

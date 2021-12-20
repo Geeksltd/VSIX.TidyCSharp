@@ -4,7 +4,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.SimplifyClassFieldDeclaration
 {
     public class Options : OptionsBase, ICleanupOption
     {
-        public const int Max_Field_Declaration_Length = 80;
+        public const int MaxFieldDeclarationLength = 80;
 
         public CleanupTypes? CleanupItems => (CleanupTypes?)CleanupItemsInteger;
 

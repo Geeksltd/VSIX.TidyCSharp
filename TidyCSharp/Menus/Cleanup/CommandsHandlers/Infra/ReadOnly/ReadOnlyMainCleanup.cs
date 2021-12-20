@@ -7,7 +7,7 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
     {
         public bool IsMainObjectSelected { get; private set; }
         public CodeCleanerType MainCleanupItemType { get; private set; }
-        public bool HasSubItems { get; private set; }
+        public bool HasSubitems { get; private set; }
         public CleanerItemUIInfo[] CleanerItemUIInfos { get; private set; }
 
         public ReadOnlyMainCleanup(CodeCleanerType mainCleanupItemType,
@@ -25,7 +25,7 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
             IsMainObjectSelected = isMainObjectSelected;
         }
 
-        public CleanerItemUIInfo[] GetSelectedSubItems() => CleanerItemUIInfos;
+        public CleanerItemUIInfo[] GetSelectedSubitems() => CleanerItemUIInfos;
 
         public void ResetItemsCheckState()
         {

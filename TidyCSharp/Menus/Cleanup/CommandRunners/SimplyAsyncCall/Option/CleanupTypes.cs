@@ -7,6 +7,6 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.SimplyAsyncCall
     public enum CleanupTypes
     {
         [CleanupItem(Title = "Remove unnecessary async / await pair (simply return the task).")]
-        Single_Expression = 0x02,
+        SingleExpression = 0x02,
     }
 }

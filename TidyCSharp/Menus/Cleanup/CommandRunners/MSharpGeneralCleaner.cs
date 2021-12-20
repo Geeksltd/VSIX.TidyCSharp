@@ -114,7 +114,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     {
                         LineNumber = lineSpan.StartLinePosition.Line,
                         Column = lineSpan.StartLinePosition.Character,
-                        Message = "your expression should be multilined",
+                        Message = "your expression should be multi lined",
                         Generator = nameof(MultiLineExpressionRewriter)
                     });
                 }
@@ -155,7 +155,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     {
                         LineNumber = lineSpan.StartLinePosition.Line,
                         Column = lineSpan.StartLinePosition.Character,
-                        Message = "\"C#:\" --> cs(\"\")",
+                        Message = "Please use cs() instead of C#)",
                         Generator = nameof(CsMethodStringRewriter)
                     });
 

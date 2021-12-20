@@ -35,11 +35,11 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
                     MainCleannerItemAttribute.Title ?? MainCleanupItemType.ToString() :
                     MainCleanupItemType.ToString();
 
-            if (MainCleannerItemAttribute.SubItemType != null)
+            if (MainCleannerItemAttribute.SubitemType != null)
             {
-                HasSubItems = true;
+                HasSubitems = true;
 
-                CreateControls(MainCleannerItemAttribute.SubItemType, checkBoxItem => AddNewCheckboxItem(checkBoxItem));
+                CreateControls(MainCleannerItemAttribute.SubitemType, checkBoxItem => AddNewCheckboxItem(checkBoxItem));
                 BorderStyle = BorderStyle.FixedSingle;
 
                 for (int i = 0; i < customCheckListBox1.Controls.Count; i++)
@@ -55,7 +55,7 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
         #region IMainCleanup
 
         public CodeCleanerType MainCleanupItemType { get; private set; }
-        public bool HasSubItems { get; private set; } = false;
+        public bool HasSubitems { get; private set; } = false;
 
         public void SetMainItemCheckState(bool isSelected) => checkboxCleanupItem.Checked = isSelected;
 
@@ -76,11 +76,11 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers
             get
             {
                 if (checkboxCleanupItem.Checked == false) return false;
-                if (HasSubItems && GetSelectedSubItems().Any() == false) return false;
+                if (HasSubitems && GetSelectedSubitems().Any() == false) return false;
                 return true;
             }
         }
-        public CleanerItemUIInfo[] GetSelectedSubItems()
+        public CleanerItemUIInfo[] GetSelectedSubitems()
         {
             var selectedTypes = customCheckListBox1.GetCheckedItems();
             return selectedTypes.OrderBy(x => x.Order).ToArray();

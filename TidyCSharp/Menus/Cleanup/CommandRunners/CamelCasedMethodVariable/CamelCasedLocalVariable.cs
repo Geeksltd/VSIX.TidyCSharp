@@ -43,7 +43,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             async Task<MethodDeclarationSyntax> RenameDeclarationsAsync(MethodDeclarationSyntax methodNode)
             {
-                if (CheckOption((int)CamelCasedMethodVariable.CleanupTypes.Local_Variable))
+                if (CheckOption((int)CamelCasedMethodVariable.CleanupTypes.LocalVariable))
                 {
                     var renamingResult = await new VariableRenamer(WorkingDocument).RenameDeclarationsAsync(methodNode);
 
@@ -67,7 +67,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     }
                 }
 
-                if (CheckOption((int)CamelCasedMethodVariable.CleanupTypes.Method_Parameter))
+                if (CheckOption((int)CamelCasedMethodVariable.CleanupTypes.MethodParameter))
                 {
                     var renamingResult = await new ParameterRenamer(WorkingDocument).RenameDeclarationsAsync(methodNode);
 

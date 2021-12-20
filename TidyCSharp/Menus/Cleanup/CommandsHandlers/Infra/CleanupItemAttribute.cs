@@ -10,7 +10,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.Infra
         public bool SelectedByDefault { get; set; } = true;
 
         public int? Order => FirstOrder == int.MaxValue ? (int?)null : FirstOrder;
-        public Type SubItemType { get; set; }
+        public Type SubitemType { get; set; }
 
         public CleanupItemAttribute()
         {

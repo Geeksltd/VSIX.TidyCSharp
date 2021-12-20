@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
+namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhiteSpace
 {
     class BlockRewriter : CSharpSyntaxRewriterBase
     {
@@ -109,7 +109,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             {
                 var singleStatement = blockNode.Statements.FirstOrDefault();
 
-                if (singleStatement.Span.Length <= NormalizeWhitespace.Options.Block_Single_Statement_Max_Length)
+                if (singleStatement.Span.Length <= NormalizeWhiteSpace.Options.Block_Single_Statement_Max_Length)
                 {
                     if (isReportOnlyMode)
                     {
@@ -127,7 +127,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                     singleStatement =
                       singleStatement
                           .WithTrailingTrivia(
-                              CleanUpListWithExactNumberOfWhitespaces(
+                              CleanUpListWithExactNumberOfWhiteSpaces(
                                   SyntaxFactory.TriviaList(
                                       blockNode.CloseBraceToken.LeadingTrivia
                                       .AddRange(singleStatement.GetTrailingTrivia())
@@ -149,7 +149,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
         {
             if (lastBlockToken != default(SyntaxToken) && lastBlockToken == lastToken)
             {
-                token = token.WithLeadingTrivia(CleanUpListWithExactNumberOfWhitespaces(token.LeadingTrivia, 1, null));
+                token = token.WithLeadingTrivia(CleanUpListWithExactNumberOfWhiteSpaces(token.LeadingTrivia, 1, null));
                 lastBlockToken = default(SyntaxToken);
             }
 

@@ -64,7 +64,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     {
                         LineNumber = lineSpan.StartLinePosition.Line,
                         Column = lineSpan.StartLinePosition.Character,
-                        Message = "CompactSmallIfElseStatements",
+                        Message = "Compact small if-else statements",
                         Generator = nameof(CompactSmallIfElseStatements)
                     });
 
@@ -86,7 +86,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             SyntaxNode Cleanup(IfStatementSyntax originalIfNode)
             {
-                if (originalIfNode.DescendantTrivia(descendIntoTrivia: true).HasNoneWhitespaceTrivia()) return base.VisitIfStatement(originalIfNode);
+                if (originalIfNode.DescendantTrivia(descendIntoTrivia: true).HasNoneWhiteSpaceTrivia()) return base.VisitIfStatement(originalIfNode);
 
                 var singleStatementInsideIf = GetInsideStatement(originalIfNode.Statement);
 
@@ -113,16 +113,16 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             IfStatementSyntax GetNewIF(IfStatementSyntax orginalIFnode, StatementSyntax singleStatementInsideIf)
             {
-                var closeParenTrivia = orginalIFnode.CloseParenToken.WithoutWhitespaceTrivia();
+                var closeParenTrivia = orginalIFnode.CloseParenToken.WithoutWhiteSpaceTrivia();
 
                 var trailingTriviaList =
                     new SyntaxTriviaList()
-                    .AddRange(closeParenTrivia.TrailingTrivia.Where(t => t.IsWhitespaceTrivia() == false))
-                    .AddRange(singleStatementInsideIf.GetTrailingTrivia().Where(t => t.IsWhitespaceTrivia() == false));
+                    .AddRange(closeParenTrivia.TrailingTrivia.Where(t => t.IsWhiteSpaceTrivia() == false))
+                    .AddRange(singleStatementInsideIf.GetTrailingTrivia().Where(t => t.IsWhiteSpaceTrivia() == false));
 
                 if (singleStatementInsideIf != orginalIFnode.Statement)
                 {
-                    trailingTriviaList = trailingTriviaList.AddRange(orginalIFnode.Statement.GetTrailingTrivia().Where(t => t.IsWhitespaceTrivia() == false));
+                    trailingTriviaList = trailingTriviaList.AddRange(orginalIFnode.Statement.GetTrailingTrivia().Where(t => t.IsWhiteSpaceTrivia() == false));
                 }
 
                 trailingTriviaList = trailingTriviaList.Add(_endOfLineTrivia);
@@ -130,9 +130,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 var newIf =
                     orginalIFnode
                         .WithIfKeyword(orginalIFnode.IfKeyword.WithTrailingTrivia(SyntaxFactory.Space))
-                        .WithOpenParenToken(orginalIFnode.OpenParenToken.WithoutWhitespaceTrivia())
+                        .WithOpenParenToken(orginalIFnode.OpenParenToken.WithoutWhiteSpaceTrivia())
                         .WithCloseParenToken(SyntaxTokenExtensions.WithoutTrivia(closeParenTrivia))
-                        .WithCondition(orginalIFnode.Condition.WithoutWhitespaceTrivia())
+                        .WithCondition(orginalIFnode.Condition.WithoutWhiteSpaceTrivia())
                         .WithStatement(
                             singleStatementInsideIf
                                 .WithLeadingTrivia(SyntaxFactory.Space)
@@ -199,10 +199,10 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             StatementSyntax GetInsideStatement(BlockSyntax block)
             {
                 if (block.Statements.Count != 1) return null;
-                if (block.HasNoneWhitespaceTrivia()) return null;
+                if (block.HasNoneWhiteSpaceTrivia()) return null;
                 var firstStatement = block.Statements.FirstOrDefault();
                 if (firstStatement is IfStatementSyntax) return firstStatement;
-                if (firstStatement.Span.Length <= NormalizeWhitespace.Options.Block_Single_Statement_Max_Length) return firstStatement;
+                if (firstStatement.Span.Length <= NormalizeWhiteSpace.Options.Block_Single_Statement_Max_Length) return firstStatement;
                 return null;
             }
 
@@ -213,7 +213,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     if ((singleStatement = GetInsideStatement(newBlockStatement)) == null) return null;
                 }
 
-                if (singleStatement.HasNoneWhitespaceTrivia()) return null;
+                if (singleStatement.HasNoneWhiteSpaceTrivia()) return null;
 
                 return singleStatement;
             }

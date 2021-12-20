@@ -4,11 +4,11 @@ using Microsoft.CodeAnalysis.CSharp;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
+namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhiteSpace
 {
     public class CSharpSyntaxRewriterBase : CleanupCSharpSyntaxRewriter
     {
-        protected SyntaxNode InitialSource;
+        protected SyntaxNode InitialSource { get; set; }
         static SyntaxTrivia _endOfLineTrivia = default(SyntaxTrivia);
 
         public CSharpSyntaxRewriterBase(SyntaxNode initialSource,
@@ -63,7 +63,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             return syntaxTrivias;
         }
 
-        protected SyntaxTriviaList CleanUpListWithNoWhitespaces(SyntaxTriviaList syntaxTrivias, CleanupTypes? options, bool itsForCloseBrace = false)
+        protected SyntaxTriviaList CleanUpListWithNoWhiteSpaces(SyntaxTriviaList syntaxTrivias, CleanupTypes? options, bool itsForCloseBrace = false)
         {
             syntaxTrivias = ProcessSpecialTrivias(syntaxTrivias, itsForCloseBrace);
 
@@ -84,7 +84,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             return syntaxTrivias;
         }
 
-        protected SyntaxTriviaList CleanUpListWithDefaultWhitespaces(SyntaxTriviaList syntaxTrivias, CleanupTypes? options, bool itsForCloseBrace = false)
+        protected SyntaxTriviaList CleanUpListWithDefaultWhiteSpaces(SyntaxTriviaList syntaxTrivias, CleanupTypes? options, bool itsForCloseBrace = false)
         {
             if (CheckOption((int?)options))
                 syntaxTrivias = CleanUpList(syntaxTrivias);
@@ -94,7 +94,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             return syntaxTrivias;
         }
 
-        protected SyntaxTriviaList CleanUpListWithExactNumberOfWhitespaces(SyntaxTriviaList syntaxTrivias, int exactNumberOfBlanks, CleanupTypes? options, bool itsForCloseBrace = false)
+        protected SyntaxTriviaList CleanUpListWithExactNumberOfWhiteSpaces(SyntaxTriviaList syntaxTrivias, int exactNumberOfBlanks, CleanupTypes? options, bool itsForCloseBrace = false)
         {
             if (CheckOption((int?)options))
                 syntaxTrivias = CleanUpList(syntaxTrivias, exactNumberOfBlanks);
@@ -121,7 +121,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                 {
                     if (itsForCloseBrace)
                     {
-                        if (CheckOption((int)CleanupTypes.Remove_Blank_After_Open_Bracket_And_Before_Close_Brackets))
+                        if (CheckOption((int)CleanupTypes.RemoveBlankAfterOpenBracketAndBeforeCloseBrackets))
                         {
                             i += RemoveBlankDuplication(syntaxTrivias, SyntaxKind.EndOfLineTrivia, i) + 1;
 
@@ -172,7 +172,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                     continue;
                 }
 
-                if (CheckOption((int)CleanupTypes.Remove_Duplicate_Inside_Comments) == false)
+                if (CheckOption((int)CleanupTypes.RemoveDuplicateInsideComments) == false)
                 {
                     outputTriviasList.Add(syntaxTrivias[i]);
 

@@ -53,28 +53,19 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
 
         void CreateCleanupTypeItemControl(CleanerItemUIInfo cleanupTypeItem)
         {
-            var newControl = new CleanupItemUserControl()
+            using (var newControl = new CleanupItemUserControl() { Dock = DockStyle.Top, AutoSize = false, })
             {
-                Dock = DockStyle.Top,
-                AutoSize = false,
-            };
+                newControl.Init((CodeCleanerType)cleanupTypeItem.CleanerType);
+                AllControls.Add(newControl);
+            }
+            //var newControl = new CleanupItemUserControl()
+            //{
+            //    Dock = DockStyle.Top,
+            //    AutoSize = false,
+            //};
 
-            newControl.Init((CodeCleanerType)cleanupTypeItem.CleanerType);
-            AllControls.Add(newControl);
-
-            // if ((leftTableLayoutPanel.Height <= rightTableLayoutPanel.Height) &&
-            //    (leftTableLayoutPanel.Height + newControl.Height <= mainPanel.Height ||
-            //    rightTableLayoutPanel.Height >= mainPanel.Height))
-            // {
-            //    leftTableLayoutPanel.Controls.Add(newControl);
-            // }
-            // else
-            // {
-            //    rightTableLayoutPanel.Controls.Add(newControl);
-            // }
-
-            // mainPanel.Controls.Add(newControl);
-            // this.Height += newSubControl.Height;
+            //newControl.Init((CodeCleanerType)cleanupTypeItem.CleanerType);
+            //AllControls.Add(newControl);
         }
 
         void DeserializeValues(string strValue)

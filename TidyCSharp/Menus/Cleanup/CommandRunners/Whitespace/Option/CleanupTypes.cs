@@ -1,31 +1,31 @@
 ﻿using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 using System;
 
-namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
+namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhiteSpace
 {
     [Flags]
     public enum CleanupTypes
     {
         [CleanupItem(FirstOrder = 1, Title = "Trim the file")]
-        Trim_The_File = 0x80,
+        TrimTheFile = 0x80,
 
         [CleanupItem(FirstOrder = 1, Title = "No duplicate blank lines between namespace members")]
-        Remove_Duplicate_Between_Namespace_Members = 0x04,
+        RemoveDuplicateBetweenNamespaceMembers = 0x04,
 
         [CleanupItem(FirstOrder = 1, Title = "No duplicate blank lines between class members")]
-        Remove_Duplicate_Between_Class_Members = 0x02,
+        RemoveDuplicateBetweenClassMembers = 0x02,
 
         [CleanupItem(FirstOrder = 1, Title = "No duplicate blank lines between method statement")]
-        Remove_Duplicate_Between_Methods_Statements = 0x01,
+        RemoveDuplicateBetweenMethodsStatements = 0x01,
 
         [CleanupItem(FirstOrder = 1, Title = "No duplicate blank lines between comments")]
-        Remove_Duplicate_Inside_Comments = 0x08,
+        RemoveDuplicateInsideComments = 0x08,
 
         [CleanupItem(FirstOrder = 1, Title = "No duplicate blank lines between \"Usings ..\"")]
-        Remove_Duplicate_Inside_Usings = 0x10,
+        RemoveDuplicateInsideUsings = 0x10,
 
         [CleanupItem(FirstOrder = 1, Title = "No blank lines immediately after { and immediately before }")]
-        Remove_Blank_After_Open_Bracket_And_Before_Close_Brackets = 0x20,
+        RemoveBlankAfterOpenBracketAndBeforeCloseBrackets = 0x20,
 
         /// <summary>
         /// Insert_one_space_between_the_comment_delimiter_and_the_comment_text,

@@ -1,6 +1,6 @@
 ﻿namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers.Infra
 {
-    partial class CustomCheckListBox
+    partial class CustomChecklistBox
     {
         /// <summary> 
         /// Required designer variable.

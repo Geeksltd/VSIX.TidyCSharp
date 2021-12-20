@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
-            this.customCheckListBox1 = new Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers.Infra.CustomCheckListBox();
+            this.customCheckListBox1 = new Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers.Infra.CustomChecklistBox();
             this.checkboxCleanupItem = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
@@ -84,7 +84,7 @@
 
         #endregion
         private System.Windows.Forms.Panel panel1;
-        private Infra.CustomCheckListBox customCheckListBox1;
+        private Infra.CustomChecklistBox customCheckListBox1;
         private System.Windows.Forms.CheckBox checkboxCleanupItem;
     }
 }

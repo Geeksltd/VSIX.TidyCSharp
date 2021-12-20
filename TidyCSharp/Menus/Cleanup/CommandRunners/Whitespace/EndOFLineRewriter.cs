@@ -3,7 +3,7 @@ using Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
+namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhiteSpace
 {
     public class EndOFLineRewriter : CSharpSyntaxRewriterBase
     {

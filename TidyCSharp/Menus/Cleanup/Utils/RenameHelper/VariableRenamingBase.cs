@@ -64,7 +64,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
         protected abstract class VariableRenamingBaseRewriter : CleanupCSharpSyntaxRewriter
         {
             public Document WorkingDocument { get; protected set; }
-            public VariableRenamingBaseRewriter(Document workingDocument, bool isReportOnlyMode, ICleanupOption options) : base(isReportOnlyMode, options)
+            protected VariableRenamingBaseRewriter(Document workingDocument, bool isReportOnlyMode, ICleanupOption options) : base(isReportOnlyMode, options)
             {
                 WorkingDocument = workingDocument;
             }

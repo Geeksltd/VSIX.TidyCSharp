@@ -6,10 +6,10 @@ namespace Geeks.GeeksProductivityTools.Utility
     {
         public struct MessageBoxArgs
         {
-            public string Message;
-            public string Caption;
-            public MessageBoxButtons Button;
-            public MessageBoxIcon Icon;
+            public string Message { get; set; }
+            public string Caption { get; set; }
+            public MessageBoxButtons Button { get; set; }
+            public MessageBoxIcon Icon { get; set; }
         }
 
         public static DialogResult Show(MessageBoxArgs args) => MessageBox.Show(args.Message, args.Caption, args.Button, args.Icon);

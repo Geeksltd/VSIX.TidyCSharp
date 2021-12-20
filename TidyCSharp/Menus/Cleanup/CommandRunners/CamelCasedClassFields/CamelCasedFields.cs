@@ -44,7 +44,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             async Task<ClassDeclarationSyntax> RenameDeclarationsAsync(ClassDeclarationSyntax classNode)
             {
-                if (CheckOption((int)CamelCasedClassFields.CleanupTypes.Normal_Fields))
+                if (CheckOption((int)CamelCasedClassFields.CleanupTypes.NormalFields))
                 {
                     var renamingResult = await new FieldRenamer(WorkingDocument).RenameDeclarationsAsync(classNode);
 
@@ -68,7 +68,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                     }
                 }
 
-                if (CheckOption((int)CamelCasedClassFields.CleanupTypes.Const_Fields))
+                if (CheckOption((int)CamelCasedClassFields.CleanupTypes.ConstFields))
                 {
                     var renamingResult = await new CONSTRenamer(WorkingDocument).RenameDeclarationsAsync(classNode);
 

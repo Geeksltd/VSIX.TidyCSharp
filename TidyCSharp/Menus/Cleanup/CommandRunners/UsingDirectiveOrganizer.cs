@@ -28,13 +28,13 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 var document = item.Document;
                 document.Activate();
 
-                try { document.DTE.ExecuteCommand(UsingsCommands.Remove_And_Sort_Command_Name); }
+                try { document.DTE.ExecuteCommand(UsingsCommands.RemoveAndSortCommandName); }
                 catch (Exception ex)
                 {
                     if (ex.Message != "Command \"Edit.RemoveAndSort\" is not available.") throw;
 
                     document.Activate();
-                    document.DTE.ExecuteCommand(UsingsCommands.Remove_And_Sort_Command_Name);
+                    document.DTE.ExecuteCommand(UsingsCommands.RemoveAndSortCommandName);
                 }
 
                 var doc = (EnvDTE.TextDocument)(document.Object("TextDocument"));

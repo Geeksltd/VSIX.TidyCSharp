@@ -7,12 +7,12 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.SimplifyClassFieldDeclaration
     public enum CleanupTypes
     {
         [CleanupItem(Title = "Remove unnecessary explicit \"=0\" or \"=false\" from class fields.")]
-        Remove_Class_Fields_Initializer_Literal = 0x01,
+        RemoveClassFieldsInitializerLiteral = 0x01,
 
         [CleanupItem(Title = "Remove unnecessary explicit \"=null\" from class fields.")]
-        Remove_Class_Fields_Initializer_Null = 0x02,
+        RemoveClassFieldsInitializerNull = 0x02,
 
         [CleanupItem(Title = "Declare multiple class fields [with the same type] on the same line (if total size < 80 chars)", SelectedByDefault = false)]
-        Group_And_Merge_Class_Fields = 0x04,
+        GroupAndMergeClassFields = 0x04,
     }
 }

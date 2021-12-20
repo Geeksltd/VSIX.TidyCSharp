@@ -25,7 +25,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                             .Run(async delegate
                             {
                                 await RunAsync(item);
-                            }); 
+                            });
 
         public ProjectItemDetailsType ProjectItemDetails { get; protected set; }
         public ProjectItemDetailsType UNModifiedProjectItemDetails { get; protected set; }
@@ -36,7 +36,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             if (IsReportOnlyMode)
             {
-                RefreshResultAsync(item.ToSyntaxNode());
+                await RefreshResultAsync(item.ToSyntaxNode());
             }
 
             UNModifiedProjectItemDetails = ProjectItemDetails;
@@ -69,7 +69,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             if (ProjectItemDetails.ProjectItemDocument != null)
             {
                 var newDocument = ProjectItemDetails.ProjectItemDocument.WithSyntaxRoot(initialSourceNode);
-               await TidyCSharpPackage.Instance.RefreshSolutionAsync(newDocument.Project.Solution);
+                await TidyCSharpPackage.Instance.RefreshSolutionAsync(newDocument.Project.Solution);
             }
 
             ProjectItemDetails = new ProjectItemDetailsType(ProjectItemDetails.ProjectItem);
@@ -112,27 +112,26 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             var xmlWriterSettings = new XmlWriterSettings();
             xmlWriterSettings.Indent = true;
 
-            var textWriter = XmlWriter.Create(Path.GetDirectoryName(App.Dte.Solution.FullName)
-                + "\\Tidy.log", xmlWriterSettings);
-
-            textWriter.WriteStartDocument();
-            textWriter.WriteStartElement("Reports");
-
-            foreach (var change in ChangesReports)
+            using (var textWriter = XmlWriter.Create(Path.GetDirectoryName(App.Dte.Solution.FullName) + "\\Tidy.log", xmlWriterSettings))
             {
-                textWriter.WriteStartElement("Report");
-                textWriter.WriteAttributeString("Generator", change.Generator);
-                textWriter.WriteElementString("LineNumber", change.LineNumber.ToString());
-                textWriter.WriteElementString("Column", change.Column.ToString());
-                textWriter.WriteElementString("FileName", change.FileName);
-                textWriter.WriteElementString("Message", change.Message);
-                textWriter.WriteEndElement();
-            }
+                textWriter.WriteStartDocument();
+                textWriter.WriteStartElement("Reports");
 
-            textWriter.WriteEndElement();
-            textWriter.WriteEndDocument();
-            textWriter.Flush();
-            textWriter.Close();
+                foreach (var change in ChangesReports)
+                {
+                    textWriter.WriteStartElement("Report");
+                    textWriter.WriteAttributeString("Generator", change.Generator);
+                    textWriter.WriteElementString("LineNumber", change.LineNumber.ToString());
+                    textWriter.WriteElementString("Column", change.Column.ToString());
+                    textWriter.WriteElementString("FileName", change.FileName);
+                    textWriter.WriteElementString("Message", change.Message);
+                    textWriter.WriteEndElement();
+                }
+
+                textWriter.WriteEndElement();
+                textWriter.WriteEndDocument();
+                textWriter.Flush();
+            }
             ChangesReports.Clear();
         }
 

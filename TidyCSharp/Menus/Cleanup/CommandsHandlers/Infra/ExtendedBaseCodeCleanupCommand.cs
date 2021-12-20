@@ -30,7 +30,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
             if (messageBoxResult != DialogResult.OK) return;
 
-            CSharpActionDelegate.TargetAction desiredAction = ActionsCSharpOnFile.DoCleanup;
+            CSharpAction.TargetAction desiredAction = ActionsCSharpOnFile.DoCleanup;
             var commandGuid = (sender as OleMenuCommand).CommandID.Guid;
 
             if (commandGuid == GuidList.GuidCleanupCmdSet)

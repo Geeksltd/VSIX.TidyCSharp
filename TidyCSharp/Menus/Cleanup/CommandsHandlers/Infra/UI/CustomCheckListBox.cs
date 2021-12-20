@@ -3,25 +3,34 @@ using System.Windows.Forms;
 
 namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.CommandsHandlers.Infra
 {
-    public partial class CustomCheckListBox : UserControl
+    public partial class CustomChecklistBox : UserControl
     {
-        public CustomCheckListBox() => InitializeComponent();
+        public CustomChecklistBox() => InitializeComponent();
 
         public void AddItem(CleanerItemUIInfo itemInfo)
         {
-            var newControl =
-                new CustomCheckBox()
-                {
-                    Text = itemInfo.Name,
-                    Info = itemInfo,
-                    Margin = new Padding(0),
-                    Padding = new Padding(0),
-                    MaximumSize = new System.Drawing.Size(460, 0),
-                    AutoSize = true,
-                    Dock = DockStyle.Top,
-                };
+            //var newControl =
+            //    new CustomCheckBox()
+            //    {
+            //        Text = itemInfo.Name,
+            //        Info = itemInfo,
+            //        Margin = new Padding(0),
+            //        Padding = new Padding(0),
+            //        MaximumSize = new System.Drawing.Size(460, 0),
+            //        AutoSize = true,
+            //        Dock = DockStyle.Top,
+            //    };
 
-            Controls.Add(newControl);
+            Controls.Add(new CustomCheckBox()
+            {
+                Text = itemInfo.Name,
+                Info = itemInfo,
+                Margin = new Padding(0),
+                Padding = new Padding(0),
+                MaximumSize = new System.Drawing.Size(460, 0),
+                AutoSize = true,
+                Dock = DockStyle.Top,
+            });
         }
 
         public CleanerItemUIInfo[] GetCheckedItems()

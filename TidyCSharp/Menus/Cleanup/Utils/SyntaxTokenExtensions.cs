@@ -112,49 +112,49 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
             return token.WithLeadingTrivia().WithTrailingTrivia();
         }
 
-        public static SyntaxTriviaList WithoutWhitespaceTrivia(this SyntaxTriviaList triviaList)
+        public static SyntaxTriviaList WithoutWhiteSpaceTrivia(this SyntaxTriviaList triviaList)
         {
-            return new SyntaxTriviaList().AddRange(triviaList.Where(t => !t.IsWhitespaceTrivia()));
+            return new SyntaxTriviaList().AddRange(triviaList.Where(t => !t.IsWhiteSpaceTrivia()));
         }
 
-        public static SyntaxToken WithoutWhitespaceTrivia(this SyntaxToken token)
+        public static SyntaxToken WithoutWhiteSpaceTrivia(this SyntaxToken token)
         {
             return
                 token
-                    .WithLeadingTrivia(token.LeadingTrivia.Where(t => !t.IsWhitespaceTrivia()))
-                    .WithTrailingTrivia(token.TrailingTrivia.Where(t => !t.IsWhitespaceTrivia()));
+                    .WithLeadingTrivia(token.LeadingTrivia.Where(t => !t.IsWhiteSpaceTrivia()))
+                    .WithTrailingTrivia(token.TrailingTrivia.Where(t => !t.IsWhiteSpaceTrivia()));
         }
 
-        public static T WithoutWhitespaceTrivia<T>(this T token)
+        public static T WithoutWhiteSpaceTrivia<T>(this T token)
             where T : SyntaxNode
         {
             return
                 token
-                    .WithLeadingTrivia(token.GetLeadingTrivia().Where(t => !t.IsWhitespaceTrivia()))
-                    .WithTrailingTrivia(token.GetTrailingTrivia().Where(t => !t.IsWhitespaceTrivia()));
+                    .WithLeadingTrivia(token.GetLeadingTrivia().Where(t => !t.IsWhiteSpaceTrivia()))
+                    .WithTrailingTrivia(token.GetTrailingTrivia().Where(t => !t.IsWhiteSpaceTrivia()));
         }
 
-        public static bool HasNoneWhitespaceTrivia(this IEnumerable<SyntaxTrivia> triviaList, SyntaxKind[] exceptionList = null)
+        public static bool HasNoneWhiteSpaceTrivia(this IEnumerable<SyntaxTrivia> triviaList, SyntaxKind[] exceptionList = null)
         {
             if (exceptionList == null)
-                return triviaList.Any(t => !t.IsWhitespaceTrivia());
+                return triviaList.Any(t => !t.IsWhiteSpaceTrivia());
 
-            return triviaList.Any(t => !t.IsWhitespaceTrivia() && exceptionList.Any(e => t.IsKind(e)) == false);
+            return triviaList.Any(t => !t.IsWhiteSpaceTrivia() && exceptionList.Any(e => t.IsKind(e)) == false);
         }
 
-        public static bool IsWhitespaceTrivia(this SyntaxTrivia trivia)
+        public static bool IsWhiteSpaceTrivia(this SyntaxTrivia trivia)
         {
             return trivia.IsKind(SyntaxKind.EndOfLineTrivia) || trivia.IsKind(SyntaxKind.WhitespaceTrivia);
         }
 
-        public static bool HasNoneWhitespaceTrivia(this SyntaxNode node, SyntaxKind[] exceptionList = null)
+        public static bool HasNoneWhiteSpaceTrivia(this SyntaxNode node, SyntaxKind[] exceptionList = null)
         {
-            return (node.ContainsDirectives || node.HasStructuredTrivia || node.DescendantTrivia(descendIntoTrivia: true).HasNoneWhitespaceTrivia(exceptionList));
+            return (node.ContainsDirectives || node.HasStructuredTrivia || node.DescendantTrivia(descendIntoTrivia: true).HasNoneWhiteSpaceTrivia(exceptionList));
         }
 
-        public static bool HasNoneWhitespaceTrivia(this SyntaxToken token, SyntaxKind[] exceptionList = null)
+        public static bool HasNoneWhiteSpaceTrivia(this SyntaxToken token, SyntaxKind[] exceptionList = null)
         {
-            return (token.ContainsDirectives || token.HasStructuredTrivia || token.GetAllTrivia().HasNoneWhitespaceTrivia());
+            return (token.ContainsDirectives || token.HasStructuredTrivia || token.GetAllTrivia().HasNoneWhiteSpaceTrivia());
         }
 
         public static bool IsPrivate(this FieldDeclarationSyntax field) => IsPrivate(field.Modifiers);

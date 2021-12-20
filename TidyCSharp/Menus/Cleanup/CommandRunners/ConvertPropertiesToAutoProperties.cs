@@ -140,14 +140,16 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 var setIdentifierSymbol = projectItemDetails.SemanticModel.GetSymbolInfo(setIdentifier).Symbol;
                 var getIdentifierSymbol = projectItemDetails.SemanticModel.GetSymbolInfo(getIdentifier).Symbol;
 
-                if (setIdentifierSymbol != getIdentifierSymbol) return null;
+                if (SymbolEqualityComparer.Default.Equals(setIdentifierSymbol, getIdentifierSymbol) == false) return null;
+                //if (setIdentifierSymbol != getIdentifierSymbol) return null;
 
                 var baseFieldSymbol = projectItemDetails.SemanticModel.GetSymbolInfo(setIdentifier).Symbol;
                 if (baseFieldSymbol is IFieldSymbol == false) return null;
 
                 var propertyDelarationSymbol = projectItemDetails.SemanticModel.GetDeclaredSymbol(propertyDeclaration);
 
-                if (baseFieldSymbol.ContainingType != propertyDelarationSymbol.ContainingType) return null;
+                if (SymbolEqualityComparer.Default.Equals(baseFieldSymbol.ContainingType, propertyDelarationSymbol.ContainingType) == false) return null;
+                //if (baseFieldSymbol.ContainingType != propertyDelarationSymbol.ContainingType) return null;
 
                 var baseFieldVariableDeclaration = await baseFieldSymbol.DeclaringSyntaxReferences[0].GetSyntaxAsync() as VariableDeclaratorSyntax;
                 var baseFieldFieldDeclaration = baseFieldVariableDeclaration.Parent.Parent as FieldDeclarationSyntax;
@@ -161,7 +163,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 if (references == null) return null;
 
-                if (baseFieldFieldDeclaration.HasNoneWhitespaceTrivia(new SyntaxKind[] { SyntaxKind.SingleLineCommentTrivia, SyntaxKind.MultiLineCommentTrivia })) return null;
+                if (baseFieldFieldDeclaration.HasNoneWhiteSpaceTrivia(new SyntaxKind[] { SyntaxKind.SingleLineCommentTrivia, SyntaxKind.MultiLineCommentTrivia })) return null;
 
                 VariablesToRemove.Add(
                     new Tuple<VariableDeclaratorSyntax, PropertyDeclarationSyntax, bool>
@@ -177,59 +179,50 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
             bool CheckVisibility(FieldDeclarationSyntax baseFieldFieldDeclaration, AccessorDeclarationSyntax getNode, AccessorDeclarationSyntax setNode, PropertyDeclarationSyntax propertyDeclaration)
             {
+                var methodResult = true;
                 if (baseFieldFieldDeclaration.IsPrivate())
                 {
-                    return true;
+                    return methodResult;
                 }
-                else
+
+                if (baseFieldFieldDeclaration.IsPublic())
                 {
-                    if (baseFieldFieldDeclaration.IsPublic())
-                    {
-                        if (propertyDeclaration.IsPublic() == false) return false;
-                        if (getNode.Modifiers.Any()) return false;
-                        if (setNode.Modifiers.Any()) return false;
-                    }
-                    else if (baseFieldFieldDeclaration.IsProtected())
-                    {
-                        if (propertyDeclaration.IsPrivate() == false) return false;
+                    if (propertyDeclaration.IsPublic() == false || getNode.Modifiers.Any() || setNode.Modifiers.Any()) return false;
+                }
+                else if (baseFieldFieldDeclaration.IsProtected())
+                {
+                    if (propertyDeclaration.IsPrivate() == false) return false;
 
-                        if (propertyDeclaration.IsProtected())
-                        {
-                            if (getNode.Modifiers.Any()) return false;
-                            if (setNode.Modifiers.Any()) return false;
-                        }
-                        else if (propertyDeclaration.IsPublic())
-                        {
-                            if (baseFieldFieldDeclaration.IsInternal() == false)
-                            {
-                                if (getNode.Modifiers.Any(x => x.IsKind(SyntaxKind.PrivateKeyword) || x.IsKind(SyntaxKind.InternalKeyword))) return false;
-                                if (setNode.Modifiers.Any(x => x.IsKind(SyntaxKind.PrivateKeyword) || x.IsKind(SyntaxKind.InternalKeyword))) return false;
-                            }
-                            else
-                            {
-                                if (getNode.Modifiers.Any(x => x.IsKind(SyntaxKind.PrivateKeyword))) return false;
-                                if (setNode.Modifiers.Any(x => x.IsKind(SyntaxKind.PrivateKeyword))) return false;
-                            }
-                        }
-                    }
-                    else if (baseFieldFieldDeclaration.IsInternal())
-                    {
-                        if (propertyDeclaration.IsPrivate() == false) return false;
+                    if (propertyDeclaration.IsProtected() && (getNode.Modifiers.Any() || setNode.Modifiers.Any())) return false;
 
-                        if (propertyDeclaration.IsInternal())
+                    else if (propertyDeclaration.IsPublic())
+                    {
+                        if (baseFieldFieldDeclaration.IsInternal() == false)
                         {
-                            if (getNode.Modifiers.Any()) return false;
-                            if (setNode.Modifiers.Any()) return false;
+                            if (getNode.Modifiers.Any(x => x.IsKind(SyntaxKind.PrivateKeyword) || x.IsKind(SyntaxKind.InternalKeyword))) return false;
+                            if (setNode.Modifiers.Any(x => x.IsKind(SyntaxKind.PrivateKeyword) || x.IsKind(SyntaxKind.InternalKeyword))) return false;
                         }
-                        else if (propertyDeclaration.IsPublic())
+                        else
                         {
-                            if (getNode.Modifiers.Any(x => x.IsKind(SyntaxKind.PrivateKeyword) || x.IsKind(SyntaxKind.ProtectedKeyword))) return false;
-                            if (setNode.Modifiers.Any(x => x.IsKind(SyntaxKind.PrivateKeyword) || x.IsKind(SyntaxKind.ProtectedKeyword))) return false;
+                            if (getNode.Modifiers.Any(x => x.IsKind(SyntaxKind.PrivateKeyword))) return false;
+                            if (setNode.Modifiers.Any(x => x.IsKind(SyntaxKind.PrivateKeyword))) return false;
                         }
                     }
                 }
+                else if (baseFieldFieldDeclaration.IsInternal())
+                {
+                    if (propertyDeclaration.IsPrivate() == false) return false;
 
-                return true;
+                    if (propertyDeclaration.IsInternal() && (getNode.Modifiers.Any() || setNode.Modifiers.Any())) return false;
+
+                    else if (propertyDeclaration.IsPublic())
+                    {
+                        if (getNode.Modifiers.Any(x => x.IsKind(SyntaxKind.PrivateKeyword) || x.IsKind(SyntaxKind.ProtectedKeyword))) return false;
+                        if (setNode.Modifiers.Any(x => x.IsKind(SyntaxKind.PrivateKeyword) || x.IsKind(SyntaxKind.ProtectedKeyword))) return false;
+                    }
+                }
+
+                return methodResult;
             }
 
             IdentifierNameSyntax HasJustSetValue(AccessorDeclarationSyntax setNode)

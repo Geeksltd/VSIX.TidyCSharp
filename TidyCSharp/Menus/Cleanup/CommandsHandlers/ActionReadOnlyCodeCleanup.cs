@@ -5,7 +5,7 @@ using System;
 using CamelCasedClassFieldsCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.CamelCasedClassFields.CleanupTypes;
 using CamelCasedMethodCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.CamelCasedMethodVariable.CleanupTypes;
 using MembersToExpressionBodiedCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.MembersToExpressionBodied.CleanupTypes;
-using NormalizeWhitespaceCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace.CleanupTypes;
+using NormalizeWhitespaceCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhiteSpace.CleanupTypes;
 using RemoveExtraThisCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.RemoveExtraThisKeyword.CleanupTypes;
 using RemovePrivateModifierCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.RemovePrivateModifier.CleanupTypes;
 using SimplifyClassFieldDeclarationCleanupTypes = Geeks.VSIX.TidyCSharp.Cleanup.SimplifyClassFieldDeclaration.CleanupTypes;
@@ -59,22 +59,22 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                     new CleanerItemUIInfo[] {
                         new CleanerItemUIInfo
                         {
-                            CleanerType = (int)MembersToExpressionBodiedCleanupTypes.Convert_Constructors,
+                            CleanerType = (int)MembersToExpressionBodiedCleanupTypes.ConvertConstructors,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(MembersToExpressionBodiedCleanupTypes), MembersToExpressionBodiedCleanupTypes.Convert_Constructors).ToString()
+                            Name = Enum.GetName(typeof(MembersToExpressionBodiedCleanupTypes), MembersToExpressionBodiedCleanupTypes.ConvertConstructors).ToString()
                         },
                         new CleanerItemUIInfo
                         {
-                            CleanerType = (int)MembersToExpressionBodiedCleanupTypes.Convert_Methods,
+                            CleanerType = (int)MembersToExpressionBodiedCleanupTypes.ConvertMethods,
                             ShouldBeSelectedByDefault = true,
                             Name = Enum.GetName(typeof(MembersToExpressionBodiedCleanupTypes),
-                                MembersToExpressionBodiedCleanupTypes.Convert_Methods).ToString()
+                                MembersToExpressionBodiedCleanupTypes.ConvertMethods).ToString()
                         },
                         new CleanerItemUIInfo
                         {
-                            CleanerType = (int)MembersToExpressionBodiedCleanupTypes.Convert_ReadOnly_Property,
+                            CleanerType = (int)MembersToExpressionBodiedCleanupTypes.ConvertReadOnlyProperty,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(MembersToExpressionBodiedCleanupTypes), MembersToExpressionBodiedCleanupTypes.Convert_ReadOnly_Property).ToString()
+                            Name = Enum.GetName(typeof(MembersToExpressionBodiedCleanupTypes), MembersToExpressionBodiedCleanupTypes.ConvertReadOnlyProperty).ToString()
                         }
                     }
                 ));
@@ -84,17 +84,17 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 {
                     new CleanerItemUIInfo
                     {
-                        CleanerType = (int)CamelCasedClassFieldsCleanupTypes.Normal_Fields,
+                        CleanerType = (int)CamelCasedClassFieldsCleanupTypes.NormalFields,
                         ShouldBeSelectedByDefault = true,
                         Name = Enum.GetName(typeof(CamelCasedClassFieldsCleanupTypes),
-                                CamelCasedClassFieldsCleanupTypes.Normal_Fields).ToString()
+                                CamelCasedClassFieldsCleanupTypes.NormalFields).ToString()
                     },
                     new CleanerItemUIInfo
                     {
-                        CleanerType = (int)CamelCasedClassFieldsCleanupTypes.Const_Fields,
+                        CleanerType = (int)CamelCasedClassFieldsCleanupTypes.ConstFields,
                         ShouldBeSelectedByDefault = true,
                         Name = Enum.GetName(typeof(CamelCasedClassFieldsCleanupTypes),
-                                CamelCasedClassFieldsCleanupTypes.Const_Fields).ToString()
+                                CamelCasedClassFieldsCleanupTypes.ConstFields).ToString()
                     },
                 }));
 
@@ -102,9 +102,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 ReadOnlyMainCleanup(CodeCleanerType.SimplyAsyncCalls, new CleanerItemUIInfo[] {
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)SimplyAsyncCallCleanupTypes.Single_Expression,
+                            CleanerType = (int)SimplyAsyncCallCleanupTypes.SingleExpression,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(SimplyAsyncCallCleanupTypes), SimplyAsyncCallCleanupTypes.Single_Expression).ToString()
+                            Name = Enum.GetName(typeof(SimplyAsyncCallCleanupTypes), SimplyAsyncCallCleanupTypes.SingleExpression).ToString()
                         },
                 }));
 
@@ -112,27 +112,27 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 ReadOnlyMainCleanup(CodeCleanerType.PrivateAccessModifier, new CleanerItemUIInfo[] {
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)RemovePrivateModifierCleanupTypes.Remove_Class_Fields_Private_Modifier,
+                            CleanerType = (int)RemovePrivateModifierCleanupTypes.RemoveClassFieldsPrivateModifier,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(RemovePrivateModifierCleanupTypes), RemovePrivateModifierCleanupTypes.Remove_Class_Methods_Private_Modifier).ToString()
+                            Name = Enum.GetName(typeof(RemovePrivateModifierCleanupTypes), RemovePrivateModifierCleanupTypes.RemoveClassMethodsPrivateModifier).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)RemovePrivateModifierCleanupTypes.Remove_Class_Methods_Private_Modifier,
+                            CleanerType = (int)RemovePrivateModifierCleanupTypes.RemoveClassMethodsPrivateModifier,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(RemovePrivateModifierCleanupTypes), RemovePrivateModifierCleanupTypes.Remove_Class_Methods_Private_Modifier).ToString()
+                            Name = Enum.GetName(typeof(RemovePrivateModifierCleanupTypes), RemovePrivateModifierCleanupTypes.RemoveClassMethodsPrivateModifier).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)RemovePrivateModifierCleanupTypes.Remove_Class_Properties_Private_Modifier,
+                            CleanerType = (int)RemovePrivateModifierCleanupTypes.RemoveClassPropertiesPrivateModifier,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(RemovePrivateModifierCleanupTypes), RemovePrivateModifierCleanupTypes.Remove_Class_Properties_Private_Modifier).ToString()
+                            Name = Enum.GetName(typeof(RemovePrivateModifierCleanupTypes), RemovePrivateModifierCleanupTypes.RemoveClassPropertiesPrivateModifier).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)RemovePrivateModifierCleanupTypes.Remove_Nested_Class_Private_Modifier,
+                            CleanerType = (int)RemovePrivateModifierCleanupTypes.RemoveNestedClassPrivateModifier,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(RemovePrivateModifierCleanupTypes), RemovePrivateModifierCleanupTypes.Remove_Nested_Class_Private_Modifier).ToString()
+                            Name = Enum.GetName(typeof(RemovePrivateModifierCleanupTypes), RemovePrivateModifierCleanupTypes.RemoveNestedClassPrivateModifier).ToString()
                         },
                 }));
 
@@ -140,21 +140,21 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 ReadOnlyMainCleanup(CodeCleanerType.RemoveExtraThisQualification, new CleanerItemUIInfo[] {
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)RemoveExtraThisCleanupTypes.Remove_From_Fields_Call,
+                            CleanerType = (int)RemoveExtraThisCleanupTypes.RemoveFromFieldsCall,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(RemoveExtraThisCleanupTypes), RemoveExtraThisCleanupTypes.Remove_From_Fields_Call).ToString()
+                            Name = Enum.GetName(typeof(RemoveExtraThisCleanupTypes), RemoveExtraThisCleanupTypes.RemoveFromFieldsCall).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)RemoveExtraThisCleanupTypes.Remove_From_Method_Call,
+                            CleanerType = (int)RemoveExtraThisCleanupTypes.RemoveFromMethodCall,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(RemoveExtraThisCleanupTypes), RemoveExtraThisCleanupTypes.Remove_From_Method_Call).ToString()
+                            Name = Enum.GetName(typeof(RemoveExtraThisCleanupTypes), RemoveExtraThisCleanupTypes.RemoveFromMethodCall).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)RemoveExtraThisCleanupTypes.Remove_From_Properties_Call,
+                            CleanerType = (int)RemoveExtraThisCleanupTypes.RemoveFromPropertiesCall,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(RemoveExtraThisCleanupTypes), RemoveExtraThisCleanupTypes.Remove_From_Properties_Call).ToString()
+                            Name = Enum.GetName(typeof(RemoveExtraThisCleanupTypes), RemoveExtraThisCleanupTypes.RemoveFromPropertiesCall).ToString()
                         },
                 }));
 
@@ -162,35 +162,35 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 ReadOnlyMainCleanup(CodeCleanerType.CamelCasedMethodVariable, new CleanerItemUIInfo[] {
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)CamelCasedMethodCleanupTypes.Local_Variable,
+                            CleanerType = (int)CamelCasedMethodCleanupTypes.LocalVariable,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(CamelCasedMethodCleanupTypes), CamelCasedMethodCleanupTypes.Local_Variable).ToString()
+                            Name = Enum.GetName(typeof(CamelCasedMethodCleanupTypes), CamelCasedMethodCleanupTypes.LocalVariable).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)CamelCasedMethodCleanupTypes.Method_Parameter,
+                            CleanerType = (int)CamelCasedMethodCleanupTypes.MethodParameter,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(CamelCasedMethodCleanupTypes), CamelCasedMethodCleanupTypes.Method_Parameter).ToString()
+                            Name = Enum.GetName(typeof(CamelCasedMethodCleanupTypes), CamelCasedMethodCleanupTypes.MethodParameter).ToString()
                         }, }));
 
             CleanupOptions.Accept(new
                 ReadOnlyMainCleanup(CodeCleanerType.SimplifyClassFieldDeclarations, new CleanerItemUIInfo[] {
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)SimplifyClassFieldDeclarationCleanupTypes.Group_And_Merge_Class_Fields,
+                            CleanerType = (int)SimplifyClassFieldDeclarationCleanupTypes.GroupAndMergeClassFields,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(SimplifyClassFieldDeclarationCleanupTypes), SimplifyClassFieldDeclarationCleanupTypes.Group_And_Merge_Class_Fields).ToString()
+                            Name = Enum.GetName(typeof(SimplifyClassFieldDeclarationCleanupTypes), SimplifyClassFieldDeclarationCleanupTypes.GroupAndMergeClassFields).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)SimplifyClassFieldDeclarationCleanupTypes.Remove_Class_Fields_Initializer_Literal,
+                            CleanerType = (int)SimplifyClassFieldDeclarationCleanupTypes.RemoveClassFieldsInitializerLiteral,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(SimplifyClassFieldDeclarationCleanupTypes), SimplifyClassFieldDeclarationCleanupTypes.Remove_Class_Fields_Initializer_Literal).ToString()
+                            Name = Enum.GetName(typeof(SimplifyClassFieldDeclarationCleanupTypes), SimplifyClassFieldDeclarationCleanupTypes.RemoveClassFieldsInitializerLiteral).ToString()
                         },new CleanerItemUIInfo
                         {
-                            CleanerType = (int)SimplifyClassFieldDeclarationCleanupTypes.Remove_Class_Fields_Initializer_Null,
+                            CleanerType = (int)SimplifyClassFieldDeclarationCleanupTypes.RemoveClassFieldsInitializerNull,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(SimplifyClassFieldDeclarationCleanupTypes), SimplifyClassFieldDeclarationCleanupTypes.Remove_Class_Fields_Initializer_Null).ToString()
+                            Name = Enum.GetName(typeof(SimplifyClassFieldDeclarationCleanupTypes), SimplifyClassFieldDeclarationCleanupTypes.RemoveClassFieldsInitializerNull).ToString()
                         },
                     }));
 
@@ -222,9 +222,9 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_Blank_After_Open_Bracket_And_Before_Close_Brackets,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.RemoveBlankAfterOpenBracketAndBeforeCloseBrackets,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_Blank_After_Open_Bracket_And_Before_Close_Brackets).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.RemoveBlankAfterOpenBracketAndBeforeCloseBrackets).ToString()
                         },
                     new CleanerItemUIInfo
                         {
@@ -234,39 +234,39 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Between_Class_Members,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.RemoveDuplicateBetweenClassMembers,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Between_Class_Members).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.RemoveDuplicateBetweenClassMembers).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Between_Methods_Statements,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.RemoveDuplicateBetweenMethodsStatements,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Between_Methods_Statements).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.RemoveDuplicateBetweenMethodsStatements).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Between_Namespace_Members,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.RemoveDuplicateBetweenNamespaceMembers,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Between_Namespace_Members).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.RemoveDuplicateBetweenNamespaceMembers).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Inside_Comments,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.RemoveDuplicateInsideComments,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Inside_Comments).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.RemoveDuplicateInsideComments).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Inside_Usings,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.RemoveDuplicateInsideUsings,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Remove_Duplicate_Inside_Usings).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.RemoveDuplicateInsideUsings).ToString()
                         },
                     new CleanerItemUIInfo
                         {
-                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.Trim_The_File,
+                            CleanerType = (int)NormalizeWhitespaceCleanupTypes.TrimTheFile,
                             ShouldBeSelectedByDefault = true,
-                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.Trim_The_File).ToString()
+                            Name = Enum.GetName(typeof(NormalizeWhitespaceCleanupTypes), NormalizeWhitespaceCleanupTypes.TrimTheFile).ToString()
                         },
                     new CleanerItemUIInfo
                         {
@@ -285,7 +285,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
 
         public void RunReadOnlyCleanUp()
         {
-            ActionsOnCSharp.CSharpActionDelegate.TargetAction desiredAction = ActionsOnCSharp.ActionsCSharpOnFile.ReportOnlyDoNotCleanup;
+            ActionsOnCSharp.CSharpAction.TargetAction desiredAction = ActionsOnCSharp.ActionsCSharpOnFile.ReportOnlyDoNotCleanup;
             ActionsOnCSharp.ActionCSharpOnSolution.Invoke(desiredAction, CleanupOptions);
         }
     }

@@ -16,7 +16,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
         {
             var modifiedSourceNode = actualSourceCode;
 
-            if (CheckOption((int)CleanupTypes.Remove_Class_Methods_Private_Modifier))
+            if (CheckOption((int)CleanupTypes.RemoveClassMethodsPrivateModifier))
             {
                 var remover = new MethodTokenRemover(IsReportOnlyMode);
                 modifiedSourceNode = remover.Remove(modifiedSourceNode) ?? modifiedSourceNode;
@@ -27,7 +27,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 }
             }
 
-            if (CheckOption((int)CleanupTypes.Remove_Class_Fields_Private_Modifier))
+            if (CheckOption((int)CleanupTypes.RemoveClassFieldsPrivateModifier))
             {
                 var remover = new FieldTokenRemover(IsReportOnlyMode);
                 modifiedSourceNode = remover.Remove(modifiedSourceNode) ?? modifiedSourceNode;
@@ -38,7 +38,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 }
             }
 
-            if (CheckOption((int)CleanupTypes.Remove_Class_Properties_Private_Modifier))
+            if (CheckOption((int)CleanupTypes.RemoveClassPropertiesPrivateModifier))
             {
                 var remover = new PropertyTokenRemover(IsReportOnlyMode);
                 modifiedSourceNode = remover.Remove(modifiedSourceNode) ?? modifiedSourceNode;
@@ -49,7 +49,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 }
             }
 
-            if (CheckOption((int)CleanupTypes.Remove_Nested_Class_Private_Modifier))
+            if (CheckOption((int)CleanupTypes.RemoveNestedClassPrivateModifier))
             {
                 var remover = new NestedClassTokenRemover(IsReportOnlyMode);
                 modifiedSourceNode = remover.Remove(modifiedSourceNode) ?? modifiedSourceNode;

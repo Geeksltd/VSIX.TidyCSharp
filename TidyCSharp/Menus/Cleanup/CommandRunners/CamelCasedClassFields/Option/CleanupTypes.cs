@@ -7,9 +7,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CamelCasedClassFields
     public enum CleanupTypes
     {
         [CleanupItem(Title = "Class fields: Change _something -> Something or something")]
-        Normal_Fields = 0x01,
+        NormalFields = 0x01,
 
         [CleanupItem(Title = "Const fields: USE_THIS_FORMAT")]
-        Const_Fields = 0x02,
+        ConstFields = 0x02,
     }
 }

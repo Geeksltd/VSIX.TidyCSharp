@@ -2,11 +2,11 @@ using EnvDTE;
 using Geeks.GeeksProductivityTools.Utils;
 using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
 using System;
-using static Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp.CSharpActionDelegate;
+using static Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp.CSharpAction;
 
 namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 {
-    public class ActionCSharpOnAnywhere
+    public sealed class ActionCSharpOnAnywhere
     {
         private ActionCSharpOnAnywhere() { }
         public static void Invoke(TargetAction action, CleanupOptions cleanupOptions)
@@ -23,7 +23,7 @@ namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 
                     if (selectedProjectItem != null)
                     {
-                        if (selectedProjectItem.ProjectItems == null || selectedProjectItem.ProjectItems.Count == 0 && action!=null)
+                        if (selectedProjectItem.ProjectItems == null || selectedProjectItem.ProjectItems.Count == 0 && action != null)
                         {
                             action(selectedProjectItem, cleanupOptions, true);
                         }

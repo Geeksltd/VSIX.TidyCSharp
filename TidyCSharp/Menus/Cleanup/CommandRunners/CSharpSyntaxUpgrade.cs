@@ -56,20 +56,23 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 if (((CSharpCompilation)semanticModel.Compilation).LanguageVersion.MapSpecifiedToEffectiveVersion() != LanguageVersion.CSharp9)
                     return base.VisitObjectCreationExpression(node);
 
-                if (node.NewKeyword == null)
+                if (node.NewKeyword == null
+                    || node.Parent.IsKind(SyntaxKind.LocalDeclarationStatement)
+                    || node.Parent.IsKind(SyntaxKind.SimpleMemberAccessExpression)
+                    || node.Parent.IsKind(SyntaxKind.UsingStatement))
                     return base.VisitObjectCreationExpression(node);
 
-                if (node.Parent.IsKind(SyntaxKind.LocalDeclarationStatement))
-                    return base.VisitObjectCreationExpression(node);
+                //if (node.Parent.IsKind(SyntaxKind.LocalDeclarationStatement))
+                //    return base.VisitObjectCreationExpression(node);
 
-                if (node.Parent.IsKind(SyntaxKind.SimpleMemberAccessExpression))
-                    return base.VisitObjectCreationExpression(node);
+                //if (node.Parent.IsKind(SyntaxKind.SimpleMemberAccessExpression))
+                //    return base.VisitObjectCreationExpression(node);
 
-                if (node.Parent.IsKind(SyntaxKind.UsingStatement))
-                    return base.VisitObjectCreationExpression(node);
+                //if (node.Parent.IsKind(SyntaxKind.UsingStatement))
+                //    return base.VisitObjectCreationExpression(node);
 
                 var newNode = node.WithType(SyntaxFactory.ParseTypeName(""))
-                    .WithNewKeyword(node.NewKeyword.WithoutWhitespaceTrivia())
+                    .WithNewKeyword(node.NewKeyword.WithoutWhiteSpaceTrivia())
                     .WithArgumentList(node.ArgumentList ?? SyntaxFactory.ParseArgumentList("()"));
 
                 var nodeTypeinfo = semanticModel.GetTypeInfo(node);

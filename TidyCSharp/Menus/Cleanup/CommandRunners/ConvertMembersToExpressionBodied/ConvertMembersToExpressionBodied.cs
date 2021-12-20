@@ -32,7 +32,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
 
                 if (node is MethodDeclarationSyntax && node.Parent is ClassDeclarationSyntax)
                 {
-                    if (CheckOption((int)CleanupTypes.Convert_Methods))
+                    if (CheckOption((int)CleanupTypes.ConvertMethods))
                     {
                         node = ConvertToExpressionBodiedHelper(node as MethodDeclarationSyntax);
                         Message = "Method Declaration should be Converted to expression bodied";
@@ -40,7 +40,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 }
                 else if (node is PropertyDeclarationSyntax)
                 {
-                    if (CheckOption((int)CleanupTypes.Convert_ReadOnly_Property))
+                    if (CheckOption((int)CleanupTypes.ConvertReadOnlyProperty))
                     {
                         node = ConvertToExpressionBodiedHelper(node as PropertyDeclarationSyntax);
                         Message = "Property Declaration should be Converted to expression bodied";
@@ -48,7 +48,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 }
                 else if (node is ConstructorDeclarationSyntax)
                 {
-                    if (CheckOption((int)CleanupTypes.Convert_Constructors))
+                    if (CheckOption((int)CleanupTypes.ConvertConstructors))
                     {
                         node = ConvertToExpressionBodiedHelper(node as ConstructorDeclarationSyntax);
                         Message = "Constructor should be Converted to expression bodied";
@@ -156,7 +156,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 .WithoutLeadingTrivia();
 
             var length = expression.WithoutTrivia().Span.Length + method.Span.Length - method.Body.FullSpan.Length;
-            if (length > MembersToExpressionBodied.Options.Max_Expression_Bodied_Member_Length) return null;
+            if (length > MembersToExpressionBodied.Options.MaxExpressionBodiedMemberLength) return null;
             if (method.Body.ChildNodes().OfType<UsingStatementSyntax>().Any()) return null;
 
             return expression;
@@ -277,7 +277,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             var length = expression.WithoutTrivia().Span.Length +
                     constructorDeclaration.Span.Length - constructorDeclaration.Body.FullSpan.Length;
 
-            if (length > MembersToExpressionBodied.Options.Max_Expression_Bodied_Member_Length) return constructorDeclaration;
+            if (length > MembersToExpressionBodied.Options.MaxExpressionBodiedMemberLength) return constructorDeclaration;
             if (constructorDeclaration.Body.ChildNodes().OfType<UsingStatementSyntax>().Any()) return constructorDeclaration;
 
             var newconstructorDeclaration = constructorDeclaration

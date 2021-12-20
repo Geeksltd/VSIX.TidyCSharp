@@ -13,7 +13,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.Infra
         {
             if (mainCleanup.MainCleanupItemType == GetCodeCleanerType())
             {
-                var selectedItems = mainCleanup.GetSelectedSubItems().Select(x => x.CleanerType).ToArray();
+                var selectedItems = mainCleanup.GetSelectedSubitems().Select(x => x.CleanerType).ToArray();
 
                 CleanupItemsInteger = selectedItems.FirstOrDefault();
 

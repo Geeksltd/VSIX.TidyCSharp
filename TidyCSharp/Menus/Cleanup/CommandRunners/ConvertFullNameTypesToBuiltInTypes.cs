@@ -76,7 +76,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                             {
                                 LineNumber = lineSpan.StartLinePosition.Line,
                                 Column = lineSpan.StartLinePosition.Character,
-                                Message = "ConvertFullNameTypesToBuiltInTypes",
+                                Message = "Convert full name types to built in Types",
                                 Generator = nameof(ConvertFullNameTypesToBuiltInTypes)
                             });
 

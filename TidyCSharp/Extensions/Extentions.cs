@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace System
 {
     public static class Extensions
@@ -8,7 +10,7 @@ namespace System
 
         public static string TrimStart(this string text, string textToTrim, bool ignoreCase = false)
         {
-            if (text.StartsWith(textToTrim, ignoreCase, Globalization.CultureInfo.InvariantCulture))
+            if (text != null && text.StartsWith(textToTrim, ignoreCase, Globalization.CultureInfo.InvariantCulture))
             {
                 return text.Substring(textToTrim.Length);
             }
@@ -20,7 +22,7 @@ namespace System
 
         public static string TrimEnd(this string text, string textToTrim)
         {
-            if (text.EndsWith(textToTrim))
+            if (text != null && text.EndsWith(textToTrim))
             {
                 return text.TrimEnd(textToTrim.Length);
             }
@@ -51,16 +53,18 @@ namespace System
 
             var result = text;
 
-            foreach (var sub in substringsToExclude)
-                result = result.Replace(sub, "");
+            if (substringsToExclude != null)
+                foreach (var sub in substringsToExclude)
+                    result = result.Replace(sub, "");
 
             return result;
         }
 
         public static bool EndsWithAny(this string input, params string[] listOfEndings)
         {
-            foreach (var option in listOfEndings)
-                if (input.EndsWith(option)) return true;
+            if (listOfEndings != null)
+                foreach (var option in listOfEndings)
+                    if (input.EndsWith(option)) return true;
 
             return false;
         }
@@ -72,17 +76,18 @@ namespace System
         {
             if (object.ReferenceEquals(item, null))
                 return default(K);
-            else
-            {
-                try
-                {
-                    return selector(item);
-                }
-                catch (NullReferenceException)
-                {
-                    return default(K);
-                }
-            }
+            return (selector != null) ? selector(item) : default(K);
+            //else
+            //{
+            //    try
+            //    {
+            //        return selector(item);
+            //    }
+            //    catch (NullReferenceException)
+            //    {
+            //        return default(K);
+            //    }
+            //}
         }
 
         /// <summary>
@@ -91,15 +96,15 @@ namespace System
         public static Guid? Get<T>(this T item, Func<T, Guid> selector) where T : class
         {
             if (item == null) return null;
-
-            try
-            {
-                return selector(item);
-            }
-            catch (NullReferenceException)
-            {
-                return null;
-            }
+            return (selector != null) ? selector(item) : null as Guid?;
+            //try
+            //{
+            //    return selector(item);
+            //}
+            //catch (NullReferenceException)
+            //{
+            //    return null;
+            //}
         }
 
         /// <summary>
@@ -108,15 +113,15 @@ namespace System
         public static int? Get<T>(this T item, Func<T, int> selector) where T : class
         {
             if (item == null) return null;
-
-            try
-            {
-                return selector(item);
-            }
-            catch (NullReferenceException)
-            {
-                return null;
-            }
+            return (selector != null) ? selector(item) : null as int?;
+            //try
+            //{
+            //    return selector(item);
+            //}
+            //catch (NullReferenceException)
+            //{
+            //    return null;
+            //}
         }
 
         /// <summary>
@@ -125,15 +130,15 @@ namespace System
         public static double? Get<T>(this T item, Func<T, double> selector) where T : class
         {
             if (item == null) return null;
-
-            try
-            {
-                return selector(item);
-            }
-            catch (NullReferenceException)
-            {
-                return null;
-            }
+            return (selector != null) ? selector(item) : null as double?;
+            //try
+            //{
+            //    return selector(item);
+            //}
+            //catch (NullReferenceException)
+            //{
+            //    return null;
+            //}
         }
 
         /// <summary>
@@ -142,15 +147,15 @@ namespace System
         public static decimal? Get<T>(this T item, Func<T, decimal> selector) where T : class
         {
             if (item == null) return null;
-
-            try
-            {
-                return selector(item);
-            }
-            catch (NullReferenceException)
-            {
-                return null;
-            }
+            return (selector != null) ? selector(item) : null as decimal?;
+            //try
+            //{
+            //    return selector(item);
+            //}
+            //catch (NullReferenceException)
+            //{
+            //    return null;
+            //}
         }
 
         /// <summary>
@@ -159,15 +164,15 @@ namespace System
         public static bool? Get<T>(this T item, Func<T, bool> selector) where T : class
         {
             if (item == null) return null;
-
-            try
-            {
-                return selector(item);
-            }
-            catch (NullReferenceException)
-            {
-                return null;
-            }
+            return (selector != null) ? selector(item) : null as bool?;
+            //try
+            //{
+            //    return selector(item);
+            //}
+            //catch (NullReferenceException)
+            //{
+            //    return null;
+            //}
         }
 
         /// <summary>
@@ -176,15 +181,15 @@ namespace System
         public static string Get(this DateTime? item, Func<DateTime?, string> selector)
         {
             if (item == null) return null;
-
-            try
-            {
-                return selector(item);
-            }
-            catch (NullReferenceException)
-            {
-                return null;
-            }
+            return (selector != null) ? selector(item) : null;
+            //try
+            //{
+            //    return selector(item);
+            //}
+            //catch (NullReferenceException)
+            //{
+            //    return null;
+            //}
         }
 
         /// <summary>
@@ -193,15 +198,15 @@ namespace System
         public static byte? Get<T>(this T item, Func<T, byte> selector) where T : class
         {
             if (item == null) return null;
-
-            try
-            {
-                return selector(item);
-            }
-            catch (NullReferenceException)
-            {
-                return null;
-            }
+            return (selector != null) ? selector(item) : null as byte?;
+            //    try
+            //{
+            //    return selector(item);
+            //}
+            //catch (NullReferenceException)
+            //{
+            //    return null;
+            //}
         }
 
         /// <summary>

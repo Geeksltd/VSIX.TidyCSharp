@@ -1,6 +1,6 @@
 ﻿using Geeks.VSIX.TidyCSharp.Cleanup.Infra;
 
-namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
+namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhiteSpace
 {
     public class Options : OptionsBase, ICleanupOption
     {

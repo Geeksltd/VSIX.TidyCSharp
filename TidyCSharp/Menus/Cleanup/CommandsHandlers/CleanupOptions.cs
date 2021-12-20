@@ -21,7 +21,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers
             optionItems.Add(RemoveExtraThisQualification = new RemoveExtraThisKeyword.Options());
             optionItems.Add(SimplifyClassFieldDeclarations = new SimplifyClassFieldDeclaration.Options());
             optionItems.Add(SimplyAsyncCall = new SimplyAsyncCall.Options());
-            optionItems.Add(WhiteSpaceNormalizer = new NormalizeWhitespace.Options());
+            optionItems.Add(WhiteSpaceNormalizer = new NormalizeWhiteSpace.Options());
         }
 
         public void Accept(IMainCleanup mainCleanup)
@@ -42,7 +42,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers
         public RemoveExtraThisKeyword.Options RemoveExtraThisQualification { get; private set; }
         public SimplifyClassFieldDeclaration.Options SimplifyClassFieldDeclarations { get; private set; }
         public SimplyAsyncCall.Options SimplyAsyncCall { get; private set; }
-        public NormalizeWhitespace.Options WhiteSpaceNormalizer { get; private set; }
+        public NormalizeWhiteSpace.Options WhiteSpaceNormalizer { get; private set; }
 
         public string SerializeValues()
         {

@@ -1,6 +1,6 @@
 using Geeks.GeeksProductivityTools;
 using Geeks.GeeksProductivityTools.Menus.Cleanup;
-using Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace;
+using Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhiteSpace;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Formatting;
 using System.Threading.Tasks;
@@ -47,7 +47,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
                 }
             }
 
-            var whitespaceRewriter = new WhitespaceRewriter(modifiedSourceNode, IsReportOnlyMode, options);
+            var whitespaceRewriter = new WhiteSpaceRewriter(modifiedSourceNode, IsReportOnlyMode, options);
             modifiedSourceNode = whitespaceRewriter.Apply();
 
             if (IsReportOnlyMode)

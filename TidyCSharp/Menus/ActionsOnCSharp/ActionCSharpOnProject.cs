@@ -3,7 +3,7 @@ using Geeks.GeeksProductivityTools.Utils;
 using Geeks.VSIX.TidyCSharp.Cleanup.CommandsHandlers;
 using System;
 using System.Windows;
-using static Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp.CSharpActionDelegate;
+using static Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp.CSharpAction;
 
 namespace Geeks.GeeksProductivityTools.Menus.ActionsOnCSharp
 {

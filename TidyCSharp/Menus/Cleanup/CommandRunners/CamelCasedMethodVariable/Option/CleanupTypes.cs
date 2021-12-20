@@ -7,9 +7,9 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.CamelCasedMethodVariable
     public enum CleanupTypes
     {
         [CleanupItem(Title = "Method parameters")]
-        Method_Parameter = 0x01,
+        MethodParameter = 0x01,
 
         [CleanupItem(Title = "Local variable declarations")]
-        Local_Variable = 0x02,
+        LocalVariable = 0x02,
     }
 }

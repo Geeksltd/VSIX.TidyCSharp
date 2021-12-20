@@ -93,14 +93,14 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             {
                 var thisItemAsMemberAccessExceptionSymbol = semanticModel.GetSymbolInfo(thisItemAsMemberAccessException).Symbol;
 
-                if (thisItemAsMemberAccessExceptionSymbol is IFieldSymbol && !CheckOption((int)RemoveExtraThisKeyword.CleanupTypes.Remove_From_Fields_Call)) return null;
-                if (thisItemAsMemberAccessExceptionSymbol is IPropertySymbol && !CheckOption((int)RemoveExtraThisKeyword.CleanupTypes.Remove_From_Properties_Call)) return null;
-                if (thisItemAsMemberAccessExceptionSymbol is IMethodSymbol && !CheckOption((int)RemoveExtraThisKeyword.CleanupTypes.Remove_From_Method_Call)) return null;
+                if (thisItemAsMemberAccessExceptionSymbol is IFieldSymbol && !CheckOption((int)RemoveExtraThisKeyword.CleanupTypes.RemoveFromFieldsCall)) return null;
+                if (thisItemAsMemberAccessExceptionSymbol is IPropertySymbol && !CheckOption((int)RemoveExtraThisKeyword.CleanupTypes.RemoveFromPropertiesCall)) return null;
+                if (thisItemAsMemberAccessExceptionSymbol is IMethodSymbol && !CheckOption((int)RemoveExtraThisKeyword.CleanupTypes.RemoveFromMethodCall)) return null;
 
                 var right = thisItemAsMemberAccessException.Name;
                 var symbols = semanticModel.LookupSymbols(thisItemAsMemberAccessException.SpanStart, name: right.Identifier.ValueText);
 
-                if (symbols.Any(x => x == thisItemAsMemberAccessExceptionSymbol))
+                if (symbols.Any(x => SymbolEqualityComparer.Default.Equals(x, thisItemAsMemberAccessExceptionSymbol)))
                 {
                     return right.WithLeadingTrivia(thisItemAsMemberAccessException.GetLeadingTrivia());
                 }

@@ -113,13 +113,17 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup
             }
 
             IEnumerable<StatementType> GetStatementTypesContainMethodName(
-                IEnumerable<StatementType> statementTypes, string methodName)
-            {
-                return statementTypes.Where(x => x.MethodName == methodName)
+                IEnumerable<StatementType> statementTypes, string methodName) =>
+                statementTypes.Where(x => x.MethodName == methodName)
                     .Where(x => x.Row.DescendantNodesOfType<MemberAccessExpressionSyntax>().Count() == 1)
                     .Where(x => x.Row.IdentifierShouldBe("button"))
                     .Where(x => x.Row.MethodNameShouldBe(methodName));
-            }
+            //{
+            //    return statementTypes.Where(x => x.MethodName == methodName)
+            //        .Where(x => x.Row.DescendantNodesOfType<MemberAccessExpressionSyntax>().Count() == 1)
+            //        .Where(x => x.Row.IdentifierShouldBe("button"))
+            //        .Where(x => x.Row.MethodNameShouldBe(methodName));
+            //}
 
             public override SyntaxNode VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
             {

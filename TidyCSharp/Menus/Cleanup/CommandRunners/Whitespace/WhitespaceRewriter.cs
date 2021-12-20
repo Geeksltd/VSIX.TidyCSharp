@@ -6,14 +6,14 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
 
-namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
+namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhiteSpace
 {
-    public class WhitespaceRewriter : CSharpSyntaxRewriterBase
+    public class WhiteSpaceRewriter : CSharpSyntaxRewriterBase
     {
         SyntaxToken _lastToken = default(SyntaxToken);
         MemberDeclarationSyntax _LastMember;
         bool _lastTokenIsAOpenBrace, _lastTokenIsACloseBrace;
-        public WhitespaceRewriter(SyntaxNode initialSource, bool isReadOnlyMode, Options options) :
+        public WhiteSpaceRewriter(SyntaxNode initialSource, bool isReadOnlyMode, Options options) :
             base(initialSource, isReadOnlyMode, options)
         { }
 
@@ -56,16 +56,16 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
         void TrimFile()
         {
-            var newLeadingTriviaList = CleanUpListWithNoWhitespaces(InitialSource.GetLeadingTrivia(), CleanupTypes.Trim_The_File);
+            var newLeadingTriviaList = CleanUpListWithNoWhiteSpaces(InitialSource.GetLeadingTrivia(), CleanupTypes.TrimTheFile);
             InitialSource = InitialSource.WithLeadingTrivia(newLeadingTriviaList);
 
             var endOfFileToken = InitialSource.DescendantTokens().SingleOrDefault(x => x.IsKind(SyntaxKind.EndOfFileToken));
             var beforeEndOfFileToken = endOfFileToken.GetPreviousToken();
 
             var leadingTriviList = endOfFileToken.LeadingTrivia;
-            leadingTriviList = CleanUpListWithNoWhitespaces(leadingTriviList, CleanupTypes.Trim_The_File, itsForCloseBrace: true);
+            leadingTriviList = CleanUpListWithNoWhiteSpaces(leadingTriviList, CleanupTypes.TrimTheFile, itsForCloseBrace: true);
 
-            if (CheckOption((int)CleanupTypes.Trim_The_File))
+            if (CheckOption((int)CleanupTypes.TrimTheFile))
             {
                 if (leadingTriviList.Any() && leadingTriviList.Last().IsKind(SyntaxKind.EndOfLineTrivia))
                 {
@@ -75,7 +75,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
             var newEndOfFileToken = endOfFileToken.WithLeadingTrivia(leadingTriviList);
 
-            newLeadingTriviaList = CleanUpListWithNoWhitespaces(beforeEndOfFileToken.TrailingTrivia, CleanupTypes.Trim_The_File);
+            newLeadingTriviaList = CleanUpListWithNoWhiteSpaces(beforeEndOfFileToken.TrailingTrivia, CleanupTypes.TrimTheFile);
 
             var newBeforeEndOfFileToken = beforeEndOfFileToken.WithTrailingTrivia(newLeadingTriviaList)
                .WithTrailingTrivia((leadingTriviList != null && leadingTriviList.Any()) ? SyntaxFactory.CarriageReturn : SyntaxFactory.ElasticMarker);
@@ -98,7 +98,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
             if (node is UsingDirectiveSyntax)
             {
-                nodeLeadingTriviList = CleanUpListWithNoWhitespaces(nodeLeadingTriviList, CleanupTypes.Remove_Duplicate_Inside_Usings);
+                nodeLeadingTriviList = CleanUpListWithNoWhiteSpaces(nodeLeadingTriviList, CleanupTypes.RemoveDuplicateInsideUsings);
                 newNode = node.WithLeadingTrivia(nodeLeadingTriviList);
 
                 _LastMember = null;
@@ -130,7 +130,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             }
             else if (CheckInnerBlocks(node))
             {
-                nodeLeadingTriviList = CleanUpListWithDefaultWhitespaces(nodeLeadingTriviList, CleanupTypes.Remove_Blank_After_Open_Bracket_And_Before_Close_Brackets);
+                nodeLeadingTriviList = CleanUpListWithDefaultWhiteSpaces(nodeLeadingTriviList, CleanupTypes.RemoveBlankAfterOpenBracketAndBeforeCloseBrackets);
                 newNode = node.WithLeadingTrivia(nodeLeadingTriviList);
             }
 
@@ -145,7 +145,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                         LineNumber = lineSpan.StartLinePosition.Line,
                         Column = lineSpan.StartLinePosition.Character,
                         Message = "Whitespaces should be normalized",
-                        Generator = nameof(WhitespaceRewriter)
+                        Generator = nameof(WhiteSpaceRewriter)
                     });
                 }
 
@@ -189,19 +189,19 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                 {
                     if (leadingTriviaList.Count(x => x.IsKind(SyntaxKind.EndOfLineTrivia)) < 2)
                     {
-                        leadingTriviaList = CleanUpListWithExactNumberOfWhitespaces(leadingTriviaList, 1, null);
+                        leadingTriviaList = CleanUpListWithExactNumberOfWhiteSpaces(leadingTriviaList, 1, null);
                         isCleanupDone = true;
                     }
                 }
-                else if (CheckOption((int)CleanupTypes.Remove_Duplicate_Between_Class_Members))
+                else if (CheckOption((int)CleanupTypes.RemoveDuplicateBetweenClassMembers))
                 {
-                    leadingTriviaList = CleanUpListWithDefaultWhitespaces(leadingTriviaList, null);
+                    leadingTriviaList = CleanUpListWithDefaultWhiteSpaces(leadingTriviaList, null);
                     isCleanupDone = true;
                 }
             }
-            else if (CheckOption((int)CleanupTypes.Remove_Duplicate_Between_Class_Members))
+            else if (CheckOption((int)CleanupTypes.RemoveDuplicateBetweenClassMembers))
             {
-                leadingTriviaList = CleanUpListWithDefaultWhitespaces(leadingTriviaList, null);
+                leadingTriviaList = CleanUpListWithDefaultWhiteSpaces(leadingTriviaList, null);
                 isCleanupDone = true;
             }
 
@@ -219,7 +219,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
 
         bool IsStartWithSpecialDirective(SyntaxTriviaList leadingTriviaList)
         {
-            var firstDirective = leadingTriviaList.SkipWhile(x => x.IsWhitespaceTrivia()).FirstOrDefault();
+            var firstDirective = leadingTriviaList.SkipWhile(x => x.IsWhiteSpaceTrivia()).FirstOrDefault();
 
             if (firstDirective == default(SyntaxTrivia)) return false;
 
@@ -247,19 +247,19 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
                 {
                     if (leadingTriviaList.Count(x => x.IsKind(SyntaxKind.EndOfLineTrivia)) < 2)
                     {
-                        leadingTriviaList = CleanUpListWithExactNumberOfWhitespaces(leadingTriviaList, 1, null);
+                        leadingTriviaList = CleanUpListWithExactNumberOfWhiteSpaces(leadingTriviaList, 1, null);
                         isCleanupDone = true;
                     }
                 }
-                else if (CheckOption((int)CleanupTypes.Remove_Duplicate_Between_Methods_Statements))
+                else if (CheckOption((int)CleanupTypes.RemoveDuplicateBetweenMethodsStatements))
                 {
-                    leadingTriviaList = CleanUpListWithDefaultWhitespaces(leadingTriviaList, null);
+                    leadingTriviaList = CleanUpListWithDefaultWhiteSpaces(leadingTriviaList, null);
                     isCleanupDone = true;
                 }
             }
-            else if (CheckOption((int)CleanupTypes.Remove_Duplicate_Between_Methods_Statements))
+            else if (CheckOption((int)CleanupTypes.RemoveDuplicateBetweenMethodsStatements))
             {
-                leadingTriviaList = CleanUpListWithDefaultWhitespaces(leadingTriviaList, null);
+                leadingTriviaList = CleanUpListWithDefaultWhiteSpaces(leadingTriviaList, null);
                 isCleanupDone = true;
             }
 
@@ -279,7 +279,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
         {
             var leadingTriviaList = mainNode.GetLeadingTrivia();
 
-            leadingTriviaList = CleanUpListWithDefaultWhitespaces(leadingTriviaList, CleanupTypes.Remove_Duplicate_Between_Namespace_Members);
+            leadingTriviaList = CleanUpListWithDefaultWhiteSpaces(leadingTriviaList, CleanupTypes.RemoveDuplicateBetweenNamespaceMembers);
 
             mainNode =
                 mainNode
@@ -298,7 +298,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
         {
             var leadingTriviaList = mainNode.GetLeadingTrivia();
 
-            leadingTriviaList = CleanUpListWithDefaultWhitespaces(leadingTriviaList, CleanupTypes.Remove_Duplicate_Between_Namespace_Members);
+            leadingTriviaList = CleanUpListWithDefaultWhiteSpaces(leadingTriviaList, CleanupTypes.RemoveDuplicateBetweenNamespaceMembers);
 
             mainNode =
                 mainNode
@@ -319,7 +319,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
         {
             var leadingTriviaList = mainNode.GetLeadingTrivia();
 
-            leadingTriviaList = CleanUpListWithDefaultWhitespaces(leadingTriviaList, CleanupTypes.Remove_Duplicate_Between_Namespace_Members);
+            leadingTriviaList = CleanUpListWithDefaultWhiteSpaces(leadingTriviaList, CleanupTypes.RemoveDuplicateBetweenNamespaceMembers);
 
             mainNode =
                 mainNode
@@ -339,7 +339,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             var x =
                 openBraceToken
                     .WithLeadingTrivia(
-                        CleanUpListWithExactNumberOfWhitespaces(openBraceToken.LeadingTrivia, 0, CleanupTypes.Remove_Blank_After_Open_Bracket_And_Before_Close_Brackets, itsForCloseBrace: false));
+                        CleanUpListWithExactNumberOfWhiteSpaces(openBraceToken.LeadingTrivia, 0, CleanupTypes.RemoveBlankAfterOpenBracketAndBeforeCloseBrackets, itsForCloseBrace: false));
 
             return x;
         }
@@ -349,7 +349,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             return
                 closeBraceToken
                     .WithLeadingTrivia(
-                        CleanUpListWithNoWhitespaces(closeBraceToken.LeadingTrivia, CleanupTypes.Remove_Blank_After_Open_Bracket_And_Before_Close_Brackets, itsForCloseBrace: true));
+                        CleanUpListWithNoWhiteSpaces(closeBraceToken.LeadingTrivia, CleanupTypes.RemoveBlankAfterOpenBracketAndBeforeCloseBrackets, itsForCloseBrace: true));
         }
 
         SyntaxToken ApplyCloseBracket_OfEmptyBlock(SyntaxToken closeBraceToken)
@@ -357,7 +357,7 @@ namespace Geeks.VSIX.TidyCSharp.Cleanup.NormalizeWhitespace
             return
                 closeBraceToken
                     .WithLeadingTrivia(
-                        CleanUpListWithExactNumberOfWhitespaces(closeBraceToken.LeadingTrivia, 0, CleanupTypes.Remove_Blank_After_Open_Bracket_And_Before_Close_Brackets, itsForCloseBrace: true));
+                        CleanUpListWithExactNumberOfWhiteSpaces(closeBraceToken.LeadingTrivia, 0, CleanupTypes.RemoveBlankAfterOpenBracketAndBeforeCloseBrackets, itsForCloseBrace: true));
         }
 
         bool CheckInnerBlocks(SyntaxNode node)

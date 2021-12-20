@@ -11,12 +11,12 @@ namespace Geeks.VSIX.TidyCSharp.Menus.Cleanup.Utils
     public abstract class CleanupCSharpSyntaxRewriter : CSharpSyntaxRewriter
     {
         protected ICleanupOption Options { get; private set; }
-        protected IEnumerable<ChangesReport> ChangesReport;
-        protected bool isReportOnlyMode;
+        protected IEnumerable<ChangesReport> ChangesReport { get; set; }
+        protected bool isReportOnlyMode { get; set; }
 
         protected bool CheckOption(int? o) => Options.Should(o);
 
-        public CleanupCSharpSyntaxRewriter(bool isReportOnlyMode, ICleanupOption options)
+        protected CleanupCSharpSyntaxRewriter(bool isReportOnlyMode, ICleanupOption options)
         {
             this.isReportOnlyMode = isReportOnlyMode;
             ChangesReport = new List<ChangesReport>();
