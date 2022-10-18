@@ -23,11 +23,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup
                 Icon = MessageBoxIcon.Warning
             });
 
-            if (messageBoxResult != DialogResult.OK) return;
-
-            var dialogResult = CleanupOptionForm.Instance.ShowDialog();
-
-            if (dialogResult == DialogResult.Cancel) return;
+            if (CleanupOptionForm.Instance.ShowDialog() == DialogResult.Cancel) return;
 
             ActionsOnCSharp.CSharpAction.TargetAction desiredAction = ActionsOnCSharp.ActionsCSharpOnFile.DoCleanup;
 

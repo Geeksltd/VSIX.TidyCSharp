@@ -36,6 +36,7 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
 
             foreach (var itemControl in AllControls.OrderByDescending(x => x.Height))
             {
+                if(itemControl.IsDisposed) continue;
                 itemControl.TabIndex = TAB_INDEX_START++;
 
                 if (rightTableLayoutPanel.Height + itemControl.Height >= leftTableLayoutPanel.Height)
@@ -53,19 +54,14 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
 
         void CreateCleanupTypeItemControl(CleanerItemUIInfo cleanupTypeItem)
         {
-            using (var newControl = new CleanupItemUserControl() { Dock = DockStyle.Top, AutoSize = false, })
+            var newControl = new CleanupItemUserControl()
             {
-                newControl.Init((CodeCleanerType)cleanupTypeItem.CleanerType);
-                AllControls.Add(newControl);
-            }
-            //var newControl = new CleanupItemUserControl()
-            //{
-            //    Dock = DockStyle.Top,
-            //    AutoSize = false,
-            //};
+                Dock = DockStyle.Top,
+                AutoSize = false,
+            };
 
-            //newControl.Init((CodeCleanerType)cleanupTypeItem.CleanerType);
-            //AllControls.Add(newControl);
+            newControl.Init((CodeCleanerType)cleanupTypeItem.CleanerType);
+            AllControls.Add(newControl);
         }
 
         void DeserializeValues(string strValue)
@@ -86,8 +82,8 @@ namespace Geeks.GeeksProductivityTools.Menus.Cleanup.CommandsHandlers.Infra
 
                     var selectedControls = controls.FirstOrDefault(c => c.MainCleanupItemType == cleanUpType);
 
-                    selectedControls.SetMainItemCheckState(isSelected);
-                    selectedControls.SetItemsCheckState(int.Parse(choiceItem[2]), true);
+                    selectedControls?.SetMainItemCheckState(isSelected);
+                    selectedControls?.SetItemsCheckState(int.Parse(choiceItem[2]), true);
                 }
             }
             catch
